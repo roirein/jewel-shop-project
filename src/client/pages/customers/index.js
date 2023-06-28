@@ -1,8 +1,12 @@
+import PageLayout from "./components/PageLayout"
+
 const CustomerPage = () => {
     return (
-        <h1>
-            Customer
-        </h1>
+        <PageLayout>
+            <h1>
+                customers
+            </h1>
+        </PageLayout>
     )
 }
 

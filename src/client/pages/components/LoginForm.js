@@ -11,13 +11,15 @@ import ButtonComponent from "../../components/UI/ButtonComponent";
 import FormCheckboxComponent from "../../components/UI/Form/Inputs/FormCheckboxComponent";
 import axios from 'axios';
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import ErrorLabelComponent from "../../components/UI/Form/Labels/ErrorLabelComponent";
+import AppContext from "../../components/context/AppContext";
 
 const LoginFormComponent = (props) => {
 
     const intl = useIntl();
     const router = useRouter()
+    const contextValue = useContext(AppContext)
 
     const loginValidationSchema = yup.object().shape({
         email: yup.string().email(intl.formatMessage(formMessages.emailError)).required(intl.formatMessage(formMessages.emptyFieldError)),
@@ -37,6 +39,7 @@ const LoginFormComponent = (props) => {
                 password: data.password
             })
             if (response.status === 200) {
+                contextValue.onLogin(response.data.token, response.data.username, response.data.permissionLevel, response.data.id)
                 router.push('/customers')
             }
         } catch(e) {

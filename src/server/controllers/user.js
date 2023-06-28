@@ -28,9 +28,9 @@ const loginUser = async (req, res ,next) => {
         user.token = token
         await user.save()
         res.status(200).send({
+            id: user.dataValues.userId,
             token,
-            firstName: user.dataValues.firstName,
-            lastName: user.dataValues.lastName,
+            username: `${user.dataValues.firstName} ${user.dataValues.lastName}`,
             permissionLevel: user.dataValues.permissionLevel
         })
     } catch (e) {

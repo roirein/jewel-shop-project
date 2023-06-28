@@ -104,3 +104,26 @@ export const buttonMessages = defineMessages({
         defineMessages: 'login'
     }
 })
+
+export const tabsMessages = {
+    customers: {
+        id: 'customers',
+        defaultMessage: 'customers'
+    },
+    employess: {
+        id: 'employees',
+        defaultMessage: 'employees'
+    },
+    orders: {
+        id: 'orders',
+        defaultMessage: 'orders'
+    },
+    models: {
+        id: 'models',
+        defaultMessage:'models'
+    },
+    requests: {
+        id: 'requests',
+        defaultMessage: 'requests'
+    }
+}

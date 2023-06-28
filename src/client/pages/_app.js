@@ -3,14 +3,17 @@ import theme from '../components/application/AppTheme';
 import AppTemplate from "../components/application/AppTemplate";
 import { IntlProvider } from "react-intl";
 import messages from '../translations/locales/he.json'
+import ContextProvider from "../components/context/ContextProvider";
 
 const MyApp = ({Component, pageProps}) => {
     return (
         <ThemeProvider theme={theme}>
             <IntlProvider messages={messages}>
-                <AppTemplate>
-                    <Component {...pageProps}/>
-                </AppTemplate>
+                <ContextProvider>
+                    <AppTemplate>
+                        <Component {...pageProps}/>
+                    </AppTemplate>
+                </ContextProvider>
             </IntlProvider>
         </ThemeProvider>
     )
