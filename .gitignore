@@ -1,0 +1,4 @@
+.env
+src/client/.next
+src/server/images
+node_modules

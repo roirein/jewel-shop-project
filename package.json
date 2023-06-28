@@ -1,0 +1,43 @@
+{
+  "name": "almaz-jewellery",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "db": "node src/server/database/db.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@hookform/resolvers": "^3.1.1",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.13.6",
+    "axios": "^1.4.0",
+    "bcrypt": "^5.1.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
+    "next": "^13.4.7",
+    "pg": "^8.11.1",
+    "pg-hstore": "^2.3.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.45.0",
+    "react-intl": "^6.4.4",
+    "sequelize": "^6.32.1",
+    "sequelize-cli": "^6.6.1",
+    "socket.io": "^4.7.0",
+    "socket.io-client": "^4.7.0",
+    "validator": "^13.9.0",
+    "yup": "^1.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1",
+    "morgan": "^1.10.0"
+  }
+}
