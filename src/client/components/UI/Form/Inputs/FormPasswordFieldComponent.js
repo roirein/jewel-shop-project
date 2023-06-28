@@ -44,6 +44,11 @@ const FormPasswordFieldComponent = (props) => {
                                 </IconButton>
                             )
                         }}
+                        onBlur={() => {
+                            if (props.onBlur) {
+                                props.onBlur()
+                            }
+                        }}
                     />
                 </Stack>
             )}  

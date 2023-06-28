@@ -4,6 +4,7 @@ import { useContext, useState, useEffect } from 'react';
 import AppContext from '../context/AppContext';
 import { MANAGER_TABS } from '../../const/TabDefinitions';
 import TemplateTabsComponent from './TemplateTabs';
+import NotificationComponent from '../UI/NotificationComponent';
 
 
 const AppTemplate = (props) => {
@@ -62,6 +63,14 @@ const AppTemplate = (props) => {
                 )}
             </CenteredStack>
             {props.children}
+            <NotificationComponent
+                open={contextValue.showNotification}
+                onClose={() => {
+                    contextValue.setShowNotification(false)
+                    contextValue.setNotificationMessage('')
+                }}
+                message={contextValue.notificationMessage}
+            />
         </Box>
     )
 }

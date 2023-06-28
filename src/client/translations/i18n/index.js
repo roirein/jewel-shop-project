@@ -91,6 +91,22 @@ export const homePageMessages = defineMessages({
     loginError: {
         id: 'loginError',
         defaultMessage: 'Email or password are incorrect'
+    },
+    userExistError: {
+        id: 'userExistError',
+        defaultMessage: 'User with email, phone number or businessId above already exist'
+    },
+    registerError: {
+        id: 'registerError',
+        defaultMessage: 'password does not match the confirmation'
+    },
+    thanksForRegister: {
+        id: 'thanksForRegister',
+        defaultMessage: 'thank you for your registration'
+    },
+    registerMessage: {
+        id: 'registerMessage',
+        defaultMessage: 'your request sent to the manager and you will recive an email when approved'
     }
 })
 
@@ -102,6 +118,10 @@ export const buttonMessages = defineMessages({
     login: {
         id: 'login',
         defineMessages: 'login'
+    },
+    register: {
+        id: 'register',
+        defaultMessage: 'register'
     }
 })
 
@@ -127,3 +147,10 @@ export const tabsMessages = {
         defaultMessage: 'requests'
     }
 }
+
+export const notificationMessages = defineMessages({
+    joinRequest: {
+        id: 'joinRequest',
+        defaultMessage: 'joining request from {name}'
+    }
+})

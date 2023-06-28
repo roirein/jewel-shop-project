@@ -7,7 +7,11 @@ const contextValue = {
     permissionLevel: 0,
     socket: null,
     onLogin: () => {},
-    onLogout: () => {}
+    onLogout: () => {},
+    showNotification: false,
+    setShowNotification: () => {},
+    notificationMessage: '',
+    setNotificationMessage: () => {}
 }
 
 const AppContext = createContext(contextValue)

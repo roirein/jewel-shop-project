@@ -45,7 +45,9 @@ const HomePage = () => {
                     />
                 )}
                 {authOption === AUTH_OPTIONS.REGISTER && (
-                    <RegisterFormComponent/>
+                    <RegisterFormComponent 
+                        onSwitchToLogin={() => setAuthOption(AUTH_OPTIONS.LOGIN)}
+                    />
                 )}
             </CenteredStack>
         </CenteredStack>

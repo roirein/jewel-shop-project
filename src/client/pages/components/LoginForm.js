@@ -73,10 +73,12 @@ const LoginFormComponent = (props) => {
                             name="email"
                             type="text"
                             fieldLabel={intl.formatMessage(formMessages.email)}
+                            onBlur={() => setLoginError(null)}
                         />
                         <FormPasswordFieldComponent
                             name="password"
                             fieldLabel={intl.formatMessage(formMessages.password)}
+                            onBlur={() => setLoginError(null)}
                         />
                         <Stack
                             width="100%"
@@ -134,9 +136,11 @@ const LoginFormComponent = (props) => {
                             </Stack>
                         </Stack>
                         {loginError && (
-                            <ErrorLabelComponent
-                                label={loginError}
-                            />
+                            <CenteredStack>
+                                <ErrorLabelComponent
+                                    label={loginError}
+                                />
+                            </CenteredStack>
                         )}
                     </Stack>
                 </form>

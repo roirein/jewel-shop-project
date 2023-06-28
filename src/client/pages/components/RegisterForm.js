@@ -8,8 +8,10 @@ import * as yup from "yup";
 import FormTextFieldComponent from "../../components/UI/Form/Inputs/FormTextFieldComponent";
 import FormPasswordFieldComponent from "../../components/UI/Form/Inputs/FormPasswordFieldComponent";
 import ButtonComponent from "../../components/UI/ButtonComponent";
+import axios from "axios";
+import { useState } from "react";
 
-const RegisterFormComponent = () => {
+const RegisterFormComponent = (props) => {
 
     const intl = useIntl();
 
@@ -31,123 +33,185 @@ const RegisterFormComponent = () => {
         resolver: yupResolver(registerValidationSchema)
     });
 
-    const onSubmit = (data) => {
-        console.log(data)
+    const [isRegisterSuccessful, setIsRegisterSuccessful] = useState(false);
+    const [registerError, setRegisterError] = useState(null)
+
+    const onSubmit = async (data) => {
+        try {
+            const response = await axios.post('http://localhost:3002/user/register', data)
+            if (response.status === 201) {
+                setIsRegisterSuccessful(true)
+            }
+        } catch (e) {
+            if (e.message === 'password-confirm-error') {
+                setRegisterError(intl.formatMessage(homePageMessages.registerError))
+            }
+            if (e.message === 'user-exist-error') {
+                setRegisterError(intl.formatMessage(homePageMessages.userExistError))
+            }
+        }
     }
 
     return (
-        <CenteredStack
-            width='100%'
-        >
-            <Typography
-                variant="h4"
-                fontWeight="bold"
-            >
-                {intl.formatMessage(homePageMessages.register)}
-            </Typography>
-            <FormProvider {...methods}>
-                <form
-                    onSubmit={methods.handleSubmit(onSubmit)}
-                    style={{
-                        width: '100%'
-                    }}
+        <>
+            {!isRegisterSuccessful && (
+                <CenteredStack
+                    width='100%'
                 >
-                    <Stack
-                        width="100%"
-                        rowGap={theme.spacing(3)}
+                    <Typography
+                        variant="h4"
+                        fontWeight="bold"
                     >
-                        <FormTextFieldComponent
-                            name="email"
-                            type="text"
-                            fieldLabel={intl.formatMessage(formMessages.email)}
-                        />
-                        <Stack
-                            width='100%'
-                            direction="row"
-                            columnGap={theme.spacing(3)}
-                        >
-                            <FormTextFieldComponent
-                                name="firstName"
-                                type="text"
-                                fieldLabel={intl.formatMessage(formMessages.firstName)}
-                            />
-                            <FormTextFieldComponent
-                                name="lastName"
-                                type="text"
-                                fieldLabel={intl.formatMessage(formMessages.lastName)}
-                            />
-                        </Stack>
-                        <Stack
-                            width='100%'
-                            direction="row"
-                            columnGap={theme.spacing(3)}
-                        >
-                            <FormTextFieldComponent
-                                name="businessName"
-                                type="text"
-                                fieldLabel={intl.formatMessage(formMessages.businessName)}
-                            />
-                            <FormTextFieldComponent
-                                name="businessId"
-                                type="text"
-                                fieldLabel={intl.formatMessage(formMessages.businessId)}
-                            />
-                        </Stack>
-                        <Stack
-                            width='100%'
-                            direction="row"
-                            columnGap={theme.spacing(3)}
-                        >
-                            <FormTextFieldComponent
-                                name="phoneNumber"
-                                type="text"
-                                fieldLabel={intl.formatMessage(formMessages.phoneNumber)}
-                            />
-                            <FormTextFieldComponent
-                                name="businessPhoneNumber"
-                                type="text"
-                                fieldLabel={intl.formatMessage(formMessages.businessPhoneNumber)}
-                            />
-                        </Stack>
-                        <FormPasswordFieldComponent
-                            name="password"
-                            fieldLabel={intl.formatMessage(formMessages.password)}
-                        />
-                        <FormPasswordFieldComponent
-                            name="confirmPassword"
-                            fieldLabel={intl.formatMessage(formMessages.confirmPassword)}
-                        />
-                        <Stack
-                            width="50%"
-                            sx={{
-                                margin: '0 auto'
+                        {intl.formatMessage(homePageMessages.register)}
+                    </Typography>
+                    <FormProvider {...methods}>
+                        <form
+                            onSubmit={methods.handleSubmit(onSubmit)}
+                            style={{
+                                width: '100%'
                             }}
                         >
-                            <ButtonComponent
-                                type="submit"
-                                onClick={() => {}}
-                                label={intl.formatMessage(buttonMessages.login)}
-                            />
-                        </Stack>
-                        <Stack
-                            width="100%"
-                            direction="row"
-                            alignItems="baseline"
-                        >
-                            <Link
-                                variant="caption"
-                                underline="none"
-                                color="primary"
-                                href="#"
-                                onClick={() => props.onSwitchToLogin()}
+                            <Stack
+                                width="100%"
+                                rowGap={theme.spacing(3)}
                             >
-                                {intl.formatMessage(homePageMessages.toLogin)}
-                            </Link>
-                        </Stack>
-                    </Stack>
-                </form>
-            </FormProvider>
-        </CenteredStack>
+                                <FormTextFieldComponent
+                                    name="email"
+                                    type="text"
+                                    fieldLabel={intl.formatMessage(formMessages.email)}
+                                    onBlur={() => setRegisterError(null)}
+                                />
+                                <Stack
+                                    width='100%'
+                                    direction="row"
+                                    columnGap={theme.spacing(3)}
+                                >
+                                    <FormTextFieldComponent
+                                        name="firstName"
+                                        type="text"
+                                        fieldLabel={intl.formatMessage(formMessages.firstName)}
+                                        onBlur={() => setRegisterError(null)}
+                                    />
+                                    <FormTextFieldComponent
+                                        name="lastName"
+                                        type="text"
+                                        fieldLabel={intl.formatMessage(formMessages.lastName)}
+                                        onBlur={() => setRegisterError(null)}
+                                    />
+                                </Stack>
+                                <Stack
+                                    width='100%'
+                                    direction="row"
+                                    columnGap={theme.spacing(3)}
+                                >
+                                    <FormTextFieldComponent
+                                        name="businessName"
+                                        type="text"
+                                        fieldLabel={intl.formatMessage(formMessages.businessName)}
+                                        onBlur={() => setRegisterError(null)}
+                                    />
+                                    <FormTextFieldComponent
+                                        name="businessId"
+                                        type="text"
+                                        fieldLabel={intl.formatMessage(formMessages.businessId)}
+                                        onBlur={() => setRegisterError(null)}
+                                    />
+                                </Stack>
+                                <Stack
+                                    width='100%'
+                                    direction="row"
+                                    columnGap={theme.spacing(3)}
+                                >
+                                    <FormTextFieldComponent
+                                        name="phoneNumber"
+                                        type="text"
+                                        fieldLabel={intl.formatMessage(formMessages.phoneNumber)}
+                                        onBlur={() => setRegisterError(null)}
+                                    />
+                                    <FormTextFieldComponent
+                                        name="businessPhoneNumber"
+                                        type="text"
+                                        fieldLabel={intl.formatMessage(formMessages.businessPhoneNumber)}
+                                        onBlur={() => setRegisterError(null)}
+                                    />
+                                </Stack>
+                                <FormPasswordFieldComponent
+                                    name="password"
+                                    fieldLabel={intl.formatMessage(formMessages.password)}
+                                    onBlur={() => setRegisterError(null)}
+                                />
+                                <FormPasswordFieldComponent
+                                    name="confirmPassword"
+                                    fieldLabel={intl.formatMessage(formMessages.confirmPassword)}
+                                    onBlur={() => setRegisterError(null)}
+                                />
+                                <Stack
+                                    width="50%"
+                                    sx={{
+                                        margin: '0 auto'
+                                    }}
+                                >
+                                    <ButtonComponent
+                                        type="submit"
+                                        onClick={() => {}}
+                                        label={intl.formatMessage(buttonMessages.register)}
+                                    />
+                                </Stack>
+                                <Stack
+                                    width="100%"
+                                    direction="row"
+                                    alignItems="baseline"
+                                >
+                                    <Link
+                                        variant="caption"
+                                        underline="none"
+                                        color="primary"
+                                        href="#"
+                                        onClick={() => props.onSwitchToLogin()}
+                                    >
+                                        {intl.formatMessage(homePageMessages.toLogin)}
+                                    </Link>
+                                </Stack>
+                                {registerError && (
+                                    <CenteredStack>
+                                        <ErrorLabelComponent
+                                            label={loginError}
+                                        />
+                                    </CenteredStack>
+                                )}
+                            </Stack>
+                        </form>
+                    </FormProvider>
+                </CenteredStack>
+            )}
+            {isRegisterSuccessful && (
+                <CenteredStack
+                    rowsGap={theme.spacing(3)}
+                >
+                    <Typography
+                        variant="h3"
+                        fontWeight="bold"
+                    >
+                        {intl.formatMessage(homePageMessages.thanksForRegister)}
+                    </Typography>
+                    <Typography
+                        variant="body1"
+                        fontWeight="bold"
+                    >
+                        {intl.formatMessage(homePageMessages.registerMessage)}
+                    </Typography> 
+                    <Link
+                        variant="body2"
+                        underline="none"
+                        color="primary"
+                        href="#"
+                        onClick={() => props.onSwitchToLogin()}
+                    >
+                        {intl.formatMessage(homePageMessages.toLogin)}
+                    </Link>              
+                </CenteredStack>
+            )}
+        </>
     )
 }
 

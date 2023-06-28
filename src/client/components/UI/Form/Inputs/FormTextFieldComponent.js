@@ -29,6 +29,11 @@ const FormTextFieldComponent = (props) => {
                                 label={errors[props.name].message}
                             />
                         ): ''}
+                        onBlur={() => {
+                            if (props.onBlur) {
+                                props.onBlur()
+                            }
+                        }}
                     />
                 </Stack>
             )}
