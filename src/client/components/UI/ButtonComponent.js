@@ -17,6 +17,7 @@ const ButtonComponent = (props) => {
                     backgroundColor: ''
                 }
             }}
+            disabled={props.disabled || false}
         >
             <Typography
                 variant="button"

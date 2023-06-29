@@ -34,7 +34,7 @@ Request.beforeCreate((request) => {
     request.requestId = uuidv4();
 })
 
-Customer.hasOne(Request, {foreignKey: 'customerId'})
+Customer.hasOne(Request, {foreignKey: 'customerId', onDelete: 'CASCADE'})
 Request.belongsTo(Customer, {foreignKey: 'customerId'})
 
 module.exports = Request

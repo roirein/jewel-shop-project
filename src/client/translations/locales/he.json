@@ -43,5 +43,7 @@
     "contactDetails": "פרטי התקשרות",
     "approve": "אשר",
     "reject": "דחה",
-    "close": "סגור"
+    "close": "סגור",
+    "joinDate": "תאריך הצטרפות",
+    "removeCustomer": "הסר לקוח"
 }

@@ -18,11 +18,11 @@ const nextApp = next({dev, dir: path.join(__dirname, 'client')});
 const handle = nextApp.getRequestHandler();
 const port = process.env.PORT
 
-// sequelize.sync({force: true}).then(() => {
-//     createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
-//         createNewEmployee(user.userId, false)
-//     })
-// })
+sequelize.sync({force: true}).then(() => {
+    createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
+        createNewEmployee(user.userId, false)
+    })
+})
 
 nextApp.prepare().then(() => {
 

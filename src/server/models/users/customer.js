@@ -35,7 +35,7 @@ Customer.init({
     modelName: 'Customers'
 })
 
-User.hasOne(Customer, {foreignKey: 'userId'});
+User.hasOne(Customer, {foreignKey: 'userId', onDelete: 'CASCADE'});
 Customer.belongsTo(User, {foreignKey: 'userId'});
 
 module.exports = Customer

@@ -30,7 +30,35 @@ const getNewCustomersRequests = async (req, res, next) => {
 
 const getCustomers = async (req, res, next) => {
     try {
+        const custmoresData = await Customer.findAll({
+            include: [
+                {
+                    model: User,
+                    attributes: ['firstName', 'lastName', 'email', 'phoneNumber']
+                },
+                {
+                    model: Request,
+                    where: {
+                        status: 1
+                    },
+                    attributes: ['updatedAt']
+                }
+            ]
+        })
 
+        const customers = custmoresData.map((customer) => {
+            return {
+                id: customer.userId,
+                name: `${customer.User.firstName} ${customer.User.lastName}`,
+                email: customer.User.email,
+                phoneNumber: customer.User.phoneNumber,
+                businessName: customer.businessName,
+                businessPhone: customer.businessPhoneNumber,
+                joined: new Date(customer.Request.updatedAt).toLocaleDateString('he-IL')
+            }
+        })
+
+        res.status(200).send({customers})
     } catch (e) {
         next (e)
     }
@@ -65,7 +93,12 @@ const getCustomerById = async (req, res, next) => {
 
 const deleteCustomer = async (req, res, next) => {
     try {
-
+        await User.destroy({
+            where: {
+                userId: req.params.customerId
+            }
+        })
+        res.status(200).send()
     } catch (e) {
         next(e)
     }
@@ -73,5 +106,7 @@ const deleteCustomer = async (req, res, next) => {
 
 module.exports = {
     getNewCustomersRequests,
-    getCustomerById
+    getCustomerById,
+    getCustomers,
+    deleteCustomer
 }

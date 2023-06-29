@@ -212,4 +212,12 @@ export const customerPageMessages = defineMessages({
         id: 'businessName',
         defaultMessage: 'business name'
     },
+    joinDate: {
+        id: 'joinDate',
+        defaultMessage: 'joining date'
+    },
+    removeCustomer: {
+        id: 'removeCustomer',
+        defaultMessage: 'remove customer'
+    }
 })
