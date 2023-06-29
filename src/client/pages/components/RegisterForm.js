@@ -7,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import FormTextFieldComponent from "../../components/UI/Form/Inputs/FormTextFieldComponent";
 import FormPasswordFieldComponent from "../../components/UI/Form/Inputs/FormPasswordFieldComponent";
+import ErrorLabelComponent from "../../components/UI/Form/Labels/ErrorLabelComponent";
 import ButtonComponent from "../../components/UI/ButtonComponent";
 import axios from "axios";
 import { useState } from "react";
@@ -43,10 +44,10 @@ const RegisterFormComponent = (props) => {
                 setIsRegisterSuccessful(true)
             }
         } catch (e) {
-            if (e.message === 'password-confirm-error') {
+            if (e.response.status === 400) {
                 setRegisterError(intl.formatMessage(homePageMessages.registerError))
             }
-            if (e.message === 'user-exist-error') {
+            if (e.response.status === 409) {
                 setRegisterError(intl.formatMessage(homePageMessages.userExistError))
             }
         }
@@ -175,7 +176,7 @@ const RegisterFormComponent = (props) => {
                                 {registerError && (
                                     <CenteredStack>
                                         <ErrorLabelComponent
-                                            label={loginError}
+                                            label={registerError}
                                         />
                                     </CenteredStack>
                                 )}
@@ -186,7 +187,7 @@ const RegisterFormComponent = (props) => {
             )}
             {isRegisterSuccessful && (
                 <CenteredStack
-                    rowsGap={theme.spacing(3)}
+                    rowGap={theme.spacing(3)}
                 >
                     <Typography
                         variant="h3"

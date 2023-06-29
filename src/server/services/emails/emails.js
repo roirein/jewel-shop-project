@@ -21,6 +21,26 @@ const sendRequestApproveMail = (username, recipient) => {
     })
 }
 
+const sendPasswordMail = (username, recipient, password) => {
+
+    const template = fs.readFileSync(path.join(__dirname, '/passwordTemplate.hbs'), 'utf8')
+    const htmlContent = handlebars.compile(template);
+
+    const mailContent = htmlContent({
+        subject: 'סיסמה זמנית',
+        name: username,
+        password
+    })
+
+    mailer.sendMail({
+        from: process.env.EMAIL_USER,
+        to: recipient,
+        subject: 'סיסמה זמנית',
+        html: mailContent
+    })
+}
+
 module.exports = {
-    sendRequestApproveMail
+    sendRequestApproveMail,
+    sendPasswordMail
 }

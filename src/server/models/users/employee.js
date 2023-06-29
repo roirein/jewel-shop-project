@@ -17,17 +17,16 @@ Employee.init({
         defaultValue: true,
         allowNull: false
     },
-    field: {
-        type: DataTypes.STRING,
-        allowNull: true
+    role: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
-    timestamps: false,
     sequelize,
     modelName: 'Employees'
 })
 
-User.hasOne(Employee, {foreignKey: 'userId'})
+User.hasOne(Employee, {foreignKey: 'userId', onDelete: 'CASCADE'})
 Employee.belongsTo(User, {foreignKey: 'userId'})
 
 module.exports = Employee

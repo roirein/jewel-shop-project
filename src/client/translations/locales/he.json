@@ -45,5 +45,15 @@
     "reject": "דחה",
     "close": "סגור",
     "joinDate": "תאריך הצטרפות",
-    "removeCustomer": "הסר לקוח"
+    "removeCustomer": "הסר לקוח",
+    "addNewEmployee": "הוסף עובד חדש",
+    "employeeName": "שם העובד",
+    "role": "תפקיד",
+    "manager": "מנהל",
+    "designManager": "מנהל עיצוב",
+    "productionManager": "מנהל ייצור",
+    "jeweller": "צורף",
+    "setter": "משבץ",
+    "send": "שלח",
+    "removeEmployee": "הסר עובד"
 }

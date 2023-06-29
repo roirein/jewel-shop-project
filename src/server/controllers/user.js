@@ -27,7 +27,7 @@ const registerNewUser = async (req, res, next) => {
         })
 
         if (user || customer) {
-            throw new Error('user-exist-error', 409)
+            throw new HttpError('user-exist-error', 409)
         }
 
         const newUser = await createNewUser(req.body.firstName, req.body.lastName, req.body.email, req.body.password, req.body.phoneNumber, 5);

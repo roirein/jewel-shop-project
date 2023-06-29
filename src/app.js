@@ -11,7 +11,8 @@ const {initSocket} = require('./server/services/sockets/socket');
 const { createNewUser, createNewEmployee } = require('./server/utils/user');
 
 const userRoute = require('./server/routes/users');
-const customerRoute = require('./server/routes/customers')
+const customerRoute = require('./server/routes/customers');
+const employeeRoute = require('./server/routes/employees')
 
 const dev = process.env.NODE_ENV !== 'production';
 const nextApp = next({dev, dir: path.join(__dirname, 'client')});
@@ -20,7 +21,7 @@ const port = process.env.PORT
 
 sequelize.sync({force: true}).then(() => {
     createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
-        createNewEmployee(user.userId, false)
+        createNewEmployee(user.userId, false, 1)
     })
 })
 
@@ -38,9 +39,10 @@ nextApp.prepare().then(() => {
 
     app.use('/user', userRoute);
     app.use('/customer', customerRoute)
+    app.use('/employee', employeeRoute)
 
     app.use((err, req, res, next) => {
-        console.log(err)
+        console.log(err.status)
         res.status(err.status || 500).send(err.message)
     })
 

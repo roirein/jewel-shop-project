@@ -138,6 +138,10 @@ export const buttonMessages = defineMessages({
     reject: {
         id: 'reject',
         defaultMessage: 'reject'
+    },
+    send: {
+        id: 'send',
+        defaultMessage: 'send'
     }
 })
 
@@ -219,5 +223,44 @@ export const customerPageMessages = defineMessages({
     removeCustomer: {
         id: 'removeCustomer',
         defaultMessage: 'remove customer'
+    }
+})
+
+export const employeesPageMessages = defineMessages({
+    addNewEmployee: {
+        id: 'addNewEmployee',
+        defaultMessage: 'add new employee'
+    },
+    employeeName: {
+        id: 'employeeName',
+        defaultMessage: 'employee name'
+    },
+    role: {
+        id: 'role',
+        defaultMessage: 'role'
+    },
+    manager: {
+        id: 'manager',
+        defaultMessage: "manager"
+    },
+    designManager: {
+        id: 'designManager',
+        defaultMessage: 'design manager'
+    }, 
+    productionManager: {
+        id: 'productionManager',
+        defaultMessage: 'production manager'
+    },
+    jeweller: {
+        id: 'jeweller',
+        defaultMessage: 'jeweller'
+    },
+    setter: {
+        id: 'setter',
+        defaultMessage: 'setter'
+    },
+    removeEmployee: {
+        id: 'removeEmployee',
+        defaultMessage: 'remobe employee'
     }
 })

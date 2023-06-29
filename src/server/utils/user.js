@@ -26,18 +26,49 @@ const createNewCustomer = async (userId, businessName, businessId, businessPhone
     return customer
 }
 
-const createNewEmployee = async (userId, replacePassword, field = null) => {
+const createNewEmployee = async (userId, replacePassword, role) => {
     const employee = await Employee.create({
         userId,
         shouldReplacePassword: replacePassword,
-        field
+        role
     })
 
     return employee
 }
 
+
+const genertaePassword = () => {
+    const uppers = 'abcdefghijklmnopqrstuvwxyz';
+    const lowers = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '01234567890';
+    const specials = '@#$*';
+
+    const charsets = [uppers, lowers, numbers, specials];
+    const shuffled = [...charsets];
+
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    let password = ''
+
+    for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < shuffled.length; j++) {
+            const index = Math.floor(Math.random() * shuffled[j].length);
+            const char = shuffled[j].charAt(index);
+            password += char
+        }
+    }
+
+
+    return password;
+
+}
+
 module.exports = {
     createNewUser,
     createNewCustomer,
-    createNewEmployee
+    createNewEmployee,
+    genertaePassword
 }
