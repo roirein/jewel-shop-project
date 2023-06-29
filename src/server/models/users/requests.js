@@ -26,7 +26,6 @@ Request.init({
         allowNull: false
     }
 }, {
-    timestamps: false,
     sequelize,
     modelName: 'Requests'
 })

@@ -13,7 +13,7 @@ import axios from 'axios';
 import { useRouter } from "next/router";
 import { useState, useContext } from "react";
 import ErrorLabelComponent from "../../components/UI/Form/Labels/ErrorLabelComponent";
-import AppContext from "../../components/context/AppContext";
+import AppContext from "../../context/AppContext";
 
 const LoginFormComponent = (props) => {
 

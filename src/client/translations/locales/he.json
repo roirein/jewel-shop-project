@@ -32,5 +32,16 @@
     "registerError": "הסיסמה אינה תואמת את האימות",
     "thanksForRegister": "תודה לך על הרשמתך",
     "registerMessage": "בקשת ההצטרפות שלך נשלחה למנהל וברגע שהיא תאושר תעודכן על כך במייל",
-    "joinRequest": "בקשת הצטרפות חדשה מ{name}"
+    "joinRequest": "בקשת הצטרפות חדשה מ{name}",
+    "customerName": "שם לקוח",
+    "requestStatus": "סטאטוס בקשה",
+    "name": "{name}",
+    "pending": "ממתין",
+    "approved": "אושר",
+    "rejected": "נדחה",
+    "showMore": "הצג עוד",
+    "contactDetails": "פרטי התקשרות",
+    "approve": "אשר",
+    "reject": "דחה",
+    "close": "סגור"
 }

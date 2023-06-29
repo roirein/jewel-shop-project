@@ -1,7 +1,7 @@
 import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab} from '@mui/material';
 import CenteredStack from '../UI/CenteredStack';
 import { useContext, useState, useEffect } from 'react';
-import AppContext from '../context/AppContext';
+import AppContext from '../../context/AppContext';
 import { MANAGER_TABS } from '../../const/TabDefinitions';
 import TemplateTabsComponent from './TemplateTabs';
 import NotificationComponent from '../UI/NotificationComponent';

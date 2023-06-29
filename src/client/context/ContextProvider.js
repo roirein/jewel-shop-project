@@ -2,7 +2,7 @@ import AppContext from "./AppContext"
 import {useState, useEffect} from "react"
 import { useIntl } from "react-intl";
 import io from 'socket.io-client';
-import { notificationMessages } from "../../translations/i18n";
+import { notificationMessages } from "../translations/i18n";
 
 const ContextProvider = (props) => {
 
@@ -38,11 +38,11 @@ const ContextProvider = (props) => {
             username: name
         }
 
-        document.cookie = JSON.stringify(values)
+        document.cookie = `userData=${JSON.stringify(values)}`
     }
 
     const onLogin = (userToken, name, userPermissionLevel, id) => {
-        setToken(`Bearer ${userToken}`),
+        setToken(userToken),
         setUserName(name)
         setPermissionLevel(userPermissionLevel);
         setUserId(id)

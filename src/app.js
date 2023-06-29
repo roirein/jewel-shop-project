@@ -11,17 +11,18 @@ const {initSocket} = require('./server/services/sockets/socket');
 const { createNewUser, createNewEmployee } = require('./server/utils/user');
 
 const userRoute = require('./server/routes/users');
+const customerRoute = require('./server/routes/customers')
 
 const dev = process.env.NODE_ENV !== 'production';
 const nextApp = next({dev, dir: path.join(__dirname, 'client')});
 const handle = nextApp.getRequestHandler();
 const port = process.env.PORT
 
-sequelize.sync({force: true}).then(() => {
-    createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
-        createNewEmployee(user.userId, false)
-    })
-})
+// sequelize.sync({force: true}).then(() => {
+//     createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
+//         createNewEmployee(user.userId, false)
+//     })
+// })
 
 nextApp.prepare().then(() => {
 
@@ -36,6 +37,7 @@ nextApp.prepare().then(() => {
     app.use(cors());
 
     app.use('/user', userRoute);
+    app.use('/customer', customerRoute)
 
     app.use((err, req, res, next) => {
         console.log(err)

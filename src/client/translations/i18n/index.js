@@ -122,6 +122,22 @@ export const buttonMessages = defineMessages({
     register: {
         id: 'register',
         defaultMessage: 'register'
+    },
+    showMore: {
+        id: 'showMore',
+        defaultMessage: 'showMore'
+    }, 
+    close: {
+        id: 'close',
+        defaultMessage: 'close'
+    },
+    approve: {
+        id: 'approve',
+        defaultMessage: 'approve'
+    },
+    reject: {
+        id: 'reject',
+        defaultMessage: 'reject'
     }
 })
 
@@ -153,4 +169,47 @@ export const notificationMessages = defineMessages({
         id: 'joinRequest',
         defaultMessage: 'joining request from {name}'
     }
+})
+
+export const customerPageMessages = defineMessages({
+    customerName: {
+        id: 'customerName',
+        defaultMessage: 'customer name'
+    },
+    requestStatus: {
+        id: 'requestStatus',
+        defaultMessage: 'request status'
+    },
+    pending: {
+        id: 'pending',
+        defaultMessage: 'pending'
+    },
+    approved: {
+        id: 'approved',
+        defaultMessage: 'approved'
+    },
+    rejeceted: {
+        id: 'rejected',
+        defaultMessage: 'rejected'
+    },
+    contactDetails: {
+        id: 'contactDetails',
+        defaultMessage: 'contact details'
+    },
+    email: {
+        id: 'email',
+        defaultMessage: 'email'
+    },
+    phoneNumber: {
+        id: 'phoneNumber',
+        defaultMessage: 'phone number'
+    },
+    businessPhoneNumber: {
+        id: 'businessPhoneNumber',
+        defaultMessage: 'business phone number'
+    },
+    businessName: {
+        id: 'businessName',
+        defaultMessage: 'business name'
+    },
 })
