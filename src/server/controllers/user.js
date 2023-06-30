@@ -36,7 +36,7 @@ const registerNewUser = async (req, res, next) => {
         const newUser = await createNewUser(req.body.firstName, req.body.lastName, req.body.email, req.body.password, req.body.phoneNumber, 5);
         await createNewCustomer(newUser.userId, req.body.businessName, req.body.businessId, req.body.businessPhoneNumber);
         await Request.create({customerId: newUser.userId});
-        await sendNewCustomerNotification(`${req.body.firstName} ${req.body.lastName}`)
+        await sendNewCustomerNotification(`${req.body.firstName} ${req.body.lastName}`, newUser.userId)
         res.status(201).send()
     } catch (e) {
         next(e)
@@ -60,19 +60,19 @@ const loginUser = async (req, res ,next) => {
         const token = await User.generateAuthToken(user.dataValues.userId)
         user.token = token
         await user.save()
-        if (user.permissionLevel === 1) {
+        if (user.permissionLevel === 5) {
             const request = await Request.findOne({
                 where: {
-                    userId: user.userId
+                    customerId: user.dataValues.userId
                 }
             })
-            if (request.dataValues.status !== 1) {
+            if (request.dataValues.status !== 5) {
                 throw new HttpError('user-unapproved', 403)
             }
         } else {
             const employee = await Employee.findOne({
                 where: {
-                    userId: user.userId
+                    userId: user.dataValues.userId
                 }
             })
             if (employee.dataValues.shouldReplacePassword) {

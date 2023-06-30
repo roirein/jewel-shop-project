@@ -1,6 +1,6 @@
 import { createIntl } from "react-intl";
 import messages from '../translations/locales/he.json';
-import { customerPageMessages, employeesPageMessages } from "../translations/i18n";
+import { customerPageMessages, employeesPageMessages, modelsPageMessages } from "../translations/i18n";
 
 const intl = createIntl({
     locale: 'he',
@@ -28,4 +28,13 @@ export const EMPLOYEES_TABLE_COLUMNS = [
     intl.formatMessage(customerPageMessages.email),
     intl.formatMessage(customerPageMessages.phoneNumber),
     intl.formatMessage(customerPageMessages.joinDate)
+]
+
+export const MODELS_TABL_COLUMNS = [
+    intl.formatMessage(modelsPageMessages.modelNumber),
+    intl.formatMessage(modelsPageMessages.item),
+    intl.formatMessage(modelsPageMessages.setting),
+    intl.formatMessage(modelsPageMessages.mainStoneSize),
+    intl.formatMessage(modelsPageMessages.sideStoneSize),
+    intl.formatMessage(modelsPageMessages.status)
 ]

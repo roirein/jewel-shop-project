@@ -40,7 +40,11 @@ const LoginFormComponent = (props) => {
             })
             if (response.status === 200) {
                 contextValue.onLogin(response.data.token, response.data.username, response.data.permissionLevel, response.data.id)
-                router.push('/customers')
+                if (response.data.permissionLevel === 2) {
+                    router.push('/models')
+                } else {
+                    router.push('/customers')
+                }
             }
         } catch(e) {
             if (e.response.status === 403) {

@@ -36,3 +36,14 @@ export const CUSTOMER_TABS = [
         route: '/customers/requests'
     }
 ]
+
+export const DESIGN_MANGER_TABS = [
+    {
+        label: intl.formatMessage(tabsMessages.models),
+        route: '/customers'
+    }, 
+    {
+        label: intl.formatMessage(tabsMessages.orders),
+        route: '/customers/requests'
+    }
+]

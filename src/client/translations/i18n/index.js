@@ -312,3 +312,90 @@ export const employeesPageMessages = defineMessages({
         defaultMessage: 'remobe employee'
     }
 })
+
+export const modelsPageMessages = defineMessages({
+    createNewModel: {
+        id: 'createNewModel',
+        defaultMessage: 'create new model'
+    }, 
+    modelNumber: {
+        id: 'modelNumber',
+        defaultMessage: 'model number',
+    },
+    setting: {
+        id: 'setting',
+        defaultMessage: 'setting'
+    },
+    sideStoneSize: {
+        id: 'sideStoneSize',
+        defaultMessage: 'side stone size'
+    },
+    mainStoneSize: {
+        id: 'mainStoneSize',
+        defaultMessage: 'main stone size'
+    },
+    modelImage: {
+        id: 'modelImage',
+        defaultMessage: 'model image'
+    },
+    item: {
+        id: 'item',
+        defaultMessage: 'item'
+    },
+    ring: {
+        id: 'ring',
+        defaultMessage: 'ring'
+    },
+    earrings: {
+        id: 'earrings',
+        defaultMessage: 'earrings'
+    },
+    pendant: {
+        id: 'pendant',
+        defaultMessage: 'pendant'
+    },
+    bracelet: {
+        id: 'bracelet',
+        defaultMessage: 'bracelet'
+    },
+    title: {
+        id: 'title',
+        defaultMessage: 'title'
+    },
+    description: {
+        id: 'description',
+        defaultMessage: 'description'
+    },
+    status: {
+        id: 'status',
+        defaultMessage: 'status'
+    },
+    approved: {
+        id: 'approved',
+        defaultMessage: 'approved'
+    },
+    rejeceted: {
+        id: 'rejected',
+        defaultMessage: 'rejected'
+    },
+    created: {
+        id: 'created',
+        defaultMessage: 'created'
+    },
+    updated: {
+        id: 'updated',
+        defaultMessage: 'updated'
+    },
+    completed: {
+        id: 'completed',
+        defaultMessage: 'completed'
+    },
+    updatePrice: {
+        id: 'updatePrice',
+        defaultMessage: 'Update material and price'
+    },
+    numberOfModel: {
+        id: 'numberOfModel',
+        defaultMessage: 'model number {number}'
+    }
+})

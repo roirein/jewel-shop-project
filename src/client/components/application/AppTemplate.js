@@ -2,7 +2,7 @@ import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab, Link} from '@mui/materi
 import CenteredStack from '../UI/CenteredStack';
 import { useContext, useState, useEffect } from 'react';
 import AppContext from '../../context/AppContext';
-import { MANAGER_TABS } from '../../const/TabDefinitions';
+import { DESIGN_MANGER_TABS, MANAGER_TABS } from '../../const/TabDefinitions';
 import TemplateTabsComponent from './TemplateTabs';
 import NotificationComponent from '../UI/NotificationComponent';
 import { useIntl } from 'react-intl';
@@ -39,6 +39,15 @@ const AppTemplate = (props) => {
             router.push('/')
         }
 
+    }
+
+    const getTabs = () => {
+        if (contextValue.permissionLevel === 1) {
+            return MANAGER_TABS
+        }
+        if (contextValue.permissionLevel === 2) {
+            return DESIGN_MANGER_TABS
+        }
     }
 
     return (
@@ -94,7 +103,7 @@ const AppTemplate = (props) => {
                 />
                 {contextValue.token && (
                     <TemplateTabsComponent
-                        tabs={MANAGER_TABS}
+                        tabs={getTabs()}
                     />
                 )}
             </CenteredStack>
