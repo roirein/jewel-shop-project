@@ -66,9 +66,17 @@ const genertaePassword = () => {
 
 }
 
+const generateVerificationCode = () => {
+    const min = 100000
+    const max = 999999
+    const randomCode = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randomCode
+}
+
 module.exports = {
     createNewUser,
     createNewCustomer,
     createNewEmployee,
-    genertaePassword
+    genertaePassword,
+    generateVerificationCode
 }

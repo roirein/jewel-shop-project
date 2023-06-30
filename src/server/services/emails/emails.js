@@ -40,7 +40,29 @@ const sendPasswordMail = (username, recipient, password) => {
     })
 }
 
+
+const sendVerificationCodeMail = (username, recipient, code) => {
+
+    const template = fs.readFileSync(path.join(__dirname, '/codeTemplate.hbs'), 'utf8')
+    const htmlContent = handlebars.compile(template);
+
+    const mailContent = htmlContent({
+        subject: 'קוד אימות',
+        name: username,
+        code
+    })
+
+    mailer.sendMail({
+        from: process.env.EMAIL_USER,
+        to: recipient,
+        subject: 'סיסמה זמנית',
+        html: mailContent
+    })
+}
+
+
 module.exports = {
     sendRequestApproveMail,
-    sendPasswordMail
+    sendPasswordMail,
+    sendVerificationCodeMail
 }

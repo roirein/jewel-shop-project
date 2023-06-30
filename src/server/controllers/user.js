@@ -3,9 +3,12 @@ const User = require("../models/users/user")
 const HttpError = require("../utils/HttpError")
 const bcrypt = require('bcrypt');
 const {Op} = require('sequelize');
-const { createNewUser, createNewCustomer } = require("../utils/user");
+const { createNewUser, createNewCustomer, generateVerificationCode } = require("../utils/user");
 const Request = require("../models/users/requests");
 const { sendNewCustomerNotification } = require("../services/sockets/socket");
+const { sendVerificationCodeMail } = require("../services/emails/emails");
+const Codes = require("../models/users/codes");
+const Employee = require("../models/users/employee");
 
 const registerNewUser = async (req, res, next) => {
     try {
@@ -57,6 +60,25 @@ const loginUser = async (req, res ,next) => {
         const token = await User.generateAuthToken(user.dataValues.userId)
         user.token = token
         await user.save()
+        if (user.permissionLevel === 1) {
+            const request = await Request.findOne({
+                where: {
+                    userId: user.userId
+                }
+            })
+            if (request.dataValues.status !== 1) {
+                throw new HttpError('user-unapproved', 403)
+            }
+        } else {
+            const employee = await Employee.findOne({
+                where: {
+                    userId: user.userId
+                }
+            })
+            if (employee.dataValues.shouldReplacePassword) {
+                throw new HttpError('replace-password', 403)
+            }
+        }
         res.status(200).send({
             id: user.dataValues.userId,
             token,
@@ -84,9 +106,77 @@ const logoutUser = async (req, res, next) => {
     }
 }
 
+const sendResetPasswordCode = async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            where: {
+                email: req.body.email
+            }
+        });
+        if (!user) {
+            throw new HttpError('No user found', 404)
+        }
+        const code = generateVerificationCode();
+        await Codes.create({
+            userId: user.dataValues.userId,
+            code,
+            expiryTime: new Date(Date.now() + 300000)
+        })
+        sendVerificationCodeMail(`${user.dataValues.firstName} ${user.dataValues.lastName}`, user.dataValues.email, code);
+        res.status(201).send()
+    } catch (e) {
+        next(e)
+    }
+}
+
+const verifyCode = async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            where: {
+                email: req.body.email
+            },
+            include: Codes
+        })
+        const code = user.Code
+        if (!code) {
+            throw new HttpError('no-code-error', 400)
+        }
+        if (req.body.code !== code.dataValues.code) {
+            throw new HttpError('invalid-code', 400)
+        }
+        if (Date.now() >= token.dataValues.expiryTime.getTime()) {
+            throw new HttpError('token-expired', 400)
+        }
+        res.status(200).send();
+    } catch (e) {
+        next(e)
+    }
+}
+
+const updatePassword = async (req, res, next) => {
+    try {
+        if (req.body.password !== req.body.confirmPassword) {
+            throw new HttpError('password-mismatch', 400)
+        }
+        await User.update({
+            password: req.body.password
+        }, {
+            where: {
+                email: req.body.email
+            }
+        })
+        res.status(200).send()
+    } catch (e) {
+        next(e)
+    }
+}
+
 module.exports = {
     registerNewUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    sendResetPasswordCode,
+    verifyCode,
+    updatePassword
 }
 
