@@ -25,7 +25,11 @@ const addNewEmployee = async (req, res, next) => {
         res.status(201).send({
             employee: {
                 id: newUser.dataValues.userId,
-                name: `${new}`
+                name: `${newUser.dataValues.firstName} ${newUser.dataValues.lastName}`,
+                role: newEmployee.dataValues.role,
+                email: newUser.dataValues.email,
+                phoneNumber: newUser.dataValues.phoneNumber,
+                joined: new Date().toLocaleDateString('he-IL')
             }
         })
     } catch(e) {

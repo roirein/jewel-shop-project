@@ -5,7 +5,8 @@ import { Add } from "@mui/icons-material"
 import { useIntl } from "react-intl"
 import { employeesPageMessages } from "../../translations/i18n"
 import { EMPLOYEES_TABLE_COLUMNS } from "../../const/TablesColumns"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
+import AppContext from "../../context/AppContext"
 import { ROLES_ENUM } from "../../const/Enums"
 import CenteredStack from "../../components/UI/CenteredStack"
 import TableComponent from "../../components/UI/TableComponent"
@@ -18,6 +19,7 @@ const EmployeesPage = (props) => {
     const [originalData, setOriginalData] = useState(props.employees)
     const [tableData, setTableData] = useState([]);
     const [showModal, setShowModal] = useState(false)
+    const contextValue = useContext(AppContext)
 
     useEffect(() => {
         const data = [];
@@ -30,6 +32,25 @@ const EmployeesPage = (props) => {
         })
         setTableData(data)
     }, [originalData])
+
+    const onAddNewEmployee = (employee) => {
+        setOriginalData([...originalData, employee])
+        setShowModal(false)
+    }
+
+    const onDeleteEmployee = async (employeeId) => {
+        const newData = [...originalData]
+        const employeeIndex = newData.findIndex((employee) => employee.id === employee);
+        newData.splice(employeeIndex, 1)
+        const response = await axios.delete(`http://localhost:3002/employee/deleteEmployee/${employeeId}`, {
+            headers: {
+                Authorization: getAuthorizationHeader(contextValue.token)
+            }
+        })
+        if (response.status === 200) {
+            setOriginalData(newData)
+        }
+    }
 
     return (
         <Stack
@@ -72,12 +93,13 @@ const EmployeesPage = (props) => {
                     data={tableData}
                     allowDelete
                     deleteButtonLabel={intl.formatMessage(employeesPageMessages.removeEmployee)}
-                    onDeleteRow={(rowId) => console.log(rowId)}
+                    onDeleteRow={(rowId) => onDeleteEmployee(rowId)}
                 />
             </CenteredStack>
             <AddNewEmployeeModalComponent
                 open={showModal}
                 onClose={() => setShowModal(false)}
+                onAddNewEmployee={(employee) => onAddNewEmployee(employee)}
             />
         </Stack>
     )

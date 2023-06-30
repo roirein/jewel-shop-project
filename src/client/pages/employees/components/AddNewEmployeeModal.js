@@ -55,9 +55,10 @@ const AddNewEmployeeModalComponent = (props) => {
                 }
             })
             if (response.status === 201) {
-                props.onAddNewUser(response.data.employee)
+                props.onAddNewEmployee(response.data.employee)
             }
         } catch (e) {
+            console.log(e)
             if (e.response.status === 409) {
                 setNewEmployeeError(homePageMessages.registerError)
             }
