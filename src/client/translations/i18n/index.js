@@ -64,6 +64,18 @@ export const formMessages = defineMessages({
     confirmPasswordError: {
         id: 'confirmPasswordError',
         defaultMessage: 'confirmed password not like the original'
+    },
+    code: {
+        id: 'code',
+        defaultMessage: 'code'
+    },
+    enterNewPassword: {
+        id: 'enterNewPassword',
+        defaultMessage: 'enter new password'
+    },
+    passwordChanged: {
+        id: 'passwordChanged',
+        defaultMessage: 'password changed successfully'
     }
 })
 
@@ -111,6 +123,38 @@ export const homePageMessages = defineMessages({
     logout: {
         id: 'logout',
         defaultMessage: 'logout'
+    },
+    enterEmail: {
+        id: 'enterEmail',
+        defaultMessage: 'Enter email to recive verification code'
+    },
+    emailNotExist: {
+        id: 'emailNotExist',
+        defaultMessage: 'email not exist'
+    },
+    unapproveError: {
+        id: 'unapproveError',
+        defaultMessage: 'you have to wait to manager approval in order to login'
+    },
+    resetPasswrodError: {
+        id: 'resetPasswrodError',
+        defaultMessage: 'you must change your password before you will be able to ligin'
+    },
+    resetPassword: {
+        id: 'resetPassword',
+        defaultMessage: 'Reset Password'
+    },
+    enterCode: {
+        id: 'enterCode',
+        defaultMessage: 'enter the code tou recived in mail'
+    },
+    invalidCode: {
+        id: 'invalidCode',
+        defaultMessage: 'code invalid'
+    },
+    codeExpired: {
+        id: 'codeExpired',
+        defaultMessage: 'code expired'
     }
 })
 

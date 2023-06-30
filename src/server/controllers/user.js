@@ -144,7 +144,7 @@ const verifyCode = async (req, res, next) => {
         if (req.body.code !== code.dataValues.code) {
             throw new HttpError('invalid-code', 400)
         }
-        if (Date.now() >= token.dataValues.expiryTime.getTime()) {
+        if (Date.now() >= code.dataValues.expiryTime.getTime()) {
             throw new HttpError('token-expired', 400)
         }
         res.status(200).send();
@@ -165,6 +165,18 @@ const updatePassword = async (req, res, next) => {
                 email: req.body.email
             }
         })
+        const employee = await Employee.findOne({
+            include: {
+                model: User,
+                where: {
+                    email: req.body.email
+                }
+            }
+        })
+        if (employee) {
+            employee.shouldReplacePassword = false
+            await employee.save()
+        }
         res.status(200).send()
     } catch (e) {
         next(e)

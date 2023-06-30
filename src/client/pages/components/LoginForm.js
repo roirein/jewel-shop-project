@@ -43,6 +43,14 @@ const LoginFormComponent = (props) => {
                 router.push('/customers')
             }
         } catch(e) {
+            if (e.response.status === 403) {
+                if (e.response.data === 'user-unapproved'){
+                    setLoginError(intl.formatMessage(homePageMessages.unapproveError))
+                } 
+                if (e.response.data === 'replace-password') {
+                    setLoginError(intl.formatMessage(homePageMessages.resetPasswrodError))
+                }
+            }
             setLoginError(intl.formatMessage(homePageMessages.loginError))
         }
 
@@ -90,6 +98,7 @@ const LoginFormComponent = (props) => {
                                 underline="none"
                                 color="primary"
                                 href="#"
+                                onClick={() => props.onForgotPassword()}
                                 sx={{
                                     position: 'absolute',
                                     bottom: methods.formState.errors['password'] ? '12px' : '-10px'

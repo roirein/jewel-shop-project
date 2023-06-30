@@ -5,10 +5,12 @@ import CenteredStack from "../components/UI/CenteredStack"
 import LoginFormComponent from "./components/LoginForm"
 import { useState } from "react"
 import RegisterFormComponent from "./components/RegisterForm"
+import RestePasswordComponent from "./components/ResetPassword"
 
 const AUTH_OPTIONS = {
     REGISTER: 'register',
-    LOGIN: 'login'
+    LOGIN: 'login',
+    RESET_PASSWORD: 'reset_password'
 }
 
 const HomePage = () => {
@@ -42,10 +44,17 @@ const HomePage = () => {
                 {authOption === AUTH_OPTIONS.LOGIN && (
                     <LoginFormComponent
                         onSwitchToRegister={() => setAuthOption(AUTH_OPTIONS.REGISTER)}
+                        onForgotPassword={() => setAuthOption(AUTH_OPTIONS.RESET_PASSWORD)}
+
                     />
                 )}
                 {authOption === AUTH_OPTIONS.REGISTER && (
                     <RegisterFormComponent 
+                        onSwitchToLogin={() => setAuthOption(AUTH_OPTIONS.LOGIN)}
+                    />
+                )}
+                {authOption === AUTH_OPTIONS.RESET_PASSWORD && (
+                    <RestePasswordComponent
                         onSwitchToLogin={() => setAuthOption(AUTH_OPTIONS.LOGIN)}
                     />
                 )}

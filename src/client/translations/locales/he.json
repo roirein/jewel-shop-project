@@ -56,5 +56,15 @@
     "setter": "משבץ",
     "send": "שלח",
     "removeEmployee": "הסר עובד",
-    "logout": "התנתק"
+    "emailVerification": "הכנס אימייל על מנת לקבל קוד אימות",
+    "enterEmail": "הזמן אימייל כדי לקבל קוד אימות",
+    "emailNotExist": "אימייל לא קיים",
+    "unapproveError": "עליך להמתין לאישור המנהל כדי להתחבר",
+    "resetPasswrodError": "עליך להחליף סיסמה על מנת שתוכל להתחבר",
+    "enterCode": "הזן את הקוד שיקבלת במייל",
+    "invalidCode": "קוד לא תקין",
+    "codeExpired": "תוקף הקוד פג",
+    "code": "קוד",
+    "enterNewPassword": "הזן סימסה חדשה",
+    "passwordChanged": "סיסמה שונתה בהצלחה"
 }
