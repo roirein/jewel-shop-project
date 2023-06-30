@@ -55,5 +55,6 @@
     "jeweller": "צורף",
     "setter": "משבץ",
     "send": "שלח",
-    "removeEmployee": "הסר עובד"
+    "removeEmployee": "הסר עובד",
+    "logout": "התנתק"
 }

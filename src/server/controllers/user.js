@@ -68,8 +68,25 @@ const loginUser = async (req, res ,next) => {
     }
 }
 
+const logoutUser = async (req, res, next) => {
+    try {
+        await User.update({
+            token: null
+        }, {
+            where: {
+                userId: req.body.userId
+            }
+        })
+
+        res.status(200).send()
+    } catch(e) {
+        next(e)
+    }
+}
+
 module.exports = {
     registerNewUser,
-    loginUser
+    loginUser,
+    logoutUser
 }
 

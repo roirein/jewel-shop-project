@@ -1,15 +1,21 @@
-import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab} from '@mui/material';
+import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab, Link} from '@mui/material';
 import CenteredStack from '../UI/CenteredStack';
 import { useContext, useState, useEffect } from 'react';
 import AppContext from '../../context/AppContext';
 import { MANAGER_TABS } from '../../const/TabDefinitions';
 import TemplateTabsComponent from './TemplateTabs';
 import NotificationComponent from '../UI/NotificationComponent';
-
+import { useIntl } from 'react-intl';
+import axios from 'axios';
+import { homePageMessages } from '../../translations/i18n';
+import { useRouter } from 'next/router';
+import { getAuthorizationHeader } from '../../utils/utils';
 
 const AppTemplate = (props) => {
 
     const theme = useTheme();
+    const intl = useIntl()
+    const router = useRouter()
     const contextValue = useContext(AppContext)
     const [avatarData, setAvatarData] = useState('')
 
@@ -19,6 +25,21 @@ const AppTemplate = (props) => {
             setAvatarData(`${nameAsArray[0][0]}${nameAsArray[1][0]}`)
         }
     }, [contextValue])
+
+    const onLogout = async () => {
+        const response = await axios.post('http://localhost:3002/user/logout', {
+            userId: contextValue.userId
+        }, {
+            headers: {
+                Authorization: getAuthorizationHeader(contextValue.token)
+            }
+        })
+        if (response.status === 200) {
+            contextValue.onLogout();
+            router.push('/')
+        }
+
+    }
 
     return (
         <Box
@@ -41,10 +62,25 @@ const AppTemplate = (props) => {
                         direction="row"
                         justifyContent="flex-end"
                         alignItems="center"
+                        sx={{
+                            direction: `rtl`
+                        }}
                     >
                         <Avatar>
                             {avatarData}
                         </Avatar>
+                        <Link
+                            color={theme.palette.secondary.main}
+                            variant='body1'
+                            onClick={() => onLogout()}
+                            sx={{
+                                fontWeight: 'bold',
+                                mr: 'auto',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {intl.formatMessage(homePageMessages.logout)}
+                        </Link>
                     </Stack>
                 )}
             </AppBar>

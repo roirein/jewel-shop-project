@@ -107,6 +107,10 @@ export const homePageMessages = defineMessages({
     registerMessage: {
         id: 'registerMessage',
         defaultMessage: 'your request sent to the manager and you will recive an email when approved'
+    },
+    logout: {
+        id: 'logout',
+        defaultMessage: 'logout'
     }
 })
 

@@ -54,6 +54,16 @@ const ContextProvider = (props) => {
         setCookie(userToken, id, userPermissionLevel, name)
     }
 
+    const onLogout = () => {
+        setToken(null)
+        setUserName('')
+        setPermissionLevel(-1);
+        setUserId('')
+        socket.disconnect()
+        setSocket(null)
+        document.cookie = `userData=`
+    }
+
 
     const contextValue = {
         userId,
@@ -62,7 +72,7 @@ const ContextProvider = (props) => {
         permissionLevel,
         socket,
         onLogin,
-        onLogout: () => {},
+        onLogout,
         showNotification,
         setShowNotification,
         notificationMessage,
