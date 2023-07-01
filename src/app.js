@@ -13,21 +13,22 @@ const { createNewUser, createNewEmployee } = require('./server/utils/user');
 const userRoute = require('./server/routes/users');
 const customerRoute = require('./server/routes/customers');
 const employeeRoute = require('./server/routes/employees');
-const modelRoute = require('./server/routes/models')
+const modelRoute = require('./server/routes/models');
+const orderRoute = require('./server/routes/orders')
 
 const dev = process.env.NODE_ENV !== 'production';
 const nextApp = next({dev, dir: path.join(__dirname, 'client')});
 const handle = nextApp.getRequestHandler();
 const port = process.env.PORT
 
-// sequelize.sync({force: true}).then(() => {
-//     createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
-//         createNewEmployee(user.userId, false, 1)
-//     })
-//     createNewUser('Itay', 'Rein', 'roirein28@gmail.com', 'Rein@6431368', '0549949976', 2).then((user) => {
-//         createNewEmployee(user.userId, false, 2)
-//     })
-// })
+sequelize.sync({force: true}).then(() => {
+    createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
+        createNewEmployee(user.userId, false, 1)
+    })
+    createNewUser('Itay', 'Rein', 'roirein28@gmail.com', 'Rein@6431368', '0549949976', 2).then((user) => {
+        createNewEmployee(user.userId, false, 2)
+    })
+})
 
 nextApp.prepare().then(() => {
 
@@ -45,6 +46,7 @@ nextApp.prepare().then(() => {
     app.use('/customer', customerRoute)
     app.use('/employee', employeeRoute)
     app.use('/model', modelRoute)
+    app.use('/order', orderRoute)
 
     app.use((err, req, res, next) => {
         console.log(err.status)

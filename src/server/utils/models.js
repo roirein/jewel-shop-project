@@ -1,12 +1,14 @@
 const JewelModel = require("../models/models/jewelModel")
 const ModelMetadata = require("../models/models/modelMetadata")
 
-const createModelMetadata = async (setting, sideStoneSize, mainStoneSize, item) => {
+const createModelMetadata = async (setting, sideStoneSize, mainStoneSize, item, orderId = null, design = null) => {
     const metadata = await ModelMetadata.create({
         setting,
         sideStoneSize,
         mainStoneSize,
-        item
+        item,
+        orderId,
+        design
     })
 
     return metadata

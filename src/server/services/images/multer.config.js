@@ -19,8 +19,19 @@ const modelStorage = multer.diskStorage({
     },
 })
 
+const designStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './src/server/images/designs');
+    },
+    filename: (req, file, cb) => {
+        const fileName = generateFileName(file)
+        cb(null, fileName);
+    },
+})
 const modelUpload = multer({storage: modelStorage})
+const designUpload = multer({storage: designStorage})
 
 module.exports = {
-    modelUpload
+    modelUpload,
+    designUpload
 };

@@ -45,6 +45,10 @@ ModelMetadata.init({
     design: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    orderId: {
+        type: DataTypes.UUID,
+        allowNull: false
     }
 }, {
     timestamps: false,
