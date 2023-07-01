@@ -3,18 +3,19 @@ import { useIntl } from "react-intl"
 import { Add } from "@mui/icons-material"
 import { useState, useContext, useEffect } from "react"
 import AppContext from '../../context/AppContext'
-import CreateModelModal from "./components/CreateModelModal"
-import { modelsPageMessages } from "../../translations/i18n"
-import CenteredStack from '../../components/UI/CenteredStack'
-import TableComponent from '../../components/UI/TableComponent'
-import axios from "axios"
-import { ITEM_ENUMS, MODEL_STATUS_ENUM } from "../../const/Enums"
-import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
-import { MODELS_TABL_COLUMNS } from "../../const/TablesColumns"
-import ModelModalComponent from "./components/ModelModal"
+//import CreateModelModal from "./components/CreateModelModal"
+import { modelsPageMessages, ordersPageMessages } from "../../translations/i18n"
+import CreateOrderModal from "./components/NewOrderModal"
+//import CenteredStack from '../../components/UI/CenteredStack'
+//import TableComponent from '../../components/UI/TableComponent'
+//import axios from "axios"
+//import { ITEM_ENUMS, MODEL_STATUS_ENUM } from "../../const/Enums"
+//import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
+//import { MODELS_TABL_COLUMNS } from "../../const/TablesColumns"
+//import ModelModalComponent from "./components/ModelModal"
 
 
-const ModelPage = (props) => {
+const OrdersPage = (props) => {
 
     const contextValue = useContext(AppContext);
     const intl = useIntl();
@@ -26,30 +27,30 @@ const ModelPage = (props) => {
     const [tableData, setTableData] = useState([]);
 
     
-    useEffect(() => {
-        const data = [];
-        originalData.forEach((dataElement) => {
-            data.push(
-                {
-                    rowId: dataElement.modelNumber,
-                    rowContent: [dataElement.modelNumber, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, MODEL_STATUS_ENUM[dataElement.status]]
-                });
-        })
-        setTableData(data)
-    }, [originalData])
+    // useEffect(() => {
+    //     const data = [];
+    //     originalData.forEach((dataElement) => {
+    //         data.push(
+    //             {
+    //                 rowId: dataElement.modelNumber,
+    //                 rowContent: [dataElement.modelNumber, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, MODEL_STATUS_ENUM[dataElement.status]]
+    //             });
+    //     })
+    //     setTableData(data)
+    // }, [originalData])
 
-    const onAddNewModel = (model) => {
-        setOriginalData([...originalData, model])
-        setShowCreateModal(false)
-    }
+    // const onAddNewModel = (model) => {
+    //     setOriginalData([...originalData, model])
+    //     setShowCreateModal(false)
+    // }
 
-    const onRespondMoal = (modelNumber, status) => {
-        const models = [...originalData]
-        const modelsIndex = models.findIndex((model) => model.modelNumber === modelNumber);
-        newData.splice(modelsIndex, 1)
-        models[modelsIndex].status = status,
-        setOriginalData[models]
-    }
+    // const onRespondMoal = (modelNumber, status) => {
+    //     const models = [...originalData]
+    //     const modelsIndex = models.findIndex((model) => model.modelNumber === modelNumber);
+    //     newData.splice(modelsIndex, 1)
+    //     models[modelsIndex].status = status,
+    //     setOriginalData[models]
+    // }
 
     return (
         <Stack
@@ -59,7 +60,7 @@ const ModelPage = (props) => {
                 direction: theme.direction
             }}
         >
-            {contextValue.permissionLevel === 2 && (
+            {(contextValue.permissionLevel === 1 || contextValue.permissionLevel === 5) && (
                 <Stack
                     sx={{
                         pr: theme.spacing(4)
@@ -78,12 +79,12 @@ const ModelPage = (props) => {
                             variant="body2"
                             color={theme.palette.primary.main}
                         >
-                            {intl.formatMessage(modelsPageMessages.createNewModel)}
+                            {intl.formatMessage(ordersPageMessages.createNewOrder)}
                         </Typography>
                     </Button>
                 </Stack>
             )}
-                <CenteredStack
+                {/* <CenteredStack
                     width="100%"
                     sx={{
                         mt: theme.spacing(3)
@@ -99,11 +100,6 @@ const ModelPage = (props) => {
                         }}
                     />
                 </CenteredStack>
-            <CreateModelModal
-                open={showCreateModal}
-                onClose={() => setShowCreateModal(false)}
-                onAddNewModel={(model) => onAddNewModel(model)}
-            />
             <ModelModalComponent
                 open={showModelModal}
                 modelNumber={selectedModel}
@@ -111,24 +107,28 @@ const ModelPage = (props) => {
                     setSelectedModel(null)
                     setShowModelModal(false)
                 }}
+            /> */}
+            <CreateOrderModal
+                open={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
             />
         </Stack>
     )
 }
 
-export const getServerSideProps = async (context) => {
-    const token = getUserToken(context.req.headers.cookie)
-    const response = await axios.get('http://localhost:3002/model/metadata', {
-        headers: {
-            Authorization: getAuthorizationHeader(token)
-        }
-    })
+// export const getServerSideProps = async (context) => {
+//     const token = getUserToken(context.req.headers.cookie)
+//     const response = await axios.get('http://localhost:3002/model/metadata', {
+//         headers: {
+//             Authorization: getAuthorizationHeader(token)
+//         }
+//     })
 
-    return {
-        props: {
-          models: response.data.models
-        }
-    }
-}
+//     return {
+//         props: {
+//           models: response.data.models
+//         }
+//     }
+// }
  
-export default ModelPage;
+export default OrdersPage;

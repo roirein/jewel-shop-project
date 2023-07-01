@@ -47,3 +47,4 @@ export const DESIGN_MANGER_TABS = [
         route: '/customers/requests'
     }
 ]
+

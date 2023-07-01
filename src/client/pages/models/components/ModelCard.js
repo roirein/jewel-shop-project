@@ -18,12 +18,13 @@ const ModelCardComponent = (props) => {
   const theme = useTheme();
 
   return (
-    <Card sx={{ maxWidth: 345, margin: '0 auto' }}>
+    <Card sx={{ maxWidth: 345, margin: '0 auto', direction: theme.direction }}>
       <CardMedia
         component="img"
         alt={props.title}
-        height="140"
+        height="250"
         image={props.image}
+
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">

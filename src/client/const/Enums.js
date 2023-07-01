@@ -1,6 +1,6 @@
 import { createIntl } from "react-intl";
 import messages from '../translations/locales/he.json';
-import { employeesPageMessages, modelsPageMessages } from "../translations/i18n";
+import { employeesPageMessages, modelsPageMessages, ordersPageMessages } from "../translations/i18n";
 
 const intl = createIntl({
     locale: 'he',
@@ -28,4 +28,23 @@ export const MODEL_STATUS_ENUM = {
     [2]: intl.formatMessage(modelsPageMessages.updated),
     [3]: intl.formatMessage(modelsPageMessages.approved),
     [4]: intl.formatMessage(modelsPageMessages.completed),
+}
+
+export const SIZE_ENUM = {
+    [1]: intl.formatMessage(ordersPageMessages.finger),
+    [2]: intl.formatMessage(ordersPageMessages.hand),
+    [3]: intl.formatMessage(ordersPageMessages.neck)
+}
+
+export const METAL_ENUM = {
+    [1]: intl.formatMessage(ordersPageMessages.yellow),
+    [2]: intl.formatMessage(ordersPageMessages.white),
+    [3]: intl.formatMessage(ordersPageMessages.rose),
+    [4]: intl.formatMessage(ordersPageMessages.platinum),
+}
+
+export const ORDER_TYPES = {
+    [1]: intl.formatMessage(ordersPageMessages.personalDesign),
+    [2]: intl.formatMessage(ordersPageMessages.existingModel),
+    [3]: intl.formatMessage(ordersPageMessages.fix)
 }

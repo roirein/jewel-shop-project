@@ -190,6 +190,14 @@ export const buttonMessages = defineMessages({
     send: {
         id: 'send',
         defaultMessage: 'send'
+    },
+    continue: {
+        id: 'continue',
+        defaultMessage: 'continue'
+    },
+    goBack: {
+        id: 'goBack',
+        defaultMessage: 'goBack'
     }
 })
 
@@ -397,5 +405,100 @@ export const modelsPageMessages = defineMessages({
     numberOfModel: {
         id: 'numberOfModel',
         defaultMessage: 'model number {number}'
+    }
+})
+
+export const ordersPageMessages = defineMessages({
+    createNewOrder: {
+        id: 'createNewOrder',
+        defaultMessage: 'create new order'
+    }, 
+    customerDetails: {
+        id: 'customerDetails',
+        defaultMessage: 'customer details'
+    },
+    orderType: {
+        id: 'orderType',
+        defaultMessage: 'order type'
+    },
+    personalDesign: {
+        id: "personalDesign",
+        defaultMessage: 'personal design'
+    },
+    existingModel: {
+        id: 'existingModel',
+        defaultMessage: 'existing model'
+    },
+    fix: {
+        id: 'fix',
+        defaultMessage: 'fix'
+    }, 
+    orderDeatils: {
+        id: 'orderDeatils',
+        defaultMessage: 'order details'
+    },
+    size: {
+        id: 'size',
+        defaultMessage: 'size'
+    },
+    finger: {
+        id: 'finger',
+        defaultMessage: 'finger'
+    },
+    hand: {
+        id: 'hand',
+        defaultMessage: 'hand'
+    },
+    neck: {
+        id: 'neck',
+        defaultMessage: 'neck'
+    },
+    metal: {
+        id: 'metal',
+        defaultMessage: 'metal'
+    }, 
+    yellow: {
+        id: 'yellow',
+        defaultMessage: 'yellow'
+    },
+    white: {
+        id: 'white',
+        defaultMessage: 'white'
+    },
+    rose: {
+        id: 'rose',
+        defaultMessage: 'rose'
+    },
+    platinum: {
+        id: 'platinum',
+        defaultMessage: 'platinum'
+    },
+    casting: {
+        id: 'casting',
+        defaultMessage: 'casting'
+    },
+    design: {
+        id: 'design',
+        defaultMessage: 'design'
+    },
+    comments: {
+        id: 'comments',
+        defaultMessage: 'comments'
+    },
+    orderSummary: {
+        id: 'orderSummary',
+        defaultMessage: 'order summary'
+    },
+    deadline: {
+        id: 'deadline',
+        defaultMessage: 'deadline'
+    },
+    required: {
+        id: 'required',
+        defaultMessage: 'required'
+    },
+    notRequired: {
+        id: 'notRequired',
+        defaultMessage: 'not required'
     }
 })

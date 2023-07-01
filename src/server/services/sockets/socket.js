@@ -3,6 +3,7 @@ const Customer = require('../../models/users/customer');
 const {sendRequestApproveMail} = require("../emails/emails");
 const Request = require('../../models/users/requests');
 const Notifications = require("../../models/notifications/notifications");
+const JewelModel = require("../../models/models/jewelModel");
 
 let ioInstance = null;
 
@@ -20,6 +21,16 @@ const initSocket = (io) => {
 
         socket.on('requestResponse', (data) => {
             updateRequestStatus(data.status, data.customerId, data.requestId)
+        })
+
+        socket.on('model-response', async (data) => {
+            await JewelModel.update({
+                status: data.status
+            }, {
+                where: {
+                    modelNumber: data.modelNumber
+                }
+            })
         })
 
         socket.on('read-notification', async (data) => {

@@ -8,6 +8,7 @@ import { getAuthorizationHeader } from '../../../utils/utils';
 import { useContext, useEffect, useState } from 'react';
 import AppContext from '../../../context/AppContext';
 import ModelCardComponent from './ModelCard';
+import CenteredStack from '../../../components/UI/CenteredStack';
 
 const ModelModalComponent = (props) => {
 
@@ -16,7 +17,7 @@ const ModelModalComponent = (props) => {
     const contextValue = useContext(AppContext);
 
     const [model, setModel] = useState({});
-    const [imageUrl, setImageUrl] = useState('')
+    const [imageUrl, setImageUrl] = useState('');
 
     useEffect(() => {
         if(props.modelNumber) {
@@ -68,6 +69,39 @@ const ModelModalComponent = (props) => {
                 description={model.description}
                 image={imageUrl}
             />
+            <CenteredStack
+                columnGap={theme.spacing(4)}
+                direction="row"
+                width="60%"
+                sx={{
+                    m: '0 auto',
+                    pt: theme.spacing(4),
+                    flexDirection: 'row-reverse'
+                }}
+            >
+                {(model.status === 1 || model.status === 2) && (
+                    <>
+                        <ButtonComponent
+                            label={intl.formatMessage(buttonMessages.approve)}
+                            onClick={() => {
+                                contextValue.socket.emit('model-response', {
+                                    status: 3,
+                                    modelNumber: model.modelNumber
+                                })
+                                props.onClose()
+                            }}
+                        />
+                        <ButtonComponent
+                            label={intl.formatMessage(buttonMessages.reject)}
+                        />
+                    </>
+                )}
+                {model.status === 3 && (
+                    <ButtonComponent
+                        label={intl.formatMessage(modelsPageMessages.updatePrice)}
+                    />
+                )}
+            </CenteredStack>
         </ModalComponent>
     )
 }
