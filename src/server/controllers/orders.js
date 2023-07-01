@@ -1,7 +1,10 @@
+const ModelMetadata = require("../models/models/modelMetadata")
 const JewelOrder = require("../models/orders/jewelOrder")
 const Order = require("../models/orders/order")
 const OrderCustomer = require("../models/orders/orderCustomer")
 const { createModelMetadata } = require("../utils/models")
+const { getOrderByPermissionLevel } = require("../utils/orders")
+const path = require('path')
 
 const createNewOrder = async (req, res, next) => {
     try {
@@ -18,7 +21,6 @@ const createNewOrder = async (req, res, next) => {
             email: req.body.email,
             phoneNumber: req.body.phoneNumber
         })
-        console.log(req.file)
         if (req.body.orderType ===  3) {
 
         } else {
@@ -48,6 +50,75 @@ const createNewOrder = async (req, res, next) => {
     }
 }
 
+
+const getOrders = async (req, res, next) => {
+    try {
+        const orders = await getOrderByPermissionLevel(req.permissionLevel);
+        res.status(200).send({orders})
+    } catch(e) {
+
+        next(e)
+    }
+}
+
+const getOrderById = async (req, res, next) => {
+    try {
+        const orderData = await Order.findOne({
+            where: {
+                orderId: req.params.orderId
+            },
+            include: [
+                {
+                    model: JewelOrder,
+                },
+                {
+                    model: OrderCustomer
+                }
+            ]
+        })
+
+        const metadata = await ModelMetadata.findOne({
+            where: {
+                metadataId: orderData['Jewel Order'].metadataId
+            }
+        })
+        const order = {
+            orderId: orderData.dataValues.orderId,
+            item: metadata.dataValues.item,
+            setting: metadata.dataValues.setting,
+            sideStoneSize: metadata.dataValues.sideStoneSize,
+            mainStoneSize: metadata.dataValues.mainStoneSize,
+            design: metadata.dataValues.design,
+            size: orderData.dataValues['Jewel Order'].size,
+            metal: orderData.dataValues['Jewel Order'].metal,
+            comments: orderData.dataValues['Jewel Order'].comments,
+            casting: orderData.dataValues['Jewel Order'].casting,
+            customerName: orderData.dataValues['Order Customer'].customerName,
+            email: orderData.dataValues['Order Customer'].dataValues.email,
+            phoneNumber: orderData.dataValues['Order Customer'].dataValues.phoneNumber,
+            deadline: orderData.dataValues.deadline
+        }
+        res.status(200).send({order})
+    } catch (e) {
+        console.log(e)
+        next(e)
+    }
+}
+
+const getOrderImage = async (req, res, next) => {
+    try {
+        const file = req.params.imagePath
+        const image = path.join(__dirname, '../../server/images/designs', file);
+        res.status(200).sendFile(image)
+    } catch(e) {
+        next (e)
+    }
+}
+
+
 module.exports = {
-    createNewOrder
+    createNewOrder,
+    getOrders,
+    getOrderById,
+    getOrderImage
 }

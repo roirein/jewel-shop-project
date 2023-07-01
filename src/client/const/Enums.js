@@ -48,3 +48,11 @@ export const ORDER_TYPES = {
     [2]: intl.formatMessage(ordersPageMessages.existingModel),
     [3]: intl.formatMessage(ordersPageMessages.fix)
 }
+
+export const ORDER_STATUS = {
+    [-1]: intl.formatMessage(modelsPageMessages.rejeceted),
+    [0]: intl.formatMessage(modelsPageMessages.created),
+    [1]: intl.formatMessage(ordersPageMessages.inDesign),
+    [2]: intl.formatMessage(ordersPageMessages.designCompleted),
+    [3]: intl.formatMessage(ordersPageMessages.customerApproved)
+}

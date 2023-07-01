@@ -6,14 +6,19 @@ import AppContext from '../../context/AppContext'
 //import CreateModelModal from "./components/CreateModelModal"
 import { modelsPageMessages, ordersPageMessages } from "../../translations/i18n"
 import CreateOrderModal from "./components/NewOrderModal"
+import CenteredStack from "../../components/UI/CenteredStack"
+import { ORDERS_MANAGER_TABLE_COLUMNS } from "../../const/TablesColumns"
+import { ORDER_STATUS, ORDER_TYPES } from "../../const/Enums"
+import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
+import axios from "axios"
 //import CenteredStack from '../../components/UI/CenteredStack'
-//import TableComponent from '../../components/UI/TableComponent'
+import TableComponent from '../../components/UI/TableComponent'
 //import axios from "axios"
 //import { ITEM_ENUMS, MODEL_STATUS_ENUM } from "../../const/Enums"
 //import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
 //import { MODELS_TABL_COLUMNS } from "../../const/TablesColumns"
 //import ModelModalComponent from "./components/ModelModal"
-
+import { useRouter } from "next/router"
 
 const OrdersPage = (props) => {
 
@@ -21,23 +26,23 @@ const OrdersPage = (props) => {
     const intl = useIntl();
     const theme = useTheme();
     const [showCreateModal, setShowCreateModal] = useState(false)
-    const [originalData, setOriginalData] = useState(props.models)
+    const [originalData, setOriginalData] = useState(props.orders)
     const [selectedModel, setSelectedModel] = useState(null);
     const [showModelModal, setShowModelModal] = useState(false)
     const [tableData, setTableData] = useState([]);
-
+    const router = useRouter()
     
-    // useEffect(() => {
-    //     const data = [];
-    //     originalData.forEach((dataElement) => {
-    //         data.push(
-    //             {
-    //                 rowId: dataElement.modelNumber,
-    //                 rowContent: [dataElement.modelNumber, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, MODEL_STATUS_ENUM[dataElement.status]]
-    //             });
-    //     })
-    //     setTableData(data)
-    // }, [originalData])
+    useEffect(() => {
+        const data = [];
+        originalData.forEach((dataElement) => {
+            data.push(
+                {
+                    rowId: dataElement.orderId,
+                    rowContent: [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
+                });
+        })
+        setTableData(data)
+    }, [originalData])
 
     // const onAddNewModel = (model) => {
     //     setOriginalData([...originalData, model])
@@ -51,6 +56,15 @@ const OrdersPage = (props) => {
     //     models[modelsIndex].status = status,
     //     setOriginalData[models]
     // }
+
+    const getTableColumns = () => {
+        switch (contextValue.permissionLevel) {
+            case 1: 
+                return ORDERS_MANAGER_TABLE_COLUMNS
+            default: 
+                return []
+        }
+    }
 
     return (
         <Stack
@@ -84,30 +98,21 @@ const OrdersPage = (props) => {
                     </Button>
                 </Stack>
             )}
-                {/* <CenteredStack
-                    width="100%"
-                    sx={{
-                        mt: theme.spacing(3)
-                    }}
-                >
-                    <TableComponent
-                        columns={MODELS_TABL_COLUMNS}
-                        data={tableData}
-                        showMore
-                        onClickShowMore={(rowId) => {
-                            setSelectedModel(rowId)
-                            setShowModelModal(true)
-                        }}
-                    />
-                </CenteredStack>
-            <ModelModalComponent
-                open={showModelModal}
-                modelNumber={selectedModel}
-                onClose={() => {
-                    setSelectedModel(null)
-                    setShowModelModal(false)
+            <CenteredStack
+                width="100%"
+                sx={{
+                    mt: theme.spacing(3)
                 }}
-            /> */}
+            >
+                <TableComponent
+                    columns={getTableColumns()}
+                    data={tableData}
+                    showMore
+                    onClickShowMore={(rowId) => {
+                        router.push(`/orders/${rowId}`)
+                    }}
+                />
+            </CenteredStack>
             <CreateOrderModal
                 open={showCreateModal}
                 onClose={() => setShowCreateModal(false)}
@@ -116,19 +121,19 @@ const OrdersPage = (props) => {
     )
 }
 
-// export const getServerSideProps = async (context) => {
-//     const token = getUserToken(context.req.headers.cookie)
-//     const response = await axios.get('http://localhost:3002/model/metadata', {
-//         headers: {
-//             Authorization: getAuthorizationHeader(token)
-//         }
-//     })
+export const getServerSideProps = async (context) => {
+    const token = getUserToken(context.req.headers.cookie)
+    const response = await axios.get('http://localhost:3002/order/orders', {
+        headers: {
+            Authorization: getAuthorizationHeader(token)
+        }
+    })
 
-//     return {
-//         props: {
-//           models: response.data.models
-//         }
-//     }
-// }
+    return {
+        props: {
+         orders: response.data.orders
+        }
+    }
+}
  
 export default OrdersPage;

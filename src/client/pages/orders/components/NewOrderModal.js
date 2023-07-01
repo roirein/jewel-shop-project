@@ -105,6 +105,14 @@ const CreateOrderModal = (props) => {
         }
     }
 
+    const handleClose = () => {
+        setSelectedOrderType(0)
+        methods.reset();
+        setActiveStep(0),
+        setSteps(initialSteps)
+        props.onClose()
+    }
+
     const onSubmit = async () => {
         const data = methods.getValues()
         const formData = new FormData()
@@ -123,7 +131,7 @@ const CreateOrderModal = (props) => {
             }
         })
         if (response.status === 201) {
-            props.onClose()
+            handleClose()
         }
     }
     
@@ -139,7 +147,7 @@ const CreateOrderModal = (props) => {
                     justifyContent="left"
                 >
                     <ButtonComponent
-                        onClick={() => props.onClose()}
+                        onClick={() => handleClose()}
                         label={intl.formatMessage(buttonMessages.close)}
                     >
                     </ButtonComponent>

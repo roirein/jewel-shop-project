@@ -500,5 +500,25 @@ export const ordersPageMessages = defineMessages({
     notRequired: {
         id: 'notRequired',
         defaultMessage: 'not required'
+    },
+    orderNumber: {
+        id: 'orderNumber',
+        defaultMessage: 'order number'
+    },
+    inDesign: {
+        id: 'inDesign',
+        defaultMessage: 'in design',
+    },
+    designCompleted: {
+        id: 'designCompleted',
+        defaultMessage: 'design completed'
+    },
+    customerApproved: {
+        id: 'customerApproved',
+        defaultMessage: 'customer approved'
+    },
+    numberOfOrder: {
+        id: 'numberOfOrder',
+        defaultMessage: 'order number {number}'
     }
 })

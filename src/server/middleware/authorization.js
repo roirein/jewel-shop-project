@@ -16,7 +16,7 @@ const checkPermissions = (allowdPermissions) => {
             if (!isPermitted) {
                 throw new HttpError('forbidden', 403)
             }
-            req.permissionLevel === user.dataValues.permissionLevel
+            req.permissionLevel = user.dataValues.permissionLevel
             next()
         } catch (e) {
             next(e)

@@ -7,8 +7,8 @@ class OrderCustomer extends Model {}
 
 OrderCustomer.init({
     orderId: {
-        type: DataTypes.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         primaryKey: true,
         allowNull: false,
         unique: true

@@ -1,13 +1,12 @@
 const {DataTypes, Model, Sequelize} = require('sequelize');
 const sequelize = require('../../database/connection');
-const {v4: uuidv4} = require('uuid')
 
 class Order extends Model {}
 
 Order.init({
     orderId: {
-        type: DataTypes.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         primaryKey: true,
         allowNull: false,
         unique: true
@@ -41,10 +40,6 @@ Order.init({
     timestamps: true,
     sequelize,
     modelName: 'Orders'
-})
-
-Order.beforeCreate((order) => {
-    order.orderId = uuidv4()
 })
 
 module.exports = Order

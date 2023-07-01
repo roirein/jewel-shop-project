@@ -4,6 +4,8 @@ const {sendRequestApproveMail} = require("../emails/emails");
 const Request = require('../../models/users/requests');
 const Notifications = require("../../models/notifications/notifications");
 const JewelModel = require("../../models/models/jewelModel");
+const Employee = require("../../models/users/employee");
+const Order = require("../../models/orders/order");
 
 let ioInstance = null;
 
@@ -31,6 +33,10 @@ const initSocket = (io) => {
                     modelNumber: data.modelNumber
                 }
             })
+        })
+
+        socket.on('new-design', async (data) => {
+            await sendOrderToDesign(data.orderId)
         })
 
         socket.on('read-notification', async (data) => {
@@ -107,6 +113,24 @@ const updateRequestStatus = async (response, customerId) => {
             customerId
         }
     })
+}
+
+const sendOrderToDesign = async (orderId) => {
+    const designManager = Employee.findOne({
+        where: {
+            role: 2
+        }
+    })
+
+    await Order.update({
+        status: 1,
+    }, {
+        where: {
+            orderId
+        }
+    })
+
+    //const socketId = users[designManager.dataValues.userId];
 }
 
 module.exports = {

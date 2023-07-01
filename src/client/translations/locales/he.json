@@ -111,5 +111,10 @@
     "goBack": "חזור",
     "deadline": "תאריך מסירה נדרש",
     "required": "נדרש",
-    "notRequired": "לא נדרש"
+    "notRequired": "לא נדרש",
+    "orderNumber": "מספר הזמנה",
+    "inDesign": "בעיצוב",
+    "designCompleted": "עיצוב הושלם",
+    "customerApproved": "לקוח אישר",
+    "numberOfOrder": "הזמנה מספר {number}"
 }

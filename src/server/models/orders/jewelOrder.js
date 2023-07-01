@@ -8,8 +8,8 @@ class JewelOrder extends Model {}
 
 JewelOrder.init({
     orderId: {
-        type: DataTypes.UUID,
-        defaultValue: Sequelize.UUIDV4,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         primaryKey: true,
         allowNull: false,
         unique: true
@@ -60,6 +60,7 @@ JewelOrder.init({
 
 
 Order.hasOne(OrderCustomer, {foreignKey: 'orderId'});
+Order.hasOne(JewelOrder, {foreignKey: 'orderId'})
 JewelOrder.hasOne(ModelMetadata, {foreignKey: 'metadataId'})
 JewelOrder.belongsTo(Order, {foreignKey: 'orderId'});
 

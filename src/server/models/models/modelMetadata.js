@@ -47,7 +47,7 @@ ModelMetadata.init({
         allowNull: true
     },
     orderId: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: true
     }
 }, {
