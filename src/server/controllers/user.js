@@ -66,7 +66,7 @@ const loginUser = async (req, res ,next) => {
                     customerId: user.dataValues.userId
                 }
             })
-            if (request.dataValues.status !== 5) {
+            if (request.dataValues.status !== 1) {
                 throw new HttpError('user-unapproved', 403)
             }
         } else {
@@ -80,10 +80,14 @@ const loginUser = async (req, res ,next) => {
             }
         }
         res.status(200).send({
-            id: user.dataValues.userId,
-            token,
-            username: `${user.dataValues.firstName} ${user.dataValues.lastName}`,
-            permissionLevel: user.dataValues.permissionLevel
+            user: {
+                id: user.dataValues.userId,
+                token,
+                username: `${user.dataValues.firstName} ${user.dataValues.lastName}`,
+                permissionLevel: user.dataValues.permissionLevel,
+                email: user.dataValues.email,
+                phoneNumber: user.dataValues.phoneNumber
+            }
         })
     } catch (e) {
         next(e)

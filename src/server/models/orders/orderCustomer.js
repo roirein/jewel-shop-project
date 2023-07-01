@@ -32,7 +32,6 @@ OrderCustomer.init({
     phoneNumber: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
         validate: {
             is: /^\d{10}$/
         }

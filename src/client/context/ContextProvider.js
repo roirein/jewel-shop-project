@@ -13,6 +13,8 @@ const ContextProvider = (props) => {
     const [userId, setUserId] = useState('');
     const [socket, setSocket] = useState(null);
     const [permissionLevel, setPermissionLevel] = useState(0);
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
 
@@ -41,17 +43,19 @@ const ContextProvider = (props) => {
         document.cookie = `userData=${JSON.stringify(values)}`
     }
 
-    const onLogin = (userToken, name, userPermissionLevel, id) => {
-        setToken(userToken),
-        setUserName(name)
-        setPermissionLevel(userPermissionLevel);
-        setUserId(id)
+    const onLogin = (user) => {
+        setToken(user.token),
+        setUserName(user.username)
+        setPermissionLevel(user.permissionLevel);
+        setUserId(user.id)
+        setEmail(user.email)
+        setPhoneNumber(user.phoneNumber)
         const sock = io('http://localhost:3002');
         sock.emit('login', {
-            userId: id
+            userId: user.id
         })
         setSocket(sock)
-        setCookie(userToken, id, userPermissionLevel, name)
+        setCookie(user.token, user.id, user.userPermissionLevel, user.username)
     }
 
     const onLogout = () => {
@@ -70,6 +74,8 @@ const ContextProvider = (props) => {
         token,
         name: userName,
         permissionLevel,
+        email,
+        phoneNumber,
         socket,
         onLogin,
         onLogout,

@@ -39,14 +39,15 @@ const LoginFormComponent = (props) => {
                 password: data.password
             })
             if (response.status === 200) {
-                contextValue.onLogin(response.data.token, response.data.username, response.data.permissionLevel, response.data.id)
-                if (response.data.permissionLevel === 2) {
+                contextValue.onLogin(response.data.user)
+                if (response.data.user.permissionLevel === 2) {
                     router.push('/models')
                 } else {
-                    router.push('/customers')
+                    router.push('/orders')
                 }
             }
         } catch(e) {
+            console.log(e)
             if (e.response.status === 403) {
                 if (e.response.data === 'user-unapproved'){
                     setLoginError(intl.formatMessage(homePageMessages.unapproveError))

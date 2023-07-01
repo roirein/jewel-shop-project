@@ -5,26 +5,26 @@ const { createModelMetadata } = require("../utils/models")
 
 const createNewOrder = async (req, res, next) => {
     try {
-                console.log(req.body, 1)
         const newOrder = await Order.create({
             type: req.body.orderType, 
-            customerId: 'e7383452-88dd-4a8a-bb9f-9820826a911a', 
+            customerId: req.userId, 
             status: 0, 
             deadline: new Date(req.body.deadline)
         })
         const customerData = await OrderCustomer.create({
             orderId: newOrder.orderId,
-            customerId: 'e7383452-88dd-4a8a-bb9f-9820826a911a',
+            customerId: req.userId,
             customerName: req.body.customerName,
             email: req.body.email,
             phoneNumber: req.body.phoneNumber
         })
+        console.log(req.file)
         if (req.body.orderType ===  3) {
 
         } else {
             let modelMetadataId
-            if (req.orderType === 1) {
-                const metadata = await createModelMetadata(req.body.item, req.body.setting, req.body.sideStoneSize, req.body.mainStoneSize, newOrder.orderId, req.file.filename);
+            if (req.body.orderType === '1') {
+                const metadata = await createModelMetadata(req.body.setting, req.body.sideStoneSize, req.body.mainStoneSize, req.body.item, newOrder.orderId, req.file.filename);
                 modelMetadataId = metadata.metadataId
             }
             const newJewlOrder = await JewelOrder.create({
@@ -33,7 +33,8 @@ const createNewOrder = async (req, res, next) => {
                 size: req.body.size,
                 metal: req.body.metal,
                 casting: req.body.casting,
-                comments: req.body.comments
+                comments: req.body.comments,
+                metadataId: modelMetadataId
             })  
         }
         // send notification 

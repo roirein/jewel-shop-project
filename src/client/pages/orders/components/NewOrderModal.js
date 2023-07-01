@@ -64,9 +64,17 @@ const CreateOrderModal = (props) => {
         mainStoneSize: yup.number().min(0).required(intl.formatMessage(formMessages.emptyFieldError)),
     })
 
+    const defaultValues = {
+        customerName: contextValue.name,
+        email: contextValue.email,
+        phoneNumber: contextValue.phoneNumber
+    }
+
     const methods = useForm({
-        resolver: yupResolver(orderDetailsValidationSchema)
+        resolver: yupResolver(orderDetailsValidationSchema),
+        defaultValues: contextValue.permissionLevel === 5 ? defaultValues : {}
     });
+
 
     const handleContinue = async () => {
         switch(activeStep) {
@@ -94,6 +102,28 @@ const CreateOrderModal = (props) => {
                 }
             default:
                 break
+        }
+    }
+
+    const onSubmit = async () => {
+        const data = methods.getValues()
+        const formData = new FormData()
+        Object.entries(data).forEach((entry) => {
+            if (entry[0] === 'design') {
+                formData.append(entry[0], entry[1][0])
+            } else {
+                formData.append(entry[0], entry[1]);
+            }
+        })
+        formData.append('orderType', selectedOrderType)
+        const response = await axios.post('http://localhost:3002/order/newOrder', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': getAuthorizationHeader(contextValue.token)
+            }
+        })
+        if (response.status === 201) {
+            props.onClose()
         }
     }
     
@@ -139,7 +169,7 @@ const CreateOrderModal = (props) => {
                     {activeStep === steps.length - 1 && (
                         <ButtonComponent
                             label={intl.formatMessage(buttonMessages.send)}
-                            onClick={() => {}}
+                            onClick={() => onSubmit()}
                         />
                     )}
                 </Stack>

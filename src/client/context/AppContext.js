@@ -5,6 +5,8 @@ const contextValue = {
     token: '',
     name: '',
     permissionLevel: 0,
+    email: '',
+    phoneNumber: '',
     socket: null,
     onLogin: () => {},
     onLogout: () => {},

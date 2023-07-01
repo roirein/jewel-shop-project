@@ -2,7 +2,7 @@ import { Typography, Stack } from "@mui/material"
 import { useIntl } from "react-intl"
 import { useFormContext } from "react-hook-form"
 import { ordersPageMessages } from "../../../../../translations/i18n";
-import { ORDER_TYPES } from "../../../../../const/Enums";
+import { ITEM_ENUMS, METAL_ENUM, ORDER_TYPES, SIZE_ENUM } from "../../../../../const/Enums";
 import { useState, useEffect } from "react";
 import OrderSummaryComponent from "../../OrderSummary";
 
@@ -28,12 +28,12 @@ const OrderSummary = (props) => {
             <OrderSummaryComponent
                 title={`${intl.formatMessage(ordersPageMessages.orderSummary)} - ${ORDER_TYPES[props.orderType]}`}
                 imageSrc={imageUrl}
-                item={getValues('item')}
+                item={ITEM_ENUMS[getValues('item')]}
                 setting={getValues('setting')}
                 sideStoneSize={getValues('sideStoneSize')}
                 mainStoneSize={getValues('mainStoneSize')}
-                size={getValues('size')}
-                metal={getValues('metal')}
+                size={SIZE_ENUM[getValues('size')]}
+                metal={METAL_ENUM[getValues('metal')]}
                 casting={getValues('casting')}
                 comment={getValues('comments')}
                 customerName={getValues('customerName')}

@@ -60,7 +60,7 @@ JewelOrder.init({
 
 
 Order.hasOne(OrderCustomer, {foreignKey: 'orderId'});
-Order.hasOne(ModelMetadata, {foreignKey: 'metadataId'})
+JewelOrder.hasOne(ModelMetadata, {foreignKey: 'metadataId'})
 JewelOrder.belongsTo(Order, {foreignKey: 'orderId'});
 
 module.exports = JewelOrder
