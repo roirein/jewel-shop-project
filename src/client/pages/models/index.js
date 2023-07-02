@@ -62,7 +62,14 @@ const ModelPage = (props) => {
     }, [originalData])
 
     const onAddNewModel = (model) => {
-        setOriginalData([...originalData, model])
+        const updatedData = [...originalData]
+        const modelIndex = updatedData.findIndex((item) => item.id === model.id)
+        if (modelIndex === -1) {
+            setOriginalData([...updatedData, model])
+        } else {
+            updatedData[modelIndex] = model
+            setOriginalData([...updatedData])
+        }
         setShowCreateModal(false)
     }
 

@@ -66,6 +66,9 @@ const CreateModelModal = (props) => {
             formData.append(entry[0], entry[1])
         })
         formData.append('model', data.model[0])
+        if (modelData) {
+            formData.append('metadataId', modelData.id)
+        }
         try {
             const response = await axios.post('http://localhost:3002/model/newModel', formData, {
                 headers: {
@@ -115,13 +118,19 @@ const CreateModelModal = (props) => {
         )
     }
 
-    console.log(methods.getValues())
+    const handleClose = () => {
+        if (modelData) {
+            Object.entries(modelData).forEach((entry) => {
+                methods.setValue(entry[0], entry[1])
+            })
+        }
+    }
 
     return (
         <ModalComponent
             open={props.open}
             onClose={() => {
-                methods.reset()
+                handleClose()
             }}
             title={intl.formatMessage(modelsPageMessages.createNewModel)}
             width="sm"

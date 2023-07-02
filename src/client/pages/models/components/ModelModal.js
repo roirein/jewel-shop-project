@@ -79,6 +79,7 @@ const ModelModalComponent = (props) => {
                     flexDirection: 'row-reverse'
                 }}
             >
+                
                 {(model.status === 1 || model.status === 2) && (
                     <>
                         <ButtonComponent

@@ -34,35 +34,6 @@ const ModelCardComponent = (props) => {
             {props.description}
         </Typography>
       </CardContent>
-      {/* <CardActions>
-        {contextValue.permissionLevel === 1 && (
-            <>
-                {(props.status === 1 || props.status === 2) && (
-                    <>
-                        <ButtonComponent
-                            label={intl.formatMessage(buttonMessages.approve)}
-                            onClick={() => {
-                                contextValue.socket.emit('model-respose', {
-                                    approved: true
-                                })
-                            }}
-                        />
-                        <ButtonComponent
-                            label={intl.formatMessage(buttonMessages.reject)}
-                        />
-                    </>
-                )}
-                {props.status === 3 && (
-                    <ButtonComponent
-                        label={intl.formatMessage(modelsPageMessages.updatePrice)}
-                    />
-                )}
-            </>
-        )}
-
-        <Button size="small">Share</Button>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
     </Card>
   );
 }

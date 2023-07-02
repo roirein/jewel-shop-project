@@ -15,16 +15,28 @@ const createNewModel = async (req, res, next) => {
         if (existingModel) {
             throw new HttpError('model-exist', 409)
         }
-        const modelMetadata = await createModelMetadata(req.body.setting, req.body.sideStoneSize, req.body.mainStoneSize, req.body.item);
-        const model = await createModel(req.body.modelNumber, req.body.title, req.body.description, req.file.filename, modelMetadata.metadataId);
+        let metadataId = req.body.metadataId
+        if (metadataId !== 'undefined') {
+            await ModelMetadata.update({
+                modelNumber: req.body.modelNumber
+            }, {
+                where: {
+                    metadataId: req.body.metadataId
+                }
+            })
+        } else {
+            const modelMetadata = await createModelMetadata(req.body.setting, req.body.sideStoneSize, req.body.mainStoneSize, req.body.item);
+            metadataId = modelMetadata.metadataId
+        }
+        const model = await createModel(req.body.modelNumber, req.body.title, req.body.description, req.file.filename, metadataId);
         //await sendNewModelNotification(modelMetadata.metadataId)
         res.status(201).send({model:{
-            id: modelMetadata.dataValues.metadataId,
+            id: metadataId,
             modelNumber: model.dataValues.modelNumber,
-            item: modelMetadata.dataValues.item,
-            setting: modelMetadata.dataValues.setting,
-            sideStoneSize: modelMetadata.dataValues.sideStoneSize,
-            mainStoneSize: modelMetadata.dataValues.mainStoneSize,
+            item: req.body.item,
+            setting: req.body.setting,
+            sideStoneSize: req.body.sideStoneSize,
+            mainStoneSize: req.body.mainStoneSize,
             status: model.dataValues.status,
         }})
     } catch (e) {
