@@ -16,14 +16,14 @@ const getOrdersInDesign = async () => {
         include: [
             {
                 model: JewelOrder,
-                include: {
-                    model: ModelMetadata,
-                    attributes: ['item', 'setting', 'sideStoneSize', 'mainStoneSize', 'modelNumber'],
-                    include: {
-                        model: JewelModel,
-                        attributes: ['status']
-                    }
-                }
+                // include: {
+                //     model: ModelMetadata,
+                //     attributes: ['item', 'setting', 'sideStoneSize', 'mainStoneSize', 'modelNumber'],
+                //     include: {
+                //         model: JewelModel,
+                //         attributes: ['status']
+                //     }
+                // }
             },
             {
                 model: OrderCustomer,
@@ -33,20 +33,32 @@ const getOrdersInDesign = async () => {
         attributes: ['orderId', 'createdAt', 'deadline'],
     })
 
-    const orders = ordersData.forEach((order) => {
+    let metadata = await ModelMetadata.findAll({
+        include: {
+            model: JewelModel,
+            attributes: ['status']
+        },
+    })
+
+    metadata.filter((met) => met.orderId !== null)
+
+    const orders = ordersData.map((order) => {
+
+        const orderModel = metadata.find((model) => model.orderId === order.orderId)
+
         return {
             orderId: order.orderId,
             customerName: order['Order Customer'].customerName,
             created: order.createdAt,
             deadline: order.deadline,
-            item: order['Jewel Order']['Model Metadata'].item,
-            setting: order['Jewel Order']['Model Metadata'].setting,
-            sideStoneSize: order['JewelOrder']['Model Metadata'].sideStoneSize,
-            mainStoneSize: order['Jewel Order']['Model Metadata'].mainStoneSize,
-            modelNumber: order['Jewel Order']['Model Metadata'].modelNumber,
-            modelStatus: order['Jewel Order']['Model Metadata'].Model.status
+            item: orderModel.dataValues.item,
+            setting: orderModel.setting,
+            sideStoneSize: orderModel.sideStoneSize,
+            mainStoneSize: orderModel.mainStoneSize,
         }
     })
+
+    console.log(orders)
 
     return orders
 }
@@ -81,6 +93,7 @@ const getOrderByPermissionLevel = async (permissionLevel) => {
             break
         case 2:
             orders = await getOrdersInDesign();
+            break;
         default: 
             orders = []
     }

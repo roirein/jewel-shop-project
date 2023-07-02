@@ -7,8 +7,8 @@ import AppContext from '../../context/AppContext'
 import { modelsPageMessages, ordersPageMessages } from "../../translations/i18n"
 import CreateOrderModal from "./components/NewOrderModal"
 import CenteredStack from "../../components/UI/CenteredStack"
-import { ORDERS_MANAGER_TABLE_COLUMNS } from "../../const/TablesColumns"
-import { ORDER_STATUS, ORDER_TYPES } from "../../const/Enums"
+import { DESIGN_MANAGER_ORDERS_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS } from "../../const/TablesColumns"
+import { ITEM_ENUMS, ORDER_STATUS, ORDER_TYPES } from "../../const/Enums"
 import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
 import axios from "axios"
 //import CenteredStack from '../../components/UI/CenteredStack'
@@ -31,6 +31,19 @@ const OrdersPage = (props) => {
     const [showModelModal, setShowModelModal] = useState(false)
     const [tableData, setTableData] = useState([]);
     const router = useRouter()
+
+    const getTableContent = (dataElement) => {
+        console.log(dataElement)
+        switch (contextValue.permissionLevel) {
+            case 1: 
+                return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
+            case 2: 
+                return [dataElement.orderId, dataElement.customerName, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, 
+                            new Date(dataElement.created).toLocaleDateString('he-IL'), new Date(dataElement.deadline).toLocaleDateString('he-IL')]
+            default:
+                return []
+        }
+    }
     
     useEffect(() => {
         const data = [];
@@ -38,7 +51,7 @@ const OrdersPage = (props) => {
             data.push(
                 {
                     rowId: dataElement.orderId,
-                    rowContent: [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
+                    rowContent: getTableContent(dataElement)
                 });
         })
         setTableData(data)
@@ -61,6 +74,8 @@ const OrdersPage = (props) => {
         switch (contextValue.permissionLevel) {
             case 1: 
                 return ORDERS_MANAGER_TABLE_COLUMNS
+            case 2:
+                return DESIGN_MANAGER_ORDERS_COLUMNS
             default: 
                 return []
         }

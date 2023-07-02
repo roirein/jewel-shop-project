@@ -44,7 +44,7 @@ export const DESIGN_MANGER_TABS = [
     }, 
     {
         label: intl.formatMessage(tabsMessages.orders),
-        route: '/customers/requests'
+        route: '/orders'
     }
 ]
 

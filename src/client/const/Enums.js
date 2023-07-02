@@ -23,6 +23,7 @@ export const ITEM_ENUMS = {
 }
 
 export const MODEL_STATUS_ENUM = {
+    [-1]: intl.formatMessage(modelsPageMessages.notCreated),
     [0]: intl.formatMessage(modelsPageMessages.rejeceted),
     [1]: intl.formatMessage(modelsPageMessages.created),
     [2]: intl.formatMessage(modelsPageMessages.updated),

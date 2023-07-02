@@ -22,8 +22,31 @@ const ModelPage = (props) => {
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [originalData, setOriginalData] = useState(props.models)
     const [selectedModel, setSelectedModel] = useState(null);
-    const [showModelModal, setShowModelModal] = useState(false)
+    const [showModelModal, setShowModelModal] = useState(false);
+    const [selectedRowData, setSelectedRowData] = useState({})
     const [tableData, setTableData] = useState([]);
+
+    const getModelNumberColumnValue = (dataElement) => {
+        if (!dataElement.modelNumber && contextValue.permissionLevel === 2) {
+            return (
+                <Button
+                    variant="text"
+                    color="primary"
+                    sx={{
+                        textDecoration: 'underline'
+                    }}
+                    onClick={() => {
+                        setShowCreateModal(true)
+                        setSelectedRowData(dataElement)
+                    }}
+                >
+                    {intl.formatMessage(modelsPageMessages.addModel)}
+                </Button>
+            )
+        } else {
+            return dataElement.modelNumber
+        }
+    }
 
     
     useEffect(() => {
@@ -32,7 +55,7 @@ const ModelPage = (props) => {
             data.push(
                 {
                     rowId: dataElement.modelNumber,
-                    rowContent: [dataElement.modelNumber, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, MODEL_STATUS_ENUM[dataElement.status]]
+                    rowContent: [getModelNumberColumnValue(dataElement), ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, MODEL_STATUS_ENUM[dataElement.status]]
                 });
         })
         setTableData(data)
@@ -43,7 +66,7 @@ const ModelPage = (props) => {
         setShowCreateModal(false)
     }
 
-    const onRespondMoal = (modelNumber, status) => {
+    const onRespondModel = (modelNumber, status) => {
         const models = [...originalData]
         const modelsIndex = models.findIndex((model) => model.modelNumber === modelNumber);
         newData.splice(modelsIndex, 1)
@@ -101,7 +124,11 @@ const ModelPage = (props) => {
                 </CenteredStack>
             <CreateModelModal
                 open={showCreateModal}
-                onClose={() => setShowCreateModal(false)}
+                onClose={() => {
+                    setShowCreateModal(false)
+                    setSelectedRowData(null)
+                }}
+                modelData={selectedRowData}
                 onAddNewModel={(model) => onAddNewModel(model)}
             />
             <ModelModalComponent

@@ -47,3 +47,14 @@ export const ORDERS_MANAGER_TABLE_COLUMNS = [
     intl.formatMessage(modelsPageMessages.created),
     intl.formatMessage(ordersPageMessages.deadline)
 ]
+
+export const DESIGN_MANAGER_ORDERS_COLUMNS = [
+    intl.formatMessage(ordersPageMessages.orderNumber),
+    intl.formatMessage(customerPageMessages.customerName),
+    intl.formatMessage(modelsPageMessages.item),
+    intl.formatMessage(modelsPageMessages.setting),
+    intl.formatMessage(modelsPageMessages.mainStoneSize),
+    intl.formatMessage(modelsPageMessages.sideStoneSize),
+    intl.formatMessage(modelsPageMessages.created),
+    intl.formatMessage(ordersPageMessages.deadline)
+]

@@ -12,7 +12,7 @@ import FormTextAreaComponent from '../../../components/UI/Form/Inputs/FormTextAr
 import ButtonComponent from '../../../components/UI/ButtonComponent';
 import axios from 'axios';
 import { getAuthorizationHeader } from '../../../utils/utils';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import AppContext from '../../../context/AppContext';
 
 const CreateModelModal = (props) => {
@@ -30,6 +30,32 @@ const CreateModelModal = (props) => {
         title: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
         description: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
     }).required()
+
+    useEffect(() => {
+        if (props.modelData) {
+            methods.reset({
+                item: props.modelData.item,
+                setting: props.modelData.setting,
+                mainStoneSize: props.modelData.mainStoneSize,
+                sideStoneSize: props.modelData.sideStoneSize
+            }
+        ) } else {
+            methods.reset({})
+        }
+    }, [props.modelData])
+
+    useEffect(() => {
+        if (props.modelData) {
+            methods.reset({
+                item: props.modelData.item,
+                setting: props.modelData.setting,
+                mainStoneSize: props.modelData.mainStoneSize,
+                sideStoneSize: props.modelData.sideStoneSize
+            }
+        )
+        }
+    }, [props.modelData])
+
 
     const methods = useForm({
         resolver: yupResolver(newModelValidationSchema)

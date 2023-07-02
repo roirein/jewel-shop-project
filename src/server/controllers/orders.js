@@ -56,7 +56,6 @@ const getOrders = async (req, res, next) => {
         const orders = await getOrderByPermissionLevel(req.permissionLevel);
         res.status(200).send({orders})
     } catch(e) {
-
         next(e)
     }
 }
@@ -96,7 +95,8 @@ const getOrderById = async (req, res, next) => {
             customerName: orderData.dataValues['Order Customer'].customerName,
             email: orderData.dataValues['Order Customer'].dataValues.email,
             phoneNumber: orderData.dataValues['Order Customer'].dataValues.phoneNumber,
-            deadline: orderData.dataValues.deadline
+            deadline: orderData.dataValues.deadline,
+            status: orderData.dataValues.status
         }
         res.status(200).send({order})
     } catch (e) {

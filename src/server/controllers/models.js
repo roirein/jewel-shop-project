@@ -41,17 +41,15 @@ const getModelsMetadata = async (req, res, next) => {
             }
         })
 
-        console.log(modelsMetadata)
-
         const models = modelsMetadata.map((model) => {
             return {
                 id: model.metadataId,
-                modelNumber: model['Jewel Model'].modelNumber,
+                modelNumber: model['Jewel Model']?.modelNumber ||  null,
                 item: model.item,
                 setting: model.setting,
                 sideStoneSize: model.sideStoneSize,
                 mainStoneSize: model.mainStoneSize,
-                status: model['Jewel Model'].status
+                status: model['Jewel Model']?.status || -1
             }
         })
         res.status(200).send({models})

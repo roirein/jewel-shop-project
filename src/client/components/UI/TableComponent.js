@@ -1,4 +1,4 @@
-import { Table, TableHead, TableRow, TableCell, TableBody, TableContainer, Paper, useTheme, Link, Checkbox, Stack} from "@mui/material";
+import { Table, TableHead, TableRow, TableCell, TableBody, TableContainer, Paper, useTheme, Link, Checkbox, Stack, Button} from "@mui/material";
 import { useIntl } from "react-intl";
 import { buttonMessages } from "../../translations/i18n";
 import { useState } from "react";
@@ -12,6 +12,7 @@ const TableComponent = (props) => {
     const intl = useIntl()
 
     const [selectedRowId, setSelectedRowId] = useState(null)
+    console.log(props.data)
 
     return (
         <CenteredStack
@@ -98,17 +99,19 @@ const TableComponent = (props) => {
                                             textAlign: 'center'
                                         }}
                                     >
-                                        <Link
-                                            variant="body1"
-                                            color={theme.palette.primary.main}
+                                        <Button
+                                            variant="text"
+                                            color="primary"
                                             onClick={() => props.onClickShowMore(row.rowId)}
                                             fontWeight="bold"
                                             sx={{
-                                                cursor: 'pointer'
+                                                cursor: 'pointer',
+                                                textDecoration: 'underline'
                                             }}
+                                            disabled={!row.rowId}
                                         >
                                             {intl.formatMessage(buttonMessages.showMore)}
-                                        </Link>
+                                        </Button>
                                     </TableCell>
                                 )}
                             </TableRow>

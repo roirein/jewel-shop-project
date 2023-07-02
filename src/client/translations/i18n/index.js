@@ -405,6 +405,14 @@ export const modelsPageMessages = defineMessages({
     numberOfModel: {
         id: 'numberOfModel',
         defaultMessage: 'model number {number}'
+    },
+    notCreated: {
+        id: 'notCreated',
+        defaultMessage: 'not created'
+    },
+    addModel: {
+        id: 'addModel',
+        defaultMessage: 'add model'
     }
 })
 
@@ -520,5 +528,13 @@ export const ordersPageMessages = defineMessages({
     numberOfOrder: {
         id: 'numberOfOrder',
         defaultMessage: 'order number {number}'
+    },
+    sendToDesignManager: {
+        id: 'sendToDesignManager',
+        defaultMessage: 'sent to design manager'
+    },
+    orderSentSucessfully: {
+        id: 'orderSentSucessfully',
+        defaultMessage: 'order sent to design manager successfully'
     }
 })

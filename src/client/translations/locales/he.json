@@ -116,5 +116,9 @@
     "inDesign": "בעיצוב",
     "designCompleted": "עיצוב הושלם",
     "customerApproved": "לקוח אישר",
-    "numberOfOrder": "הזמנה מספר {number}"
+    "numberOfOrder": "הזמנה מספר {number}",
+    "sendToDesignManager": "שלח למנהל עיצוב",
+    "orderSentSucessfully": "הזמנה הועברה למנהל עיצוב בהצלחה",
+    "notCreated": "לא נוצר",
+    "addModel": "הוסף מודל"
 }
