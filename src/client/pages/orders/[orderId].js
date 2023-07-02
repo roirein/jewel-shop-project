@@ -9,6 +9,7 @@ import { ordersPageMessages } from "../../translations/i18n"
 import { ITEM_ENUMS, METAL_ENUM, SIZE_ENUM } from "../../const/Enums"
 import { Stack, Typography, useTheme } from "@mui/material"
 import ButtonComponent from "../../components/UI/ButtonComponent"
+import OrderModelData from "./components/OrderModelData"
 
 const OrderPage = (props) => {
 
@@ -86,6 +87,21 @@ const OrderPage = (props) => {
                         )}
                     </Stack>
                 )}
+                {props.status >= 2 && (
+                    <OrderModelData
+                        orderId={props.orderId}
+                        status={props.status}
+                        price={props.price}
+                        casting={props.casting}
+                        title={props.title}
+                        description={props.description}
+                        image={props.image}
+                        materials={props.materials}
+                        priceWithMaterials={props.priceWithMaterials}
+                        priceWithoutMaterials={props.priceWithoutMaterials}
+
+                    />
+                )}
             </Stack>
         </CenteredStack>
     )
@@ -100,9 +116,24 @@ export const getServerSideProps = async (context) => {
             Authorization: getAuthorizationHeader(token)
         }
     })
-    console.log(response.data)
-    return {
-        props: {
+    let modelData;
+    if (response.data.order.status >= 2) {
+        const modelResponse = await axios.get(`http://localhost:3002/model/model/${response.data.order.modelId}`, {
+            headers: {
+                Authorization: getAuthorizationHeader(token)
+            }
+        })
+        modelData = {
+            title: modelResponse.data.model.title,
+            description: modelResponse.data.model.description,
+            image: modelResponse.data.model.image,
+            materials: modelResponse.data.model.materials,
+            priceWithMaterials: modelResponse.data.model.priceWithMaterials,
+            priceWithoutMaterials: modelResponse.data.model.priceWithoutMaterials
+        }
+    }
+    
+    let props =  {
             orderId: response.data.order.orderId,
             item: response.data.order.item,
             setting: response.data.order.setting,
@@ -117,7 +148,20 @@ export const getServerSideProps = async (context) => {
             email: response.data.order.email,
             phoneNumber: response.data.order.phoneNumber,
             deadline: response.data.order.deadline,
-            status: response.data.order.status
+            status: response.data.order.status,
+            //price: response.data.order.price
         }
+    
+    if (modelData) {
+        props = {
+            ...props,
+            ...modelData
+        }
+    }
+
+    console.log(props)
+
+    return {
+        props: props
     }
 }

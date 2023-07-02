@@ -556,5 +556,17 @@ export const ordersPageMessages = defineMessages({
     orderSentSucessfully: {
         id: 'orderSentSucessfully',
         defaultMessage: 'order sent to design manager successfully'
+    },
+    chooseOption: {
+        id: 'chooseOption',
+        defaultMessage: 'choose your preferred option'
+    },
+    pricePaid: {
+        id: 'pricePaid',
+        defaultMessage: 'price paid: {price}'
+    },
+    sendOrderToCasting: {
+        id: 'sendOrderToCasting',
+        defaultMessage: 'send order to casting'
     }
 })

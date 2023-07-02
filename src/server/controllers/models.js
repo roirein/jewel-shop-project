@@ -2,6 +2,7 @@ const JewelModel = require("../models/models/jewelModel")
 const Comments = require("../models/models/modelComments")
 const ModelMetadata = require("../models/models/modelMetadata")
 const ModelPrice = require("../models/models/modelPrice")
+const Order = require("../models/orders/order")
 const { sendNewModelNotification } = require("../services/sockets/socket")
 const HttpError = require('../utils/HttpError')
 const { createModelMetadata, createModel } = require("../utils/models")
@@ -81,12 +82,33 @@ const getModelById = async (req, res, next) => {
             }
         })
 
-        const model = {
+        let modelPrice;
+        const modelPriceData = await ModelPrice.findOne({
+            where: {
+                modelNumber: req.params.modelId
+            }
+        })
+        modelPrice = {
+            materials: modelPriceData.dataValues.materials,
+            priceWithMaterials: modelPriceData.dataValues.priceWithMaterials,
+            priceWithoutMaterials: modelPriceData.dataValues.priceWithoutMaterials
+        }
+//         if (req.permissionLevel === 5 || req.permissionLevel === 1) {
+// /
+//         } 
+
+        let model = {
             modelNumber: modelData.dataValues.modelNumber,
             title: modelData.dataValues.title,
             description: modelData.dataValues.description,
             image: modelData.dataValues.image,
             status: modelData.dataValues.status
+        }
+        if (modelPrice) {
+            model = {
+                ...model,
+                ...modelPrice
+            }
         }
         res.status(200).send({model})
     } catch (e) {
@@ -159,6 +181,20 @@ const updateModelPrice = async (req, res, next) => {
                 modelNumber: req.params.modelNumber
             }
         })
+        const modelMetadata = await ModelMetadata.findOne({
+            where: {
+                modelNumber: req.params.modelNumber
+            }
+        })
+        if (modelMetadata.dataValues.orderId) {
+            await Order.update({
+                status: 2
+            }, {
+                where: {
+                    orderId: modelMetadata.dataValues.orderId
+                }
+            })
+        }
         res.status(201).send();
     } catch (e) {
         console.log(e)
@@ -184,6 +220,7 @@ const getPriceData = async (req, res, next) => {
         next (e)
     }
 }
+
 
 module.exports = {
     createNewModel,

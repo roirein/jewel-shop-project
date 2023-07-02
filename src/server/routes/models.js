@@ -9,9 +9,9 @@ router.post('/newModel', authorizeUser, checkPermissions([2]), modelUpload.singl
 
 router.get('/metadata', authorizeUser, checkPermissions([1, 2]), getModelsMetadata);
 
-router.get('/model/:modelId', authorizeUser, checkPermissions([1, 2]), getModelById);
+router.get('/model/:modelId', authorizeUser, checkPermissions([1, 2, 5]), getModelById);
 
-router.get('/image/:imagePath', authorizeUser, checkPermissions([1, 2]), getModelImage);
+router.get('/image/:imagePath', authorizeUser, checkPermissions([1, 2, 5]), getModelImage);
 
 router.get('/comments/:modelNumber', authorizeUser, checkPermissions([1,2]), getModelComments)
 

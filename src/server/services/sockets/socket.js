@@ -7,6 +7,7 @@ const JewelModel = require("../../models/models/jewelModel");
 const Employee = require("../../models/users/employee");
 const Order = require("../../models/orders/order");
 const Comments = require("../../models/models/modelComments");
+const OrdersInCasting = require("../../models/orders/ordersInCasing");
 
 let ioInstance = null;
 
@@ -44,6 +45,31 @@ const initSocket = (io) => {
 
         socket.on('new-design', async (data) => {
             await sendOrderToDesign(data.orderId)
+        })
+
+        socket.on('customer-approval', async (data) => {
+            await Order.update({
+                price: data.price,
+                status: 3
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
+
+            if (data.casting) {
+                await OrdersInCasting.create({orderId: data.orderId})
+            }
+        })
+
+        socket.on('update-casting-status', async (data) => {
+            await OrdersInCasting.update({
+                status: data.status
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
         })
 
         socket.on('read-notification', async (data) => {

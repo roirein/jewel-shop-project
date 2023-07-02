@@ -35,6 +35,10 @@ Order.init({
     deadline: {
         type: DataTypes.DATE,
         allowNull: false
+    },
+    price: {
+        type: DataTypes.FLOAT,
+        allowNull: true
     }
 }, {
     timestamps: true,

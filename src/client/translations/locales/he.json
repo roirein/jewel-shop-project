@@ -125,5 +125,8 @@
     "update": "עדכן",
     "materials": "חומרים",
     "priceWithMaterials": "מחיר עם חומר",
-    "priceWithoutMaterials": "מחיר ללא חומר"
+    "priceWithoutMaterials": "מחיר ללא חומר",
+    "chooseOption": "בחר את האופציה המועדפת עליך",
+    "pricePaid": "מחיר ששולם: {price}",
+    "sendOrderToCasting": "שלח הזמנה ליציקה"
 }

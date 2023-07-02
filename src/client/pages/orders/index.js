@@ -35,11 +35,13 @@ const OrdersPage = (props) => {
     const getTableContent = (dataElement) => {
         console.log(dataElement)
         switch (contextValue.permissionLevel) {
-            case 1: 
+            case 1:
                 return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
             case 2: 
                 return [dataElement.orderId, dataElement.customerName, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, 
                             new Date(dataElement.created).toLocaleDateString('he-IL'), new Date(dataElement.deadline).toLocaleDateString('he-IL')]
+            case 5: 
+                return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
             default:
                 return []
         }
@@ -76,6 +78,8 @@ const OrdersPage = (props) => {
                 return ORDERS_MANAGER_TABLE_COLUMNS
             case 2:
                 return DESIGN_MANAGER_ORDERS_COLUMNS
+            case 5: 
+                return ORDERS_MANAGER_TABLE_COLUMNS
             default: 
                 return []
         }

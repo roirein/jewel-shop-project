@@ -53,7 +53,7 @@ const createNewOrder = async (req, res, next) => {
 
 const getOrders = async (req, res, next) => {
     try {
-        const orders = await getOrderByPermissionLevel(req.permissionLevel);
+        const orders = await getOrderByPermissionLevel(req.permissionLevel, req.userId);
         res.status(200).send({orders})
     } catch(e) {
         next(e)
@@ -81,6 +81,8 @@ const getOrderById = async (req, res, next) => {
                 metadataId: orderData['Jewel Order'].metadataId
             }
         })
+
+        console.log(metadata)
         const order = {
             orderId: orderData.dataValues.orderId,
             item: metadata.dataValues.item,
@@ -96,7 +98,9 @@ const getOrderById = async (req, res, next) => {
             email: orderData.dataValues['Order Customer'].dataValues.email,
             phoneNumber: orderData.dataValues['Order Customer'].dataValues.phoneNumber,
             deadline: orderData.dataValues.deadline,
-            status: orderData.dataValues.status
+            status: orderData.dataValues.status,
+            modelId: metadata.dataValues.modelNumber || null,
+            price: orderData.dataValues.price || null
         }
         res.status(200).send({order})
     } catch (e) {

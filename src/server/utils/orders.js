@@ -64,13 +64,20 @@ const getOrdersInDesign = async () => {
 }
 
 
-const getAllOrders = async () => {
-    const ordersData = await Order.findAll({
+const getAllOrders = async (permissionLevel, userId) => {
+    
+    let ordersData = await Order.findAll({
         include: {
             model: OrderCustomer,
             attributes: ['customerName']
-        }
+        }, 
     });
+
+    if (permissionLevel === 5) {
+        ordersData.filter((order) => {
+            return order.customerId === userId
+        })
+    }
     const orders = ordersData.map((order) => {
         return {
             orderId: order.orderId,
@@ -85,14 +92,17 @@ const getAllOrders = async () => {
 }
 
 
-const getOrderByPermissionLevel = async (permissionLevel) => {
+const getOrderByPermissionLevel = async (permissionLevel, userId) => {
     let orders;
     switch (permissionLevel) {
         case 1: 
-            orders = await getAllOrders();
+            orders = await getAllOrders(permissionLevel, userId);
             break
         case 2:
             orders = await getOrdersInDesign();
+            break;
+        case 5: 
+            orders = await getAllOrders(permissionLevel, userId)
             break;
         default: 
             orders = []
