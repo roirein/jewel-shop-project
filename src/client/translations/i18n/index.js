@@ -198,6 +198,14 @@ export const buttonMessages = defineMessages({
     goBack: {
         id: 'goBack',
         defaultMessage: 'goBack'
+    },
+    cancel: {
+        id: 'cancel',
+        defaultMessage: 'cancel'
+    },
+    update: {
+        id: 'update',
+        defaultMessage: 'update'
     }
 })
 
@@ -413,6 +421,18 @@ export const modelsPageMessages = defineMessages({
     addModel: {
         id: 'addModel',
         defaultMessage: 'add model'
+    },
+    materials: {
+        id: 'materials',
+        defaultMessage: 'materials'
+    },
+    priceWithMaterials: {
+        id: 'priceWithMaterials',
+        defaultMessage: 'price with material'
+    },
+    priceWithoutMaterials: {
+        id: 'priceWithoutMaterials',
+        defaultMessage: 'price without materials'
     }
 })
 

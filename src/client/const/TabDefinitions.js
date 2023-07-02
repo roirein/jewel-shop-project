@@ -40,7 +40,7 @@ export const CUSTOMER_TABS = [
 export const DESIGN_MANGER_TABS = [
     {
         label: intl.formatMessage(tabsMessages.models),
-        route: '/customers'
+        route: '/models'
     }, 
     {
         label: intl.formatMessage(tabsMessages.orders),

@@ -64,6 +64,7 @@ const CreateModelModal = (props) => {
         const formData = new FormData();
         Object.entries(rest).forEach((entry) => {
             formData.append(entry[0], entry[1])
+            methods.setValue(entry[0], '')
         })
         formData.append('model', data.model[0])
         if (modelData) {
@@ -121,9 +122,10 @@ const CreateModelModal = (props) => {
     const handleClose = () => {
         if (modelData) {
             Object.entries(modelData).forEach((entry) => {
-                methods.setValue(entry[0], entry[1])
+                methods.setValue(entry[0], '')
             })
         }
+        props.onClose()
     }
 
     return (

@@ -6,6 +6,7 @@ const Notifications = require("../../models/notifications/notifications");
 const JewelModel = require("../../models/models/jewelModel");
 const Employee = require("../../models/users/employee");
 const Order = require("../../models/orders/order");
+const Comments = require("../../models/models/modelComments");
 
 let ioInstance = null;
 
@@ -33,6 +34,12 @@ const initSocket = (io) => {
                     modelNumber: data.modelNumber
                 }
             })
+            if (data.comments) {
+                await Comments.create({
+                    modelNumber: data.modelNumber,
+                    content: data.comments
+                })
+            }
         })
 
         socket.on('new-design', async (data) => {

@@ -76,9 +76,8 @@ const ModelPage = (props) => {
     const onRespondModel = (modelNumber, status) => {
         const models = [...originalData]
         const modelsIndex = models.findIndex((model) => model.modelNumber === modelNumber);
-        newData.splice(modelsIndex, 1)
         models[modelsIndex].status = status,
-        setOriginalData[models]
+        setOriginalData(models)
     }
 
     return (
@@ -141,9 +140,12 @@ const ModelPage = (props) => {
             <ModelModalComponent
                 open={showModelModal}
                 modelNumber={selectedModel}
-                onClose={() => {
+                onClose={(modelNumber, status) => {
                     setSelectedModel(null)
                     setShowModelModal(false)
+                    if (status !== undefined) {
+                        onRespondModel(modelNumber, status)
+                    }
                 }}
             />
         </Stack>

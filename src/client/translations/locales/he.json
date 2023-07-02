@@ -120,5 +120,10 @@
     "sendToDesignManager": "שלח למנהל עיצוב",
     "orderSentSucessfully": "הזמנה הועברה למנהל עיצוב בהצלחה",
     "notCreated": "לא נוצר",
-    "addModel": "הוסף מודל"
+    "addModel": "הוסף מודל",
+    "cancel": "ביטול",
+    "update": "עדכן",
+    "materials": "חומרים",
+    "priceWithMaterials": "מחיר עם חומר",
+    "priceWithoutMaterials": "מחיר ללא חומר"
 }

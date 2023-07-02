@@ -9,7 +9,7 @@ require('dotenv').config();
 const sequelize = require('./server/database/connection');
 const {initSocket} = require('./server/services/sockets/socket');
 const { createNewUser, createNewEmployee } = require('./server/utils/user');
-
+const ModelPrice =  require('./server/models/models/modelPrice')
 const userRoute = require('./server/routes/users');
 const customerRoute = require('./server/routes/customers');
 const employeeRoute = require('./server/routes/employees');

@@ -1,5 +1,7 @@
 const JewelModel = require("../models/models/jewelModel")
+const Comments = require("../models/models/modelComments")
 const ModelMetadata = require("../models/models/modelMetadata")
+const ModelPrice = require("../models/models/modelPrice")
 const { sendNewModelNotification } = require("../services/sockets/socket")
 const HttpError = require('../utils/HttpError')
 const { createModelMetadata, createModel } = require("../utils/models")
@@ -61,7 +63,7 @@ const getModelsMetadata = async (req, res, next) => {
                 setting: model.setting,
                 sideStoneSize: model.sideStoneSize,
                 mainStoneSize: model.mainStoneSize,
-                status: model['Jewel Model']?.status || -1
+                status: model['Jewel Model']?.status === null ? -1 : model['Jewel Model']?.status 
             }
         })
         res.status(200).send({models})
@@ -92,6 +94,46 @@ const getModelById = async (req, res, next) => {
     }
 }
 
+const getModelComments = async (req, res, next) => {
+    try {
+        const commentData = await Comments.findAll({
+            where: {
+                modelNumber: req.params.modelNumber
+            },
+            attributes: ['content'], 
+            order: [['createdAt', 'DESC']],
+            limit: 1
+        })
+
+        res.status(200).send({comment: commentData[0].dataValues.content})
+    } catch (e) {
+        next(e)
+    }
+}
+
+const updateModel = async (req, res, next) => {
+    try {
+        await JewelModel.update({
+            title: req.body.title,
+            description: req.body.description,
+            image: req.file.filename,
+            status: 2
+        },{
+            where: {
+                modelNumber: req.params.modelNumber
+            }
+        })
+        res.status(200).send({newModel: {
+            title: req.body.title,
+            description: req.body.description,
+            image: req.body.image,
+            status: 2
+        }})
+    } catch(e) {
+        next(e)
+    }
+}
+
 const getModelImage = async (req, res, next) => {
     try {
         const file = req.params.imagePath
@@ -102,9 +144,54 @@ const getModelImage = async (req, res, next) => {
     }
 }
 
+const updateModelPrice = async (req, res, next) => {
+    try {
+        await ModelPrice.create({
+            modelNumber: req.params.modelNumber,
+            materials: req.body.materials,
+            priceWithMaterials: req.body.priceWithMaterials,
+            priceWithoutMaterials: req.body.priceWithoutMaterials
+        })
+        await JewelModel.update({
+            status: 4
+        }, {
+            where: {
+                modelNumber: req.params.modelNumber
+            }
+        })
+        res.status(201).send();
+    } catch (e) {
+        console.log(e)
+        next(e)
+    }
+}
+
+const getPriceData = async (req, res, next) => {
+    try {
+        const priceData = await ModelPrice.findOne({
+            where: {
+                modelNumber: req.params.modelNumber
+            }
+        })
+        const price = {
+            materials: priceData.dataValues.materials,
+            priceWithMaterials: priceData.dataValues.priceWithMaterials,
+            priceWithoutMaterials: priceData.dataValues.priceWithoutMaterials
+        }
+
+        res.status(200).send({price})
+    } catch (e) {
+        next (e)
+    }
+}
+
 module.exports = {
     createNewModel,
     getModelsMetadata,
     getModelById,
-    getModelImage
+    getModelImage,
+    getModelComments,
+    updateModel,
+    updateModelPrice,
+    getPriceData
 }
