@@ -36,8 +36,8 @@ const ModelPage = (props) => {
                         textDecoration: 'underline'
                     }}
                     onClick={() => {
-                        setShowCreateModal(true)
                         setSelectedRowData(dataElement)
+                        setShowCreateModal(true)
                     }}
                 >
                     {intl.formatMessage(modelsPageMessages.addModel)}
@@ -125,8 +125,8 @@ const ModelPage = (props) => {
             <CreateModelModal
                 open={showCreateModal}
                 onClose={() => {
-                    setShowCreateModal(false)
                     setSelectedRowData(null)
+                    setShowCreateModal(false)
                 }}
                 modelData={selectedRowData}
                 onAddNewModel={(model) => onAddNewModel(model)}

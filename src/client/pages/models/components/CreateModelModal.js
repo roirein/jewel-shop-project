@@ -31,37 +31,25 @@ const CreateModelModal = (props) => {
         description: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
     }).required()
 
-    useEffect(() => {
-        if (props.modelData) {
-            methods.reset({
-                item: props.modelData.item,
-                setting: props.modelData.setting,
-                mainStoneSize: props.modelData.mainStoneSize,
-                sideStoneSize: props.modelData.sideStoneSize
-            }
-        ) } else {
-            methods.reset({})
-        }
-    }, [props.modelData])
-
-    useEffect(() => {
-        if (props.modelData) {
-            methods.reset({
-                item: props.modelData.item,
-                setting: props.modelData.setting,
-                mainStoneSize: props.modelData.mainStoneSize,
-                sideStoneSize: props.modelData.sideStoneSize
-            }
-        )
-        }
-    }, [props.modelData])
-
+    const modelData = props.modelData
+    const defaultValues = {
+        item: modelData ? props.modelData.item : '',
+        setting: modelData ? props.modelData.setting: '',
+        sideStoneSize: modelData ? props.modelData.sideStoneSize : '',
+        mainStoneSize: modelData ? props.modelData.mainStoneSize: ''
+    }
 
     const methods = useForm({
         resolver: yupResolver(newModelValidationSchema)
     });
 
-    
+    useEffect(() => {
+        console.log(defaultValues)
+        Object.entries(defaultValues).forEach((entry) => {
+            methods.setValue(entry[0], entry[1])
+        })
+    }, [modelData])
+
     const getItemsOptions = () => {
         return Object.entries(ITEM_ENUMS).map((entry) => {
             return {
@@ -127,10 +115,14 @@ const CreateModelModal = (props) => {
         )
     }
 
+    console.log(methods.getValues())
+
     return (
         <ModalComponent
             open={props.open}
-            onClose={() => props.onClose()}
+            onClose={() => {
+                methods.reset()
+            }}
             title={intl.formatMessage(modelsPageMessages.createNewModel)}
             width="sm"
             actions={getModalActions()}
