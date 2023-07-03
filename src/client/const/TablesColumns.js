@@ -58,3 +58,11 @@ export const DESIGN_MANAGER_ORDERS_COLUMNS = [
     intl.formatMessage(modelsPageMessages.created),
     intl.formatMessage(ordersPageMessages.deadline)
 ]
+
+export const ORDERS_IN_CASTING_TABLE_COLUMNS = [
+    intl.formatMessage(ordersPageMessages.orderNumber),
+    intl.formatMessage(ordersPageMessages.orderType),
+    intl.formatMessage(customerPageMessages.customerName),
+    intl.formatMessage(ordersPageMessages.deadline),
+    intl.formatMessage(modelsPageMessages.status)
+]

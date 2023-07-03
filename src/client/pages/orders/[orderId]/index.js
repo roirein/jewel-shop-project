@@ -1,15 +1,15 @@
 import axios from "axios"
-import CenteredStack from "../../components/UI/CenteredStack"
-import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
+import CenteredStack from "../../../components/UI/CenteredStack"
+import { getAuthorizationHeader, getUserToken } from "../../../utils/utils"
 import { useIntl } from "react-intl"
-import OrderSummaryComponent from "./components/OrderSummary"
+import OrderSummaryComponent from "../components/OrderSummary"
 import { useState, useEffect, useContext } from "react"
-import AppContext from "../../context/AppContext"
-import { ordersPageMessages } from "../../translations/i18n"
-import { ITEM_ENUMS, METAL_ENUM, SIZE_ENUM } from "../../const/Enums"
+import AppContext from "../../../context/AppContext"
+import { ordersPageMessages } from "../../../translations/i18n"
+import { ITEM_ENUMS, METAL_ENUM, SIZE_ENUM } from "../../../const/Enums"
 import { Stack, Typography, useTheme } from "@mui/material"
-import ButtonComponent from "../../components/UI/ButtonComponent"
-import OrderModelData from "./components/OrderModelData"
+import ButtonComponent from "../../../components/UI/ButtonComponent"
+import OrderModelData from "../components/OrderModelData"
 
 const OrderPage = (props) => {
 
@@ -149,7 +149,7 @@ export const getServerSideProps = async (context) => {
             phoneNumber: response.data.order.phoneNumber,
             deadline: response.data.order.deadline,
             status: response.data.order.status,
-            //price: response.data.order.price
+            price: response.data.order.price
         }
     
     if (modelData) {

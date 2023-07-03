@@ -2,7 +2,7 @@ import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab, Link} from '@mui/materi
 import CenteredStack from '../UI/CenteredStack';
 import { useContext, useState, useEffect } from 'react';
 import AppContext from '../../context/AppContext';
-import { DESIGN_MANGER_TABS, MANAGER_TABS } from '../../const/TabDefinitions';
+import { CUSTOMER_INTERFACE_TABS, DESIGN_MANGER_TABS, MANAGER_TABS } from '../../const/TabDefinitions';
 import TemplateTabsComponent from './TemplateTabs';
 import NotificationComponent from '../UI/NotificationComponent';
 import { useIntl } from 'react-intl';
@@ -47,6 +47,9 @@ const AppTemplate = (props) => {
         }
         if (contextValue.permissionLevel === 2) {
             return DESIGN_MANGER_TABS
+        }
+        if (contextValue.permissionLevel === 5) {
+            return CUSTOMER_INTERFACE_TABS
         }
         else {
             return []

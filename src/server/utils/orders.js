@@ -3,8 +3,9 @@ const ModelMetadata = require("../models/models/modelMetadata")
 const Order = require("../models/orders/order")
 const {Op} = require('sequelize')
 const OrderCustomer = require("../models/orders/orderCustomer")
-const JewelOrder = require("../models/orders/jewelOrder")
-
+const JewelOrder = require("../models/orders/jewelOrder");
+const OrdersInCasting = require('../models/orders/ordersInCasing')
+ 
 const getOrdersInDesign = async () => {
     const ordersData = await Order.findAll({
         where: {
@@ -110,6 +111,33 @@ const getOrderByPermissionLevel = async (permissionLevel, userId) => {
     return orders
 }
 
+const getOrdersInCasting = async () => {
+    const orderData = await Order.findAll({
+        where: {
+            status: {
+                [Op.or]: [3, 4, 5]
+            },
+            type: {
+                [Op.or]: [1, 2]
+            }
+        },
+        include: [OrderCustomer, OrdersInCasting]
+    })
+
+    const orders = orderData.map((order) => {
+        return {
+            orderId: order.orderId,
+            type: order.type,
+            customerName: order['Order Customer'].customerName,
+            deadline: new Date(order.deadline).toLocaleDateString('he-IL'),
+            castingStatus: order['Orders in Casting'].castingStatus
+        }
+    })
+
+    return orders
+}
+
 module.exports = {
-    getOrderByPermissionLevel
+    getOrderByPermissionLevel,
+    getOrdersInCasting
 }

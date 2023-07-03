@@ -64,7 +64,31 @@ const initSocket = (io) => {
 
         socket.on('update-casting-status', async (data) => {
             await OrdersInCasting.update({
-                status: data.status
+                castingStatus: data.castingStatus
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
+            let status
+            if (data.castingStatus === 2) {
+                status = 4
+            }
+            if (data.castingStatus === 3) {
+                status = 5
+            }
+            await Order.update({
+                status: status
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
+        })
+
+        socket.on('send-order-to-production', async (data) => {
+            await Order.update({
+                status: data.status,
             }, {
                 where: {
                     orderId: data.orderId

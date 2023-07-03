@@ -55,5 +55,13 @@ export const ORDER_STATUS = {
     [0]: intl.formatMessage(modelsPageMessages.created),
     [1]: intl.formatMessage(ordersPageMessages.inDesign),
     [2]: intl.formatMessage(ordersPageMessages.designCompleted),
-    [3]: intl.formatMessage(ordersPageMessages.customerApproved)
+    [3]: intl.formatMessage(ordersPageMessages.customerApproved),
+    [4]: intl.formatMessage(ordersPageMessages.inCasting),
+    [5]: intl.formatMessage(ordersPageMessages.castingCompleted)
+}
+
+export const CASTING_STATUS = {
+    [1]: intl.formatMessage(ordersPageMessages.notSend),
+    [2]: intl.formatMessage(ordersPageMessages.inCasting),
+    [3]: intl.formatMessage(modelsPageMessages.completed)
 }

@@ -568,5 +568,53 @@ export const ordersPageMessages = defineMessages({
     sendOrderToCasting: {
         id: 'sendOrderToCasting',
         defaultMessage: 'send order to casting'
+    },
+    ordersInDesign: {
+        id: 'ordersInDesign',
+        defaultMessage: 'orders in design'
+    },
+    ordersInCasting: {
+        id: 'ordersInCasting',
+        defaultMessage: 'orders in casting'
+    },
+    ordersInProduction: {
+        id: 'ordersInProduction',
+        defaultMessage: 'orders in production'
+    },
+    orderCompleted: {
+        id: 'orderCompleted',
+        defaultMessage: 'orders completed'
+    },
+    notSend: {
+        id: 'notSend',
+        defaultMessage: 'not send'
+    },
+    inCasting: {
+        id: 'inCasting',
+        defaultMessage: 'in casting'
+    },
+    castingCompleted: {
+        id: 'castingCompleted',
+        defaultMessage: 'casting completed'
+    },
+    senToCasting: {
+        id: 'sentToCasting',
+        defaultMessage: 'order sent to casting successfully'
+    },
+    sendOrderToProduction: {
+        id: 'sendOrderToProduction',
+        defaultMessage: 'send order to production manager',
+    },
+    orderSentToProductionSuccessfully: {
+        id: 'orderSentToProductionSuccessfully',
+        defaultMessage: 'order successfully sent to design manager'
+    },
+    completeCasting: {
+        id: 'completeCasting',
+        defaultMessage: 'complete casting'
+    },
+    castingCompleted: {
+        id: 'castingCompleted',
+        defaultMessage: 'casting completed'
     }
 })

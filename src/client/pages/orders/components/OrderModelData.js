@@ -13,8 +13,11 @@ const OrderModelData = (props) => {
     const [imageUrl, setImageUrl] = useState();
     const [status, setStatus] = useState(props.status)
     const [price, setPrice] = useState(props.price)
-    const intl = useIntl()
-    const theme = useTheme()
+    const [sentToCasting, setSentToCasting] = useState(false);
+    const [castingCompleted, setCastingCompleted] = useState(false)
+    const [sentToProduction, setSentToProduction] = useState(false);
+    const intl = useIntl();
+    const theme = useTheme();
     const contextValue = useContext(AppContext)
 
     useEffect(() => {
@@ -37,7 +40,31 @@ const OrderModelData = (props) => {
         })
         setPrice(price)
         setStatus(3)
-    } 
+    }
+
+    const updateCasting = (castingStatus) => {
+        contextValue.socket.emit('update-casting-status', {
+            orderId: props.orderId,
+            castingStatus: castingStatus
+        })
+        if (castingStatus === 2) {
+            setStatus(4)
+            setSentToCasting(true)
+        }
+        if (castingStatus === 3) {
+            setStatus(5)
+            setCastingCompleted(true)
+        }
+    }
+
+    const sendOrderToProduction = () => {
+        contextValue.socket.emit('send-order-to-production', {
+            orderId: props.orderId,
+            status: 6
+        })
+        setStatus(6)
+        setSentToProduction(true)
+    }
 
     return (
         <Stack
@@ -96,16 +123,60 @@ const OrderModelData = (props) => {
                         width="75%"
                         height="40px"
                     >
-                        <ButtonComponent
-                            label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
-                            onClick={() => {
-                                contextValue.socket.emit('update-casting-status', {
-                                    status: 2,
-                                    orderId: props.orderId
-                                })
-                            }}
-                        />
+                        {!sentToCasting && (
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
+                                onClick={() => updateCasting(2)}
+                            />
+                        )}
                     </Stack>
+                )}
+                {status === 4 && (
+                    <>
+                        {sentToCasting && (
+                            <Typography>
+                                {intl.formatMessage(ordersPageMessages.senToCasting)}
+                            </Typography>
+                        )}
+                        {(!sentToCasting) && (
+                            <Stack
+                                width="75%"
+                                height="40px"
+                            >
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.completeCasting)}
+                                    onClick={() => updateCasting(3)}
+                                />
+                            </Stack>
+                        )} 
+                    </>
+                )}
+                {(status === 5 || (status === 3 && !props.casting && price)) && (
+                    <>
+                        {castingCompleted && (
+                            <Typography>
+                                {intl.formatMessage(ordersPageMessages.castingCompleted)}
+                            </Typography>
+                        )}
+                        <Stack
+                            width="75%"
+                            height="40px"
+                        >
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
+                                onClick={() => sendOrderToProduction()}
+                            />
+                        </Stack>
+                    </>
+                )}
+                {status === 6 && (
+                    <>
+                        {sentToProduction && (
+                            <Typography>
+                                {intl.formatMessage(ordersPageMessages.orderSentToProductionSuccessfully)}
+                            </Typography>
+                        )}
+                    </>
                 )}
             </Stack>
         </Stack>

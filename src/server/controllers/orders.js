@@ -2,8 +2,9 @@ const ModelMetadata = require("../models/models/modelMetadata")
 const JewelOrder = require("../models/orders/jewelOrder")
 const Order = require("../models/orders/order")
 const OrderCustomer = require("../models/orders/orderCustomer")
+const OrdersInCasting = require("../models/orders/ordersInCasing")
 const { createModelMetadata } = require("../utils/models")
-const { getOrderByPermissionLevel } = require("../utils/orders")
+const { getOrderByPermissionLevel, getOrdersInCasting } = require("../utils/orders")
 const path = require('path')
 
 const createNewOrder = async (req, res, next) => {
@@ -72,6 +73,9 @@ const getOrderById = async (req, res, next) => {
                 },
                 {
                     model: OrderCustomer
+                }, 
+                {
+                    model: OrdersInCasting
                 }
             ]
         })
@@ -82,7 +86,6 @@ const getOrderById = async (req, res, next) => {
             }
         })
 
-        console.log(metadata)
         const order = {
             orderId: orderData.dataValues.orderId,
             item: metadata.dataValues.item,
@@ -100,7 +103,8 @@ const getOrderById = async (req, res, next) => {
             deadline: orderData.dataValues.deadline,
             status: orderData.dataValues.status,
             modelId: metadata.dataValues.modelNumber || null,
-            price: orderData.dataValues.price || null
+            price: orderData.dataValues.price || null,
+            castingStatus: orderData.dataValues['Orders in Casting'] ? orderData.dataValues['Orders in Casting'].dataValues.castingStatus : null
         }
         res.status(200).send({order})
     } catch (e) {
@@ -119,10 +123,24 @@ const getOrderImage = async (req, res, next) => {
     }
 }
 
+const getOrderByStatus = async (req, res, next) => {
+    try {
+        let orders = []
+        if (req.params.type === 'casting') {
+            orders = await getOrdersInCasting();
+        }
+        res.status(200).send({orders})
+    }
+    catch(e) {
+        next(e)
+    }
+}
+
 
 module.exports = {
     createNewOrder,
     getOrders,
     getOrderById,
-    getOrderImage
+    getOrderImage,
+    getOrderByStatus
 }

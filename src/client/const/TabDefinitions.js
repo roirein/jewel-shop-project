@@ -1,6 +1,6 @@
 import { createIntl } from "react-intl";
 import messages from '../translations/locales/he.json'
-import { tabsMessages } from "../translations/i18n";
+import { ordersPageMessages, tabsMessages } from "../translations/i18n";
 
 const intl = createIntl({
     locale: 'he',
@@ -48,3 +48,28 @@ export const DESIGN_MANGER_TABS = [
     }
 ]
 
+export const CUSTOMER_INTERFACE_TABS = [
+    {
+        label: intl.formatMessage(tabsMessages.orders),
+        route: '/orders'
+    }
+]
+
+export const MANAGER_ORDERS_PAGE_TABS = [
+    {
+        label: intl.formatMessage(tabsMessages.orders),
+        route: '/orders'
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInDesign),
+        route: '/orders/design'
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInCasting),
+        route: '/orders/casting'
+    },
+    // {
+    //     label: intl.formatMessage(ordersPageMessages.),
+    //     route: '/orders'
+    // }
+]

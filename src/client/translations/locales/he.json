@@ -128,5 +128,16 @@
     "priceWithoutMaterials": "מחיר ללא חומר",
     "chooseOption": "בחר את האופציה המועדפת עליך",
     "pricePaid": "מחיר ששולם: {price}",
-    "sendOrderToCasting": "שלח הזמנה ליציקה"
+    "sendOrderToCasting": "שלח הזמנה ליציקה",
+    "ordersInDesign": "הזמנות בעיצוב",
+    "ordersInCasting": "הזמנות ביציקה",
+    "ordersInProduction": "הזמנות בהכנה",
+    "orderCompleted": "הזמנות שהושלמו",
+    "notSend": "לא נשלח",
+    "inCasting": "ביציקה",
+    "sentToCasting": "הזמנה נשלחה ליציקה בהצלחה",
+    "sendOrderToProduction": "שלח למנהל עיצוב",
+    "orderSentToProductionSuccessfully": "הזמנה נשלה למנהל עיצוב בהצלחה",
+    "completeCasting": "השלם יציקה",
+    "castingCompleted": "יציקה הושלמה"
 }

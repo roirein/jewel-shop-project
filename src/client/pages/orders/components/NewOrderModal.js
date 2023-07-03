@@ -7,9 +7,6 @@ import * as yup from "yup";
 import { Stack, useTheme, Stepper, Step, StepLabel } from "@mui/material";
 import { useState, useContext } from "react";
 import AppContext from '../../../context/AppContext'
-import FormSelectComponent from "../../../components/UI/Form/Inputs/FormSelectComponent";
-import FormTextFieldComponent from '../../../components/UI/Form/Inputs/FormTextFieldComponent'
-import { ROLES_ENUM } from "../../../const/Enums";
 import ButtonComponent from "../../../components/UI/ButtonComponent";
 import axios from "axios";
 import { getAuthorizationHeader } from "../../../utils/utils";
@@ -17,11 +14,13 @@ import CustomerDetails from "./order-steps/CustomerDetails";
 import OrdersMenuComponent from "./order-steps/OrderTypesMenu";
 import PersonalDesignOrderDetails from "./order-steps/order-detail/PersonalDesginForm";
 import OrderSummary from "./order-steps/order-summary/OrderSummaryCOmponent";
+import { useRouter } from "next/router";
 
 const CreateOrderModal = (props) => {
 
     const intl = useIntl();
     const theme = useTheme();
+    const router = useRouter();
     const contextValue = useContext(AppContext)
 
     const [activeStep, setActiveStep] = useState(0);
@@ -132,6 +131,7 @@ const CreateOrderModal = (props) => {
         })
         if (response.status === 201) {
             handleClose()
+            router.push(`orders/${response.data.orderId}`)
         }
     }
     
