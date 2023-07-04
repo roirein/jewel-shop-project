@@ -59,7 +59,6 @@ JewelOrder.init({
 })
 
 
-Order.hasOne(OrderCustomer, {foreignKey: 'orderId'});
 Order.hasOne(JewelOrder, {foreignKey: 'orderId'})
 JewelOrder.hasOne(ModelMetadata, {foreignKey: 'metadataId'})
 JewelOrder.belongsTo(Order, {foreignKey: 'orderId'});

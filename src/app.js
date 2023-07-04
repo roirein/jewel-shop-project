@@ -8,15 +8,17 @@ const path = require('path')
 require('dotenv').config();
 const sequelize = require('./server/database/connection');
 const {initSocket} = require('./server/services/sockets/socket');
-const { createNewUser, createNewEmployee } = require('./server/utils/user');
+const { createNewUser, createNewEmployee, createNewCustomer } = require('./server/utils/user');
 const ModelPrice =  require('./server/models/models/modelPrice')
 require('./server/models/tasks/task')
 require('./server/models/orders/ordersInProduction')
+require('./server/models/orders/fixOrder')
 const userRoute = require('./server/routes/users');
 const customerRoute = require('./server/routes/customers');
 const employeeRoute = require('./server/routes/employees');
 const modelRoute = require('./server/routes/models');
-const orderRoute = require('./server/routes/orders')
+const orderRoute = require('./server/routes/orders');
+const Request = require('./server/models/users/requests');
 
 const dev = process.env.NODE_ENV !== 'production';
 const nextApp = next({dev, dir: path.join(__dirname, 'client')});
@@ -44,6 +46,14 @@ const port = process.env.PORT
 //     })
 //     createNewUser('Dor', 'Maor', 'roirein7@gmail.com', 'Rein@7890', '0505050505', 4).then((user) => {
 //         createNewEmployee(user.userId, false, 5)
+//     })
+//     createNewUser('רועי', 'ריינשטיין', 'roirein@post.bgu.ac.il', 'Rein@270897', '0545454545', 5).then((user) => {
+//         createNewCustomer(user.userId, 'העסק שלי', 1).then((customer) => {
+//             Request.create({
+//                 customerId: customer.userId,
+//                 status: 1
+//             })
+//         })
 //     })
 // })
 

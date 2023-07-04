@@ -15,6 +15,7 @@ import OrdersMenuComponent from "./order-steps/OrderTypesMenu";
 import PersonalDesignOrderDetails from "./order-steps/order-detail/PersonalDesginForm";
 import OrderSummary from "./order-steps/order-summary/OrderSummaryCOmponent";
 import { useRouter } from "next/router";
+import FixOrderForm from "./order-steps/order-detail/FixOrderForm";
 
 
 const CreateOrderModal = (props) => {
@@ -220,6 +221,12 @@ const CreateOrderModal = (props) => {
                     <>
                         {selectedOrderType === 1 && (
                             <PersonalDesignOrderDetails
+                                ref={orderDetailsFormRef}
+                                onSubmitOrderDetails={(data) => onSubmitOrderDetails(data)}
+                            />
+                        )}
+                        {selectedOrderType === 3 && (
+                            <FixOrderForm
                                 ref={orderDetailsFormRef}
                                 onSubmitOrderDetails={(data) => onSubmitOrderDetails(data)}
                             />

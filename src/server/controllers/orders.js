@@ -1,4 +1,5 @@
 const ModelMetadata = require("../models/models/modelMetadata")
+const FixOrder = require("../models/orders/fixOrder")
 const JewelOrder = require("../models/orders/jewelOrder")
 const Order = require("../models/orders/order")
 const OrderCustomer = require("../models/orders/orderCustomer")
@@ -26,8 +27,12 @@ const createNewOrder = async (req, res, next) => {
             email: req.body.email,
             phoneNumber: req.body.phoneNumber
         })
-        if (req.body.orderType ===  3) {
-
+        if (req.body.orderType ===  '3') {
+            await FixOrder.create({
+                orderId: newOrder.orderId,
+                item: req.body.item,
+                description: req.body.description  
+            })
         } else {
             let modelMetadataId
             if (req.body.orderType === '1') {
@@ -74,6 +79,9 @@ const getOrderById = async (req, res, next) => {
             include: [
                 {
                     model: JewelOrder,
+                },
+                {
+                    model: FixOrder
                 },
                 {
                     model: OrderCustomer
