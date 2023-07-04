@@ -130,8 +130,9 @@ const CreateTasksModal = (props) => {
             }
         })
         if (response.status === 201) {
-            console.log(response.data.tasks)
-            props.onClose()
+            props.onClose();
+            router.push('/orders')
+            contextValue.socket.emit('send-task-to-employee')
         }
     }
 

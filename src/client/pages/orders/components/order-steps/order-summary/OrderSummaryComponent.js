@@ -8,17 +8,17 @@ import OrderSummaryComponent from "../../OrderSummary";
 
 const OrderSummary = (props) => {
 
-    const {getValues} = useFormContext();
     const intl = useIntl()
 
     const [imageUrl, setImageUrl] = useState()
+    console.log(props.orderData)
 
     useEffect(() => {
         const reader  = new FileReader();
         reader.onload = () => {
             setImageUrl(reader.result)
         }
-        reader.readAsDataURL(getValues('design')[0])
+        reader.readAsDataURL(props.orderData['design'][0])
     }, [])
 
     return (
@@ -28,18 +28,18 @@ const OrderSummary = (props) => {
             <OrderSummaryComponent
                 title={`${intl.formatMessage(ordersPageMessages.orderSummary)} - ${ORDER_TYPES[props.orderType]}`}
                 imageSrc={imageUrl}
-                item={ITEM_ENUMS[getValues('item')]}
-                setting={getValues('setting')}
-                sideStoneSize={getValues('sideStoneSize')}
-                mainStoneSize={getValues('mainStoneSize')}
-                size={SIZE_ENUM[getValues('size')]}
-                metal={METAL_ENUM[getValues('metal')]}
-                casting={getValues('casting')}
-                comment={getValues('comments')}
-                customerName={getValues('customerName')}
-                email={getValues('email')}
-                phoneNumber={getValues('phoneNumber')}
-                deadline={getValues('deadline')}
+                item={ITEM_ENUMS[props.orderData['item']]}
+                setting={props.orderData['setting']}
+                sideStoneSize={props.orderData['sideStoneSize']}
+                mainStoneSize={props.orderData['mainStoneSize']}
+                size={SIZE_ENUM[props.orderData['size']]}
+                metal={METAL_ENUM[props.orderData['metal']]}
+                casting={props.orderData['casting']}
+                comment={props.orderData['comments']}
+                customerName={props.orderData['customerName']}
+                email={props.orderData['email']}
+                phoneNumber={props.orderData['phoneNumber']}
+                deadline={props.orderData['deadline']}
             />
         </Stack>
     )

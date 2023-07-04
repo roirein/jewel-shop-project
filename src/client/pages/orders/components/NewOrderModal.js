@@ -5,7 +5,7 @@ import { FormProvider, useForm } from "react-hook-form"
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { Stack, useTheme, Stepper, Step, StepLabel } from "@mui/material";
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import AppContext from '../../../context/AppContext'
 import ButtonComponent from "../../../components/UI/ButtonComponent";
 import axios from "axios";
@@ -16,15 +16,19 @@ import PersonalDesignOrderDetails from "./order-steps/order-detail/PersonalDesgi
 import OrderSummary from "./order-steps/order-summary/OrderSummaryCOmponent";
 import { useRouter } from "next/router";
 
+
 const CreateOrderModal = (props) => {
 
     const intl = useIntl();
     const theme = useTheme();
     const router = useRouter();
-    const contextValue = useContext(AppContext)
+    const contextValue = useContext(AppContext);
+    const customerDetasilsFormRef = useRef();
+    const orderDetailsFormRef = useRef()
 
     const [activeStep, setActiveStep] = useState(0);
     const [selectedOrderType, setSelectedOrderType] = useState(0);
+    const [orderDetails, setOrderDetails] = useState({})
 
     const initialSteps = [
         {
@@ -50,55 +54,48 @@ const CreateOrderModal = (props) => {
     ]
 
     const [steps, setSteps] = useState(initialSteps);
-    const orderDetailsValidationSchema = yup.object().shape({
-        email: yup.string().email(intl.formatMessage(formMessages.emailError)).required(intl.formatMessage(formMessages.emptyFieldError)),
-        customerName:  yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        phoneNumber: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)).matches(/^\d{10}$/, intl.formatMessage(formMessages.phoneError)),
-        deadline: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        item: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        size: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        metal: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        setting: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        sideStoneSize: yup.number().min(0).required(intl.formatMessage(formMessages.emptyFieldError)),
-        mainStoneSize: yup.number().min(0).required(intl.formatMessage(formMessages.emptyFieldError)),
-    })
 
-    const defaultValues = {
-        customerName: contextValue.name,
-        email: contextValue.email,
-        phoneNumber: contextValue.phoneNumber
+    console.log(orderDetails)
+
+    const handleUpdateNextStep = (nextStep) => {
+        const updatedSteps = [...steps];
+        updatedSteps[activeStep].completed = true,
+        setActiveStep(nextStep)
+        setSteps(updatedSteps)
     }
 
-    const methods = useForm({
-        resolver: yupResolver(orderDetailsValidationSchema),
-        defaultValues: contextValue.permissionLevel === 5 ? defaultValues : {}
-    });
+    const onSubmitCustomerDetails = (data) => {
+        setOrderDetails({
+            ...orderDetails,
+            ...data
+        })
+        handleUpdateNextStep(1)
+    }
+
+    const onSubmitOrderDetails = (data) => {
+        setOrderDetails({
+            ...orderDetails,
+            ...data
+        })
+        handleUpdateNextStep(3)
+    }
 
 
     const handleContinue = async () => {
         switch(activeStep) {
             case 0: 
-                const customerDetailsRes = await methods.trigger(['email', 'customerName', 'phoneNumber', 'deadline'])
-                if (customerDetailsRes) {
-                    const updatedSteps = [...steps]
-                    updatedSteps[activeStep].completed = true
-                    setActiveStep(1)
-                    setSteps(updatedSteps)
-                }
+                customerDetasilsFormRef.current.onSetCustomerDetails()
                 break;
             case 1: 
-                const updatedSteps = [...steps]
-                updatedSteps[activeStep].completed = true
-                setActiveStep(2)
-                setSteps(updatedSteps)
-            case 2: 
-                const orderDetailsRes = await methods.trigger(['item', 'size', 'metal', 'setting', 'mainStoneSize', 'sideStoneSize'])
-                if (orderDetailsRes) {
-                    const updatedSteps = [...steps]
-                    updatedSteps[activeStep].completed = true
-                    setActiveStep(3)
-                    setSteps(updatedSteps)
-                }
+                setOrderDetails({
+                    ...orderDetails,
+                    orderType: selectedOrderType
+                })
+                handleUpdateNextStep(2)
+                break;
+            case 2:
+                orderDetailsFormRef.current.onSubmitOrderDetails();
+                break
             default:
                 break
         }
@@ -106,23 +103,20 @@ const CreateOrderModal = (props) => {
 
     const handleClose = () => {
         setSelectedOrderType(0)
-        methods.reset();
         setActiveStep(0),
         setSteps(initialSteps)
         props.onClose()
     }
 
     const onSubmit = async () => {
-        const data = methods.getValues()
         const formData = new FormData()
-        Object.entries(data).forEach((entry) => {
+        Object.entries(orderDetails).forEach((entry) => {
             if (entry[0] === 'design') {
                 formData.append(entry[0], entry[1][0])
             } else {
                 formData.append(entry[0], entry[1]);
             }
         })
-        formData.append('orderType', selectedOrderType)
         const response = await axios.post('http://localhost:3002/order/newOrder', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -211,38 +205,33 @@ const CreateOrderModal = (props) => {
                     direction: theme.direction
                 }}
             >
-                <FormProvider {...methods}>
-                    <form
-                        style={{
-                            width: '100%'
-                        }}
-                    >
-                        <Stack
-                            rowGap={theme.spacing(3)}
-                        >
-                            {activeStep === 0 && (
-                                <CustomerDetails/>
-                            )}
-                            {activeStep === 1 && (
-                                <OrdersMenuComponent
-                                    onChooseOrder={(orderType) => setSelectedOrderType(orderType)}
-                                />
-                            )}
-                            {activeStep === 2 && (
-                                <>
-                                    {selectedOrderType === 1 && (
-                                        <PersonalDesignOrderDetails/>
-                                    )}
-                                </>
-                            )}
-                            {activeStep === 3 && (
-                                <OrderSummary
-                                    orderType={selectedOrderType}
-                                />
-                            )}
-                        </Stack>
-                    </form>
-                </FormProvider>
+                {activeStep === 0 && (
+                    <CustomerDetails
+                        ref={customerDetasilsFormRef}
+                        onSubmitCustomerDetails={(data) => onSubmitCustomerDetails(data)}
+                    />
+                )}
+                {activeStep === 1 && (
+                    <OrdersMenuComponent
+                        onChooseOrder={(orderType) => setSelectedOrderType(orderType)}
+                    />
+                )}
+                {activeStep === 2 && (
+                    <>
+                        {selectedOrderType === 1 && (
+                            <PersonalDesignOrderDetails
+                                ref={orderDetailsFormRef}
+                                onSubmitOrderDetails={(data) => onSubmitOrderDetails(data)}
+                            />
+                        )}
+                    </>
+                )}
+                {activeStep === 3 && (
+                    <OrderSummary
+                        orderType={selectedOrderType}
+                        orderData={orderDetails}
+                    />
+                )}
             </Stack>
         </ModalComponent>
     )

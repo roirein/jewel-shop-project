@@ -83,9 +83,13 @@ const getOrderById = async (req, res, next) => {
                 },
                 {
                     model: OrdersInProduction
+                },
+                {
+                    model: Task
                 }
             ]
         })
+
 
         const metadata = await ModelMetadata.findOne({
             where: {
@@ -112,7 +116,8 @@ const getOrderById = async (req, res, next) => {
             modelId: metadata.dataValues.modelNumber || null,
             price: orderData.dataValues.price || null,
             castingStatus: orderData.dataValues['Orders in Casting'] ? orderData.dataValues['Orders in Casting'].dataValues.castingStatus : null,
-            productionStatus: orderData.dataValues['Orders in Production'] ? orderData.dataValues['Orders in Production'].dataValues.productionStatus : null
+            productionStatus: orderData.dataValues['Orders in Production'] ? orderData.dataValues['Orders in Production'].dataValues.productionStatus : null,
+            tasks: orderData.dataValues['Tasks'] ? orderData.dataValues['Tasks'].map(task => task.dataValues) : null
         }
         res.status(200).send({order})
     } catch (e) {
@@ -164,6 +169,9 @@ const setTasksForOrder = async (req, res, next) => {
             tasks[i-1].nextTask = tasks[i].taskId
             await tasks[i-1].save()
         }
+
+        tasks[0].blocked = false
+        await tasks[0].save();
 
         res.status(201).send({tasks})
     } catch (e) {

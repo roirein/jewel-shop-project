@@ -11,6 +11,7 @@ import { Stack, Typography, useTheme } from "@mui/material"
 import ButtonComponent from "../../../components/UI/ButtonComponent"
 import OrderModelData from "../components/OrderModelData"
 import CreateTasksModal from "../components/tasks/CreateTasksModal"
+import TaskSummaryComponent from "../components/tasks/TasksSummary"
 
 const OrderPage = (props) => {
 
@@ -20,6 +21,7 @@ const OrderPage = (props) => {
     const [buttonClick, setButtonClick] = useState(false)
     const [showTaskModal, setShowTaskModal] = useState(false)
     const contextValue = useContext(AppContext);
+    const [tasks, setTasks] = useState([])
 
     useEffect(() => {
         axios.get(`http://localhost:3002/order/image/${props.design}`, {
@@ -39,6 +41,10 @@ const OrderPage = (props) => {
         })
         setButtonClick(true)
     }
+
+    // useEffect(() => {
+
+    // }, [])
 
     return (
         <CenteredStack
@@ -104,10 +110,16 @@ const OrderPage = (props) => {
 
                     />
                 )}
-                {props.status === 6 && (
+                {props.status === 6 && contextValue.permissionLevel === 3 && !props.tasks && (
                     <ButtonComponent
                         label={intl.formatMessage(ordersPageMessages.defineTasks)}
                         onClick={() => setShowTaskModal(true)}
+                    />
+                )}
+
+                {props.status === 6 && (contextValue.permissionLevel === 3 || contextValue.permissionLevel === 1) && props.tasks && (
+                    <TaskSummaryComponent
+                        tasks={props.tasks}
                     />
                 )}
             </Stack>
@@ -163,7 +175,8 @@ export const getServerSideProps = async (context) => {
             phoneNumber: response.data.order.phoneNumber,
             deadline: response.data.order.deadline,
             status: response.data.order.status,
-            price: response.data.order.price
+            price: response.data.order.price,
+            tasks: response.data.order.tasks
         }
     
     if (modelData) {
