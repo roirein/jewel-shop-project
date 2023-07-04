@@ -10,6 +10,8 @@ const sequelize = require('./server/database/connection');
 const {initSocket} = require('./server/services/sockets/socket');
 const { createNewUser, createNewEmployee } = require('./server/utils/user');
 const ModelPrice =  require('./server/models/models/modelPrice')
+require('./server/models/tasks/task')
+require('./server/models/orders/ordersInProduction')
 const userRoute = require('./server/routes/users');
 const customerRoute = require('./server/routes/customers');
 const employeeRoute = require('./server/routes/employees');
@@ -27,6 +29,21 @@ const port = process.env.PORT
 //     })
 //     createNewUser('Itay', 'Rein', 'roirein28@gmail.com', 'Rein@6431368', '0549949976', 2).then((user) => {
 //         createNewEmployee(user.userId, false, 2)
+//     })
+//     createNewUser('Eilon', 'Rein', 'roirein3@gmail.com', 'Rein@1234', '0505050501', 3).then((user) => {
+//         createNewEmployee(user.userId, false, 3)
+//     })
+//     createNewUser('Gilad', 'Rein', 'roirein4@gmail.com', 'Rein@5678', '0505050502', 4).then((user) => {
+//         createNewEmployee(user.userId, false, 4)
+//     })
+//     createNewUser('Guy', 'Doytch', 'roirein5@gmail.com', 'Rein@9012', '0505050503', 4).then((user) => {
+//         createNewEmployee(user.userId, false, 4)
+//     })
+//     createNewUser('Robert', 'Varnavsky', 'roirein6@gmail.com', 'Rein@3456', '0505050504', 4).then((user) => {
+//         createNewEmployee(user.userId, false, 5)
+//     })
+//     createNewUser('Dor', 'Maor', 'roirein7@gmail.com', 'Rein@7890', '0505050505', 4).then((user) => {
+//         createNewEmployee(user.userId, false, 5)
 //     })
 // })
 

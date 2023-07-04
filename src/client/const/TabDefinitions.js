@@ -68,8 +68,8 @@ export const MANAGER_ORDERS_PAGE_TABS = [
         label: intl.formatMessage(ordersPageMessages.ordersInCasting),
         route: '/orders/casting'
     },
-    // {
-    //     label: intl.formatMessage(ordersPageMessages.),
-    //     route: '/orders'
-    // }
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInProduction),
+        route: '/orders/production'
+    }
 ]

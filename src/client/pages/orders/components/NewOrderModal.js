@@ -131,7 +131,8 @@ const CreateOrderModal = (props) => {
         })
         if (response.status === 201) {
             handleClose()
-            router.push(`orders/${response.data.orderId}`)
+            console.log(response.data)
+            router.push(`orders/${response.data.dataValues.orderId}`)
         }
     }
     

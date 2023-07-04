@@ -3,8 +3,12 @@ const JewelOrder = require("../models/orders/jewelOrder")
 const Order = require("../models/orders/order")
 const OrderCustomer = require("../models/orders/orderCustomer")
 const OrdersInCasting = require("../models/orders/ordersInCasing")
+const OrdersInProduction = require("../models/orders/ordersInProduction")
+const Task = require("../models/tasks/task")
+const Employee = require("../models/users/employee")
+const User = require("../models/users/user")
 const { createModelMetadata } = require("../utils/models")
-const { getOrderByPermissionLevel, getOrdersInCasting } = require("../utils/orders")
+const { getOrderByPermissionLevel, getOrdersInCasting, createTaskForOrder, getOrdersInProduction, getOrdersInDesignForManager } = require("../utils/orders")
 const path = require('path')
 
 const createNewOrder = async (req, res, next) => {
@@ -76,6 +80,9 @@ const getOrderById = async (req, res, next) => {
                 }, 
                 {
                     model: OrdersInCasting
+                },
+                {
+                    model: OrdersInProduction
                 }
             ]
         })
@@ -104,7 +111,8 @@ const getOrderById = async (req, res, next) => {
             status: orderData.dataValues.status,
             modelId: metadata.dataValues.modelNumber || null,
             price: orderData.dataValues.price || null,
-            castingStatus: orderData.dataValues['Orders in Casting'] ? orderData.dataValues['Orders in Casting'].dataValues.castingStatus : null
+            castingStatus: orderData.dataValues['Orders in Casting'] ? orderData.dataValues['Orders in Casting'].dataValues.castingStatus : null,
+            productionStatus: orderData.dataValues['Orders in Production'] ? orderData.dataValues['Orders in Production'].dataValues.productionStatus : null
         }
         res.status(200).send({order})
     } catch (e) {
@@ -126,8 +134,14 @@ const getOrderImage = async (req, res, next) => {
 const getOrderByStatus = async (req, res, next) => {
     try {
         let orders = []
+        if (req.params.type === 'design') {
+            orders = await getOrdersInDesignForManager()
+        }
         if (req.params.type === 'casting') {
             orders = await getOrdersInCasting();
+        }
+        if (req.params.type === 'production') {
+            orders = await getOrdersInProduction();
         }
         res.status(200).send({orders})
     }
@@ -137,10 +151,75 @@ const getOrderByStatus = async (req, res, next) => {
 }
 
 
+const setTasksForOrder = async (req, res, next) => {
+    try {
+        const sortedTasksData = req.body.tasks.sort((a,b) => a.index - b.index);
+        const tasks = [];
+        for (const taskData of sortedTasksData) {
+            const task = await createTaskForOrder(taskData, req.params.orderId)
+            tasks.push(task)
+        }
+
+        for (let i = 1; i < tasks.length; i++) {
+            tasks[i-1].nextTask = tasks[i].taskId
+            await tasks[i-1].save()
+        }
+
+        res.status(201).send({tasks})
+    } catch (e) {
+        next (e)
+    }
+}
+
+const getAllOrdersTaks = async (req, res, next) => {
+    try {
+        const tasksData = await Task.findAll({
+            where: {
+                orderId: req.params.orderId
+            },
+            include: {
+                model: Employee,
+                include: {
+                    model: User,
+                    attributes: ['firstName', 'lastName']
+                }
+            }
+        })
+    
+        const tasks = tasksData.map((task) => {
+            return {
+                taskId: task.taskId,
+                description: task.description,
+                employeeName: `${task.Employee.User.firstName} ${task.Employee.User.lastName}`
+            }
+        })
+
+        res.status(200).send({tasks})
+    } catch (e) {
+        next(e)
+    }
+}
+
+const getTaskByEmployeeAndOrder = async (req, res, next) => {
+    try{
+        const task = await Task.findOne({
+            where: {
+                taskId: req.params.taskId,
+                orderId: req.params.orderId
+            }
+        })
+    } catch (e) {
+        next (e)
+    }
+}
+
 module.exports = {
     createNewOrder,
     getOrders,
     getOrderById,
     getOrderImage,
-    getOrderByStatus
+    getOrderByStatus,
+    setTasksForOrder,
+    getAllOrdersTaks,
+    getTaskByEmployeeAndOrder
 }

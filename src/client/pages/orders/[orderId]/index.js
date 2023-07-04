@@ -10,6 +10,7 @@ import { ITEM_ENUMS, METAL_ENUM, SIZE_ENUM } from "../../../const/Enums"
 import { Stack, Typography, useTheme } from "@mui/material"
 import ButtonComponent from "../../../components/UI/ButtonComponent"
 import OrderModelData from "../components/OrderModelData"
+import CreateTasksModal from "../components/tasks/CreateTasksModal"
 
 const OrderPage = (props) => {
 
@@ -17,6 +18,7 @@ const OrderPage = (props) => {
     const theme = useTheme()
     const [imageUrl, setImageUrl] = useState('');
     const [buttonClick, setButtonClick] = useState(false)
+    const [showTaskModal, setShowTaskModal] = useState(false)
     const contextValue = useContext(AppContext);
 
     useEffect(() => {
@@ -102,7 +104,19 @@ const OrderPage = (props) => {
 
                     />
                 )}
+                {props.status === 6 && (
+                    <ButtonComponent
+                        label={intl.formatMessage(ordersPageMessages.defineTasks)}
+                        onClick={() => setShowTaskModal(true)}
+                    />
+                )}
             </Stack>
+            {(contextValue.permissionLevel === 1 || contextValue.permissionLevel === 3) && (
+                <CreateTasksModal
+                    open={showTaskModal}
+                    onClose={() => setShowTaskModal(false)}
+                />
+            )}
         </CenteredStack>
     )
 }

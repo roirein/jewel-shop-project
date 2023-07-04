@@ -206,6 +206,10 @@ export const buttonMessages = defineMessages({
     update: {
         id: 'update',
         defaultMessage: 'update'
+    },
+    skip: {
+        id: 'skip',
+        defaultMessage: 'skip'
     }
 })
 
@@ -616,5 +620,33 @@ export const ordersPageMessages = defineMessages({
     castingCompleted: {
         id: 'castingCompleted',
         defaultMessage: 'casting completed'
+    },
+    tasksToOrder: {
+        id: 'tasksToOrder',
+        defaultMessage: 'create tasks for order'
+    },
+    finishing: {
+        id: 'finishing',
+        defaultMessage: 'finishing'
+    },
+    qualityEnsurance: {
+        id: 'qualityEnsurance',
+        defaultMessage: 'quality ensurance'
+    },
+    summary: {
+        id: 'summary',
+        defaultMessage: 'summary'
+    },
+    defineTasks: {
+        id: 'defineTasks',
+        defaultMessage: 'define tasks'
+    },
+    taskNumber: {
+        id: 'taskNumber',
+        defaultMessage: 'task number'
+    },
+    inProduction: {
+        id: 'inProduction',
+        defaultMessage: 'בהכנה'
     }
 })

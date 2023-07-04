@@ -57,11 +57,21 @@ export const ORDER_STATUS = {
     [2]: intl.formatMessage(ordersPageMessages.designCompleted),
     [3]: intl.formatMessage(ordersPageMessages.customerApproved),
     [4]: intl.formatMessage(ordersPageMessages.inCasting),
-    [5]: intl.formatMessage(ordersPageMessages.castingCompleted)
+    [5]: intl.formatMessage(ordersPageMessages.castingCompleted),
+    [6]: intl.formatMessage(ordersPageMessages.inProduction)
 }
 
 export const CASTING_STATUS = {
     [1]: intl.formatMessage(ordersPageMessages.notSend),
     [2]: intl.formatMessage(ordersPageMessages.inCasting),
     [3]: intl.formatMessage(modelsPageMessages.completed)
+}
+
+export const PRODUCTION_STATUS = {
+    [1]: intl.formatMessage(modelsPageMessages.created),
+    [2]: intl.formatMessage(employeesPageMessages.jeweller),
+    [3]: intl.formatMessage(employeesPageMessages.setter),
+    [4]: intl.formatMessage(ordersPageMessages.finishing),
+    [5]: intl.formatMessage(ordersPageMessages.qualityEnsurance),
+    [6]: intl.formatMessage(modelsPageMessages.completed)
 }

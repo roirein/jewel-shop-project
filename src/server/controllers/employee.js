@@ -75,8 +75,37 @@ const deleteEmployee = async (req, res, next) => {
     }
 }
 
+
+const getEmployeesByRole = async (req, res, next) => {
+    try {
+        const employessData = await Employee.findAll({
+            where: {
+                role: {
+                    [Op.or]: [3,4,5]
+                }
+            },
+            include: {
+                model: User,
+                attributes: ['firstName', 'lastName']
+            }
+        });
+
+        const employees = employessData.map((employee) => {
+            return {
+                employeeId: employee.userId,
+                name: `${employee.User.firstName} ${employee.User.lastName}`,
+                role: employee.role
+            }
+        })
+        res.status(200).send({employees})
+    } catch (e) {
+        next(e)
+    }
+}
+
 module.exports = {
     addNewEmployee,
     getEmployees,
-    deleteEmployee
+    deleteEmployee,
+    getEmployeesByRole
 }

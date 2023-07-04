@@ -8,6 +8,7 @@ const Employee = require("../../models/users/employee");
 const Order = require("../../models/orders/order");
 const Comments = require("../../models/models/modelComments");
 const OrdersInCasting = require("../../models/orders/ordersInCasing");
+const OrdersInProduction = require("../../models/orders/ordersInProduction");
 
 let ioInstance = null;
 
@@ -93,6 +94,9 @@ const initSocket = (io) => {
                 where: {
                     orderId: data.orderId
                 }
+            })
+            await OrdersInProduction.create({
+                orderId: data.orderId
             })
         })
 

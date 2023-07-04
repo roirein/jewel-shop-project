@@ -1,12 +1,13 @@
 import { useState, useContext, useEffect } from "react"
 import AppContext from '../../context/AppContext'
-import { DESIGN_MANAGER_ORDERS_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS } from "../../const/TablesColumns"
-import { ITEM_ENUMS, ORDER_STATUS, ORDER_TYPES } from "../../const/Enums"
+import { DESIGN_MANAGER_ORDERS_COLUMNS, ORDERS_IN_PRODUCTION_TABLE_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS } from "../../const/TablesColumns"
+import { ITEM_ENUMS, ORDER_STATUS, ORDER_TYPES, PRODUCTION_STATUS } from "../../const/Enums"
 import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
 import axios from "axios"
 import TableComponent from '../../components/UI/TableComponent'
 import { useRouter } from "next/router"
 import PageLayoutComponent from "./components/PageLayout"
+import { parse } from "cookie"
 
 const OrdersPage = (props) => {
 
@@ -22,6 +23,9 @@ const OrdersPage = (props) => {
             case 2: 
                 return [dataElement.orderId, dataElement.customerName, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, 
                             new Date(dataElement.created).toLocaleDateString('he-IL'), new Date(dataElement.deadline).toLocaleDateString('he-IL')]
+            case 3: 
+                return [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName,
+                            new Date(dataElement.created).toLocaleDateString('he-IL'), PRODUCTION_STATUS[dataElement.productionStatus]]
             case 5: 
                 return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
             default:
@@ -48,6 +52,8 @@ const OrdersPage = (props) => {
                 return ORDERS_MANAGER_TABLE_COLUMNS
             case 2:
                 return DESIGN_MANAGER_ORDERS_COLUMNS
+            case 3:
+                return ORDERS_IN_PRODUCTION_TABLE_COLUMNS
             case 5: 
                 return ORDERS_MANAGER_TABLE_COLUMNS
             default: 

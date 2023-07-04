@@ -82,20 +82,19 @@ const getModelById = async (req, res, next) => {
             }
         })
 
-        let modelPrice;
+        let modelPrice = {};
         const modelPriceData = await ModelPrice.findOne({
             where: {
                 modelNumber: req.params.modelId
             }
         })
-        modelPrice = {
-            materials: modelPriceData.dataValues.materials,
-            priceWithMaterials: modelPriceData.dataValues.priceWithMaterials,
-            priceWithoutMaterials: modelPriceData.dataValues.priceWithoutMaterials
+        if (modelPriceData) {
+            modelPrice = {
+                materials: modelPriceData.dataValues.materials,
+                priceWithMaterials: modelPriceData.dataValues.priceWithMaterials,
+                priceWithoutMaterials: modelPriceData.dataValues.priceWithoutMaterials
+            }
         }
-//         if (req.permissionLevel === 5 || req.permissionLevel === 1) {
-// /
-//         } 
 
         let model = {
             modelNumber: modelData.dataValues.modelNumber,

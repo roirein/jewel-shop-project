@@ -55,7 +55,7 @@ const ContextProvider = (props) => {
             userId: user.id
         })
         setSocket(sock)
-        setCookie(user.token, user.id, user.userPermissionLevel, user.username)
+        setCookie(user.token, user.id, user.permissionLevel, user.username)
     }
 
     const onLogout = () => {

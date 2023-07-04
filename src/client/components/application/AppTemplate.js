@@ -48,6 +48,9 @@ const AppTemplate = (props) => {
         if (contextValue.permissionLevel === 2) {
             return DESIGN_MANGER_TABS
         }
+        if (contextValue.permissionLevel === 3) {
+            return CUSTOMER_INTERFACE_TABS
+        }
         if (contextValue.permissionLevel === 5) {
             return CUSTOMER_INTERFACE_TABS
         }

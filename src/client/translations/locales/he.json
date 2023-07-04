@@ -87,7 +87,7 @@
     "created": "נוצר",
     "updatePrice": "עדכן מחיר וחומרים",
     "numberOfModel": "מודל מספר {number}",
-    "createNewOrder": "צירת הזמנה חדשה",
+    "createNewOrder": "יצירת הזמנה חדשה",
     "customerDetails": "פרטי לקוח",
     "orderType": "סוג הזמנה",
     "personalDesign": "תכשיט בעיצוב אישי",
@@ -139,5 +139,13 @@
     "sendOrderToProduction": "שלח למנהל עיצוב",
     "orderSentToProductionSuccessfully": "הזמנה נשלה למנהל עיצוב בהצלחה",
     "completeCasting": "השלם יציקה",
-    "castingCompleted": "יציקה הושלמה"
+    "castingCompleted": "יציקה הושלמה",
+    "tasksToOrder": "יצירת משימות להזמנה",
+    "finishing": "גימור",
+    "qualityEnsurance": "בקרת איכות",
+    "summary": "סיכום",
+    "skip": "דלג",
+    "defineTasks": "הגדר משימות",
+    "taskNumber": "מספר משימה",
+    "inProduction": "בהכנה"
 }
