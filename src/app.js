@@ -19,6 +19,8 @@ const employeeRoute = require('./server/routes/employees');
 const modelRoute = require('./server/routes/models');
 const orderRoute = require('./server/routes/orders');
 const Request = require('./server/models/users/requests');
+const ModelMetadata = require('./server/models/models/modelMetadata');
+const JewelModel = require('./server/models/models/jewelModel');
 
 const dev = process.env.NODE_ENV !== 'production';
 const nextApp = next({dev, dir: path.join(__dirname, 'client')});
@@ -55,7 +57,7 @@ const port = process.env.PORT
 //             })
 //         })
 //     })
-// })
+
 
 nextApp.prepare().then(() => {
 

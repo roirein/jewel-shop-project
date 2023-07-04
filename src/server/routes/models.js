@@ -1,7 +1,7 @@
 const express = require('express');
 const { authorizeUser } = require('../middleware/authentication');
 const { checkPermissions } = require('../middleware/authorization');
-const { createNewModel, getModelsMetadata, getModelById, getModelImage, getModelComments, updateModel, updateModelPrice, getPriceData } = require('../controllers/models');
+const { createNewModel, getModelsMetadata, getModelById, getModelImage, getModelComments, updateModel, updateModelPrice, getPriceData, getModelsForOrders } = require('../controllers/models');
 const {modelUpload} = require('../services/images/multer.config')
 const router = express.Router();
 
@@ -20,5 +20,7 @@ router.put('/model/:modelNumber', authorizeUser, checkPermissions([2]), modelUpl
 router.post('/price/:modelNumber', authorizeUser, checkPermissions([1]), updateModelPrice)
 
 router.get('/price/:modelNumber', authorizeUser, checkPermissions([1,2,5]), getPriceData)
+
+router.get('/models', authorizeUser, checkPermissions([1, 5]), getModelsForOrders)
 
 module.exports = router

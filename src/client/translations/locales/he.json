@@ -147,5 +147,7 @@
     "skip": "דלג",
     "defineTasks": "הגדר משימות",
     "taskNumber": "מספר משימה",
-    "inProduction": "בהכנה"
+    "inProduction": "בהכנה",
+    "priceWith": " מחיר עם חומר {price}",
+    "priceWithout": "מחיר בלי חומר {price}"
 }

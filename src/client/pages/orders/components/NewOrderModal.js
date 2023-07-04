@@ -16,6 +16,7 @@ import PersonalDesignOrderDetails from "./order-steps/order-detail/PersonalDesgi
 import OrderSummary from "./order-steps/order-summary/OrderSummaryCOmponent";
 import { useRouter } from "next/router";
 import FixOrderForm from "./order-steps/order-detail/FixOrderForm";
+import ExistingModelForm from "./order-steps/existing-model-odrer/ExistingModelForm";
 
 
 const CreateOrderModal = (props) => {
@@ -221,6 +222,12 @@ const CreateOrderModal = (props) => {
                     <>
                         {selectedOrderType === 1 && (
                             <PersonalDesignOrderDetails
+                                ref={orderDetailsFormRef}
+                                onSubmitOrderDetails={(data) => onSubmitOrderDetails(data)}
+                            />
+                        )}
+                        {selectedOrderType === 2 && (
+                            <ExistingModelForm
                                 ref={orderDetailsFormRef}
                                 onSubmitOrderDetails={(data) => onSubmitOrderDetails(data)}
                             />

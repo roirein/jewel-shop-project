@@ -1,3 +1,4 @@
+const { Mode } = require("@mui/icons-material")
 const JewelModel = require("../models/models/jewelModel")
 const Comments = require("../models/models/modelComments")
 const ModelMetadata = require("../models/models/modelMetadata")
@@ -185,7 +186,8 @@ const updateModelPrice = async (req, res, next) => {
                 modelNumber: req.params.modelNumber
             }
         })
-        if (modelMetadata.dataValues.orderId) {
+
+        if (modelMetadata && modelMetadata.dataValues.orderId) {
             await Order.update({
                 status: 2
             }, {
@@ -220,6 +222,47 @@ const getPriceData = async (req, res, next) => {
     }
 }
 
+const getModelsForOrders = async (req, res, next) => {
+    try {
+        const modelsData = await JewelModel.findAll({
+            where: {
+                status: 4,
+            },
+            include: {
+                model: ModelMetadata
+            }
+        })
+        const filteredModels = modelsData.filter((model) => {
+            return !model['Model Metadatum'].dataValues.orderId
+        })
+
+        const modelsPrice = await ModelPrice.findAll({})
+
+        const models = filteredModels.map((model) => {
+
+            const priceData = modelsPrice.find((price) => {
+                console.log(price)
+                return price.dataValues.modelNumber === Number(model.dataValues.modelNumber)
+            })
+            return {
+                modelNumber: model.dataValues.modelNumber,
+                title: model.dataValues.title,
+                description: model.dataValues.description,
+                image: model.dataValues.image,
+                status: model.dataValues.status,
+                materials: priceData.materials,
+                priceWithMaterials: priceData.priceWithMaterials,
+                priceWithoutMaterials: priceData.priceWithoutMaterials,
+                item: model['Model Metadatum'].dataValues.item
+            }
+        })
+        res.status(200).send({models})
+    } catch(e) {
+        console.log(e)
+        next(e)
+    }
+}
+
 
 module.exports = {
     createNewModel,
@@ -229,5 +272,6 @@ module.exports = {
     getModelComments,
     updateModel,
     updateModelPrice,
-    getPriceData
+    getPriceData,
+    getModelsForOrders
 }

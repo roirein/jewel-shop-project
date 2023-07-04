@@ -648,5 +648,13 @@ export const ordersPageMessages = defineMessages({
     inProduction: {
         id: 'inProduction',
         defaultMessage: 'בהכנה'
+    },
+    priceWith: {
+        id: 'priceWith',
+        defaultMessage: 'price with material: {price}'
+    },
+    priceWithout: {
+        id: 'priceWithout',
+        defaultMessage: 'price without materials: {price}'
     }
 })
