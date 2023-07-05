@@ -9,6 +9,7 @@ const Order = require("../../models/orders/order");
 const Comments = require("../../models/models/modelComments");
 const OrdersInCasting = require("../../models/orders/ordersInCasing");
 const OrdersInProduction = require("../../models/orders/ordersInProduction");
+const FixOrder = require('../../models/orders/fixOrder')
 
 let ioInstance = null;
 
@@ -106,6 +107,28 @@ const initSocket = (io) => {
             }, {
                 where: {
                     resourceId: data.resourceId
+                }
+            })
+        })
+
+        socket.on('send-price-offer', async (data) => {
+            console.log(data)
+            await FixOrder.update({
+                priceffer: data.price
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
+        })
+
+        socket.on('accept-price-offer', async (data) => {
+            await Order.update({
+                status: 3,
+                price: data.price
+            }, {
+                where: {
+                    orderId: data.orderId
                 }
             })
         })

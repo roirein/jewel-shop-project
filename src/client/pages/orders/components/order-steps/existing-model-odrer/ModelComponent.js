@@ -38,7 +38,7 @@ export const ModelComponent = (props) => {
                 border: `${props.selected ? theme.spacing(1) : theme.spacing(0)} solid black `
 
             }}
-            width="33%"
+            width="100%"
             rowGap={theme.spacing(3)}
             onClick={() => {
                 props.onClick(props.modelNumber)

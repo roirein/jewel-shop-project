@@ -1,5 +1,6 @@
 const JewelModel = require("../models/models/jewelModel")
 const ModelMetadata = require("../models/models/modelMetadata")
+const ModelPrice = require('../models/models/modelPrice')
 const Order = require("../models/orders/order")
 const {Op} = require('sequelize')
 const OrderCustomer = require("../models/orders/orderCustomer")
@@ -7,6 +8,7 @@ const JewelOrder = require("../models/orders/jewelOrder");
 const OrdersInCasting = require('../models/orders/ordersInCasing')
 const OrdersInProduction = require('../models/orders/ordersInProduction')
 const Task = require("../models/tasks/task")
+const FixOrder = require("../models/orders/fixOrder")
  
 const getOrdersInDesign = async () => {
     const ordersData = await Order.findAll({
@@ -214,10 +216,116 @@ const getOrdersInDesignForManager = async () => {
     return orders
 }
 
+const getModelDataDForOrder = async (modelMetadataId, orderId, orderType, orderStatus, permissionLevel) => {
+    const modelData = await ModelMetadata.findOne({
+        where: {
+            metadataId: modelMetadataId,
+        }
+    })
+
+
+    let model = {
+        setting: modelData.dataValues.setting,
+        sideStoneSize: modelData.dataValues.sideStoneSize,
+        mainStoneSize: modelData.mainStoneSize,
+        design: modelData.dataValues.design
+    }
+
+    if (orderType === 1) {
+        if (orderStatus >= 2) {
+            const orderModelData = await JewelModel.findOne({
+                where: {
+                    status: 4,
+                    metadataId: modelData.dataValues.metadataId
+                }
+            })
+            
+            model = {
+                ...model,
+                title: orderModelData.dataValues.title,
+                description: orderModelData.dataValues.description,
+                image: orderModelData.dataValues.image
+            }
+            if (permissionLevel === 5 && orderStatus === 2) {
+                const priceData = await ModelPrice.findOne({
+                    where: {
+                        modelNumber: orderModelData.dataValues.modelNumber
+                    }
+                })
+
+                model = {
+                    ...model,
+                    materials: priceData.dataValues.materials,
+                    priceWithMaterials: priceData.dataValues.priceWithMaterials,
+                    priceWithoutMaterials: priceData.dataValues.priceWithoutMaterials
+                }
+            }
+        }
+    }
+    if (orderType === 2) {
+        const orderModelData = await JewelModel.findOne({
+            where: {
+                status: 4,
+                metadataId: modelData.dataValues.metadataId
+            }
+        })
+        model = {
+            title: orderModelData.dataValues.title,
+            description: orderModelData.dataValues.description,
+            image: orderModelData.dataValues.image
+        }
+    }
+
+    return model
+}
+
+const getJewelOrderData = async (orderId, orderType, orderStatus, permissionLevel) => {
+    const jewelOrderData = await JewelOrder.findOne({
+        where: {
+            orderId
+        }
+    })
+
+    let jewelOrder = {
+        item: jewelOrderData.dataValues.item,
+        metal: jewelOrderData.dataValues.metal,
+        size: jewelOrderData.dataValues.size,
+        comments: jewelOrderData.dataValues.comments,
+        casting: jewelOrderData.dataValues.casting
+    }
+
+    console.log(jewelOrderData.dataValues.metadataId)
+
+    const modelData = await getModelDataDForOrder(jewelOrderData.dataValues.metadataId, orderId, orderType, orderStatus, permissionLevel)
+
+    jewelOrder = {
+        ...jewelOrder,
+        ...modelData
+    }
+
+    return jewelOrder
+}
+
+const getFixOrderData = async (orderId) => {
+    const fixOrderData = await FixOrder.findOne({
+        where: {
+            orderId
+        }
+    })
+    return {
+        item: fixOrderData.dataValues.item,
+        description: fixOrderData.dataValues.description,
+        priceOffer: fixOrderData.dataValues.priceffer ? fixOrderData.dataValues.priceffer : null
+    }
+}
+
+
 module.exports = {
     getOrderByPermissionLevel,
     getOrdersInCasting,
     createTaskForOrder,
     getOrdersInProduction,
-    getOrdersInDesignForManager
+    getOrdersInDesignForManager,
+    getJewelOrderData,
+    getFixOrderData
 }

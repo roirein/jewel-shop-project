@@ -39,25 +39,29 @@ const ModelsList = (props) => {
             columnGap={theme.spacing(4)}
         >
             {displayedModels.map((model) => (
-                <ModelComponent
+                <Stack
+                    width="100%"
                     key={model.modelNumber}
-                    modelNumber={model.modelNumber}
-                    title={model.title}
-                    description={model.description}
-                    image={model.image}
-                    materials={model.materials}
-                    priceWith={model.priceWithMaterials}
-                    priceWithout={model.priceWithoutMaterials}
-                    selected={selectedModel === Number(model.modelNumber)}
-                    onClick={(modelNumber) => {
-                        setSelctedModel(Number(modelNumber))
-                        setValue('modelNumber', model.modelNumber)
-                    }}
-                    onClickPrice={(price) => {
-                        setValue('price', price)
-                    }}
+                >
+                    <ModelComponent
+                        modelNumber={model.modelNumber}
+                        title={model.title}
+                        description={model.description}
+                        image={model.image}
+                        materials={model.materials}
+                        priceWith={model.priceWithMaterials}
+                        priceWithout={model.priceWithoutMaterials}
+                        selected={selectedModel === Number(model.modelNumber)}
+                        onClick={(modelNumber) => {
+                            setSelctedModel(Number(modelNumber))
+                            setValue('modelNumber', model.modelNumber)
+                        }}
+                        onClickPrice={(price) => {
+                            setValue('price', price)
+                        }}
 
-                />
+                    />
+                </Stack>
             ))}
         </Stack>
     )

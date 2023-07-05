@@ -4,7 +4,6 @@ import { useFormContext } from "react-hook-form"
 import { ordersPageMessages } from "../../../../../translations/i18n";
 import { ITEM_ENUMS, METAL_ENUM, ORDER_TYPES, SIZE_ENUM } from "../../../../../const/Enums";
 import { useState, useEffect, useContext } from "react";
-import OrderSummaryComponent from "../../OrderSummary";
 import CustomerDetails from "../../order-summary/CustomerDetails";
 import OrderDeatils from "../../order-summary/OrderDetails";
 import axios from "axios";

@@ -149,5 +149,9 @@
     "taskNumber": "מספר משימה",
     "inProduction": "בהכנה",
     "priceWith": " מחיר עם חומר {price}",
-    "priceWithout": "מחיר בלי חומר {price}"
+    "priceWithout": "מחיר בלי חומר {price}",
+    "orderInDesign": "הזמנה בעיצוב",
+    "priceOffer": "הצעת מחיר",
+    "acceptPriceOffer": "אשר הצעת מחיר",
+    "price": "מחיר {price}"
 }

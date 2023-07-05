@@ -24,6 +24,10 @@ FixOrder.init({
         type: DataTypes.TEXT,
         allowNull: true
     },
+    priceffer: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    }
 }, {
     timestamps: true,
     sequelize,

@@ -9,7 +9,7 @@ router.post('/newOrder',authorizeUser, checkPermissions([1, 5]), designUpload.si
 
 router.get('/orders', authorizeUser, checkPermissions([1,2,3,4,5]), getOrders)
 
-router.get('/order/:orderId', authorizeUser, getOrderById);
+router.get('/order/:orderId', authorizeUser, checkPermissions([1,2,3,4,5]), getOrderById);
 
 router.get('/image/:imagePath', authorizeUser, getOrderImage)
 

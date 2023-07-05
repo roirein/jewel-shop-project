@@ -656,5 +656,21 @@ export const ordersPageMessages = defineMessages({
     priceWithout: {
         id: 'priceWithout',
         defaultMessage: 'price without materials: {price}'
+    },
+    orderInDesign: {
+        id: 'orderInDesign',
+        defaultMessage: 'Order In Design'
+    },
+    priceOffer: {
+        id: 'priceOffer',
+        defaultMessage: 'price offer'
+    },
+    acceptPriceOffer: {
+        id: 'acceptPriceOffer',
+        defaultMessage: 'accept price offer'
+    },
+    price: {
+        id: 'price',
+        defaultMessage: 'price {price}'
     }
 })

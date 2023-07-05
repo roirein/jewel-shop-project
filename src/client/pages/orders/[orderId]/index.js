@@ -1,5 +1,4 @@
 import axios from "axios"
-import CenteredStack from "../../../components/UI/CenteredStack"
 import { getAuthorizationHeader, getUserToken } from "../../../utils/utils"
 import { useIntl } from "react-intl"
 import OrderSummaryComponent from "../components/OrderSummary"
@@ -12,39 +11,105 @@ import ButtonComponent from "../../../components/UI/ButtonComponent"
 import OrderModelData from "../components/OrderModelData"
 import CreateTasksModal from "../components/tasks/CreateTasksModal"
 import TaskSummaryComponent from "../components/tasks/TasksSummary"
+import CustomerDetails from "../components/order-summary/CustomerDetails"
+import OrderDeatils from "../components/order-summary/OrderDetails"
+import { useRouter } from "next/router"
+import CenteredStack from "../../../components/UI/CenteredStack"
+import ModelComponent from "../components/order-steps/existing-model-odrer/ModelComponent"
+import PriceOfferModal from "./OfferPriceModal"
 
 const OrderPage = (props) => {
 
     const intl = useIntl();
     const theme = useTheme()
+    const router = useRouter()
     const [imageUrl, setImageUrl] = useState('');
-    const [buttonClick, setButtonClick] = useState(false)
+    const [showPriceOfferModal, setShowPriceOfferModal] = useState(false)
     const [showTaskModal, setShowTaskModal] = useState(false)
     const contextValue = useContext(AppContext);
     const [tasks, setTasks] = useState([])
+    const [orderSummary, setOrderSummary] = useState();
 
     useEffect(() => {
-        axios.get(`http://localhost:3002/order/image/${props.design}`, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            },
-            responseType: 'blob'
-        }).then((res) => {
-            const image = URL.createObjectURL(res.data);
-            setImageUrl(image)
-        })
+        if (props.order['type'] === 1) {
+            axios.get(`http://localhost:3002/order/image/${props.order['design']}`, {
+                headers: {
+                    Authorization: getAuthorizationHeader(contextValue.token)
+                },
+                responseType: 'blob'
+            }).then((res) => {
+                const image = URL.createObjectURL(res.data);
+                setImageUrl(image)
+            })
+        }
     }, [])
+
+    useEffect(() => {
+        if ((contextValue.permissionLevel === 1 || contextValue.permissionLevel === 3) && props.order['status'] === 6) {
+            axios.get(`localhost:3002/order/tasks/${props.order['orderId']}`, {
+                headers: {
+                    Authorization: getAuthorizationHeader(contextValue.token)
+                }
+            }).then((res) => setTasks(res.data.task))
+        }
+    }, [props.order])
 
     const sendOrderToDesignManager = () => {
         contextValue.socket.emit('new-design', {
-            orderId: props.orderId
+            orderId: props.order['orderId']
         })
-        setButtonClick(true)
+        router.push('/orders/design')
     }
 
-    // useEffect(() => {
+    useEffect(() => {
+        const detailsProps = {}
+        if (props.order['type']=== 3) {
+            detailsProps['description'] = props.order['description']
+        } else {
+            detailsProps['size'] = props.order['size']
+            detailsProps['metal'] = props.order['metal']
+            if (props.order['type'] === 1) {
+                detailsProps['setting'] = props.order['setting'];
+                detailsProps['sideStoneSize'] = props.order['sideStoneSize']
+                detailsProps['mainStoneSize'] = props.order['mainStoneSize']
+            }
+            if (props.order['type'] === 2) {
+                detailsProps['price'] = props.order['price']
+            }
+        }
+       setOrderSummary(detailsProps)
+    }, [])
 
-    // }, [])
+    const getShowPriceDataInModel = () => {
+        if (props.order['type'] === 2) {
+            return true
+        }
+        if (contextValue.permissionLevel !== 5) {
+            return true
+        } else {
+            if (props['order'].status === 2) {
+                return false
+            }
+        }
+        return true
+    }
+
+    const onChoosePrice = (price) => {
+        contextValue.socket.emit('customer-approval', {
+            orderId: props.order['orderId'],
+            price,
+            casting: props.order['casting']
+        })
+        router.push('/orders')
+    }
+
+    const updateCastingStatus = (castingStatus) => {
+        contextValue.socket.emit('update-casting-status', {
+            orderId: props.order['orderId'],
+            castingStatus: castingStatus
+        })
+        router.push('/orders/casting')
+    }
 
     return (
         <CenteredStack
@@ -53,77 +118,233 @@ const OrderPage = (props) => {
             <Stack
                 width='fit-content'
                 sx={{
-                    mt: theme.spacing(4)
+                    mt: theme.spacing(4),
+                    direction: theme.direction
                 }}
+                direction="row"
+                columnGap={theme.spacing(4)}
             >
-                <OrderSummaryComponent
-                    title={intl.formatMessage(ordersPageMessages.numberOfOrder, {number: props.orderId})}
-                    imageSrc={imageUrl}
-                    item={ITEM_ENUMS[props.item]}
-                    setting={props.setting}
-                    sideStoneSize={props.sideStoneSize}
-                    mainStoneSize={props.mainStoneSize}
-                    size={SIZE_ENUM[props.size]}
-                    metal={METAL_ENUM[props.metal]}
-                    casting={props.casting}
-                    comment={props.comments}
-                    customerName={props.customerName}
-                    email={props.email}
-                    phoneNumber={props.phoneNumber}
-                    deadline={props.deadline}
-                />
-                {contextValue.permissionLevel === 1 && props.status === 0 && (
+             {props.order['type'] === 1 && (
                     <Stack
-                        width="50%"
-                        sx={{
-                            m: '0 auto'
-                        }}
-                    > 
-                        {!buttonClick && (
+                        columnGap={theme.spacing(4)}
+                    >
+                        <Typography
+                            variant="h5"
+                        >
+                            {intl.formatMessage(ordersPageMessages.design)}
+                        </Typography>
+                        <img
+                            width="300px"
+                            height="300px"
+                            src={imageUrl}
+                        />
+                    </Stack>
+                )}
+                {props.order['status'] >= 2 && props.order['type'] !== 3 && (
+                    <ModelComponent
+                        image={props.order['image']}
+                        title={props['order'].title}
+                        description={props.order['description']}
+                        selected
+                        onClick={() => {}}
+                        price={getShowPriceDataInModel()}
+                        materials={props.order['materials']}
+                        priceWith={props.order['priceWithMaterials']}
+                        priceWithout={props.order['priceWithoutMaterials']}
+                        onClickPrice={(price) => onChoosePrice(price)}
+                    />
+                )}
+                <CustomerDetails
+                    customerName={props.order['customerName']}
+                    email={props.order['email']}
+                    phoneNumber={props.order['phoneNumber']}
+                />
+                <OrderDeatils
+                    orderType={props.order['type']}
+                    item={ITEM_ENUMS[props.order['item']]}
+                    casting={props.order['casting']}
+                    comments={props.order['comments'] !== 'undefined' ? props.order['comments'] : ''}
+                    deadline={new Date(props.order['deadline']).toLocaleDateString('he-IL')}
+                    {...orderSummary}
+                />
+            </Stack>
+            <Stack>
+               {contextValue.permissionLevel === 1 && (
+                <>
+                    {props.order['status'] === 0 && props.order['type'] === 1 && (
+                        <CenteredStack
+                            width="100%"
+                            height="40px"
+                            sx={{
+                                mt: theme.spacing(4)
+                            }}
+                        >
                             <ButtonComponent
                                 label={intl.formatMessage(ordersPageMessages.sendToDesignManager)}
                                 onClick={() => sendOrderToDesignManager()}
                             />
-                        )}
-                        {buttonClick && (
-                            <Typography
-                                fontWeight="bold"
-                                variant="body1"
+                        </CenteredStack>
+                    )}
+                    {props.order['status'] === 0 && props.order['type'] === 3 && !props.order['priceOffer'] && (
+                        <CenteredStack
+                            width="100%"
+                            height="40px"
+                            sx={{
+                                mt: theme.spacing(4)
+                            }}
+                        >
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.priceOffer)}
+                                onClick={() => setShowPriceOfferModal(true)}
+                            />
+                        </CenteredStack>
+                    )}
+                    {props.order['status'] === 1 && (
+                        <Typography
+                            variant="h6"
+                            fontWeight="bold"
+                        >
+                            {intl.formatMessage(ordersPageMessages.orderInDesign)}
+                        </Typography>
+                    )}
+                    {props.order['status'] === 3 && (
+                        <>
+                            {props.order['casting'] && (
+                                <CenteredStack
+                                    width="100%"
+                                    height="40px"
+                                    sx={{
+                                        mt: theme.spacing(4)
+                                    }}
+                                >
+                                    <ButtonComponent
+                                        label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
+                                        onClick={() => updateCastingStatus(2)}
+                                    />
+                                </CenteredStack>
+                            )}
+                            {!props.order['casting'] && (
+                                <CenteredStack
+                                    width="100%"
+                                    height="40px"
+                                    sx={{
+                                        mt: theme.spacing(4)
+                                    }}
+                                >
+                                    <ButtonComponent
+                                        label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
+                                        onClick={() => {
+                                            contextValue.socket.emit('send-order-to-production', {
+                                                orderId: props.order['orderId'],
+                                                status: 6
+                                            })
+                                            router.push('/orders/production')
+                                        }}
+                                    />
+                                </CenteredStack>
+                            )}
+                        </>
+                    )}
+                    {props.order['status'] === 4 && (
+                        <>
+                            {props.order['casting'] && (
+                                <CenteredStack
+                                    width="100%"
+                                    height="40px"
+                                    sx={{
+                                        mt: theme.spacing(4)
+                                    }}
+                                >
+                                    <ButtonComponent
+                                        label={intl.formatMessage(ordersPageMessages.completeCasting)}
+                                        onClick={() => updateCastingStatus(3)}
+                                    />
+                                </CenteredStack>
+                            )}
+                        </>
+                    )}
+                    {(props.order['status'] === 5) && (
+                        <>
+                            {props.order['casting'] && (
+                                <CenteredStack
+                                    width="100%"
+                                    height="40px"
+                                    sx={{
+                                        mt: theme.spacing(4)
+                                    }}
+                                >
+                                    <ButtonComponent
+                                        label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
+                                        onClick={() => {
+                                            contextValue.socket.emit('send-order-to-production', {
+                                                orderId: props.order['orderId'],
+                                                status: 6
+                                            })
+                                            router.push('/orders/production')
+                                        }}
+                                    />
+                                </CenteredStack>
+                            )}
+                        </>
+                    )}
+                </>
+               )}
+               {contextValue.permissionLevel === 5 && (
+                    <>
+                        {props.order['status'] === 0 && props.order['priceOffer'] && (
+                            <CenteredStack
+                                width="100%"
+                                height="40px"
+                                sx={{
+                                    mt: theme.spacing(4)
+                                }}
                             >
-                                {intl.formatMessage(ordersPageMessages.orderSentSucessfully)}
-                            </Typography>
+                                <Typography>
+                                    {`${intl.formatMessage(ordersPageMessages.priceOffer)}: ${props.order['priceOffer']}`}
+                                </Typography>
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.acceptPriceOffer)}
+                                    onClick={() => {
+                                        contextValue.socket.emit('accept-price-offer', {
+                                            orderId: props.order['orderId'],
+                                            price: props.order['priceOffer']
+                                        })
+                                    }}
+                                />
+                            </CenteredStack>                   
                         )}
-                    </Stack>
-                )}
-                {props.status >= 2 && (
-                    <OrderModelData
-                        orderId={props.orderId}
-                        status={props.status}
-                        price={props.price}
-                        casting={props.casting}
-                        title={props.title}
-                        description={props.description}
-                        image={props.image}
-                        materials={props.materials}
-                        priceWithMaterials={props.priceWithMaterials}
-                        priceWithoutMaterials={props.priceWithoutMaterials}
-
-                    />
-                )}
-                {props.status === 6 && contextValue.permissionLevel === 3 && !props.tasks && (
+                    </>
+               )}
+            </Stack>
+            {contextValue.permissionLevel === 3 && props.order['status'] === 6 (
+                <CenteredStack
+                    width="100%"
+                    height="40px"
+                    sx={{
+                        mt: theme.spacing(4)
+                    }}
+                >
                     <ButtonComponent
                         label={intl.formatMessage(ordersPageMessages.defineTasks)}
                         onClick={() => setShowTaskModal(true)}
                     />
-                )}
-
-                {props.status === 6 && (contextValue.permissionLevel === 3 || contextValue.permissionLevel === 1) && props.tasks && (
-                    <TaskSummaryComponent
-                        tasks={props.tasks}
-                    />
-                )}
-            </Stack>
-            {(contextValue.permissionLevel === 1 || contextValue.permissionLevel === 3) && (
+                </CenteredStack>
+            )}
+            {contextValue.permissionLevel === 1 && props.order['type'] === 3 && (
+                <PriceOfferModal
+                    open={showPriceOfferModal}
+                    onClose={() => setShowPriceOfferModal(false)}
+                    onSend={(data) => {
+                        console.log(data.price)
+                        contextValue.socket.emit('send-price-offer', {
+                            price: data.price,
+                            orderId: props.order['orderId']
+                        })
+                        router.push('/orders')
+                    }}
+                />
+            )}
+            {contextValue.permissionLevel === 3 && (
                 <CreateTasksModal
                     open={showTaskModal}
                     onClose={() => setShowTaskModal(false)}
@@ -142,53 +363,11 @@ export const getServerSideProps = async (context) => {
             Authorization: getAuthorizationHeader(token)
         }
     })
-    let modelData;
-    if (response.data.order.status >= 2) {
-        const modelResponse = await axios.get(`http://localhost:3002/model/model/${response.data.order.modelId}`, {
-            headers: {
-                Authorization: getAuthorizationHeader(token)
-            }
-        })
-        modelData = {
-            title: modelResponse.data.model.title,
-            description: modelResponse.data.model.description,
-            image: modelResponse.data.model.image,
-            materials: modelResponse.data.model.materials,
-            priceWithMaterials: modelResponse.data.model.priceWithMaterials,
-            priceWithoutMaterials: modelResponse.data.model.priceWithoutMaterials
-        }
-    }
-    
-    let props =  {
-            orderId: response.data.order.orderId,
-            item: response.data.order.item,
-            setting: response.data.order.setting,
-            sideStoneSize: response.data.order.sideStoneSize,
-            mainStoneSize: response.data.order.mainStoneSize,
-            design: response.data.order.design,
-            size: response.data.order.size,
-            metal: response.data.order.metal,
-            comments: response.data.order.comments,
-            casting: response.data.order.casting,
-            customerName: response.data.order.customerName,
-            email: response.data.order.email,
-            phoneNumber: response.data.order.phoneNumber,
-            deadline: response.data.order.deadline,
-            status: response.data.order.status,
-            price: response.data.order.price,
-            tasks: response.data.order.tasks
-        }
-    
-    if (modelData) {
-        props = {
-            ...props,
-            ...modelData
-        }
-    }
 
-    console.log(props)
 
     return {
-        props: props
+        props: {
+            order: response.data.order
+        }
     }
 }

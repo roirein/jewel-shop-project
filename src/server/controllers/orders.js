@@ -9,7 +9,7 @@ const Task = require("../models/tasks/task")
 const Employee = require("../models/users/employee")
 const User = require("../models/users/user")
 const { createModelMetadata } = require("../utils/models")
-const { getOrderByPermissionLevel, getOrdersInCasting, createTaskForOrder, getOrdersInProduction, getOrdersInDesignForManager } = require("../utils/orders")
+const { getOrderByPermissionLevel, getOrdersInCasting, createTaskForOrder, getOrdersInProduction, getOrdersInDesignForManager, getJewelOrderData, getFixOrderData } = require("../utils/orders")
 const path = require('path')
 
 const createNewOrder = async (req, res, next) => {
@@ -27,37 +27,43 @@ const createNewOrder = async (req, res, next) => {
             email: req.body.email,
             phoneNumber: req.body.phoneNumber
         })
-        if (req.body.orderType ===  '3') {
+        if (req.body.orderType ===  '3' || req.body.orderType === 3) {
             await FixOrder.create({
                 orderId: newOrder.orderId,
                 item: req.body.item,
                 description: req.body.description  
             })
         } else {
+            console.log(req.body.orderType, req.body.orderType === 2)
             let modelMetadataId
             if (req.body.orderType === '1') {
                 const metadata = await createModelMetadata(req.body.setting, req.body.sideStoneSize, req.body.mainStoneSize, req.body.item, newOrder.orderId, req.file.filename);
                 modelMetadataId = metadata.metadataId
             }
-            if (req.body.orderType === '2') {
-                newOrder.price === req.body.price
+            if (req.body.orderType === '2' || req.body.orderType === 2) {
+                newOrder.price = req.body.price
                 newOrder.status = 3
                 await newOrder.save()
+                console.log(req.body.modelNumber)
                 const meta = await ModelMetadata.findOne({
                     where: {
                         modelNumber: req.body.modelNumber
                     }
                 })
-                console.log(req.body.modelNumber)
-                console.log(meta)
-                metadataId = meta.dataValues.modelNumber
+                console.log(meta.dataValues)
+                modelMetadataId = meta.dataValues.metadataId
+                if (req.body.casting || req.body.casting === 'false') {
+                    await OrdersInCasting.create({
+                        orderId: newOrder.orderId  
+                    })
+                }
             }
             const newJewlOrder = await JewelOrder.create({
                 orderId: newOrder.orderId,
                 item: req.body.item,
                 size: req.body.size,
                 metal: req.body.metal,
-                casting: req.body.casting,
+                casting: req.body.casting ? req.body.casting : false,
                 comments: req.body.comments,
                 metadataId: modelMetadataId
             })  
@@ -89,57 +95,33 @@ const getOrderById = async (req, res, next) => {
             where: {
                 orderId: req.params.orderId
             },
-            include: [
-                {
-                    model: JewelOrder,
-                },
-                {
-                    model: FixOrder
-                },
-                {
-                    model: OrderCustomer
-                }, 
-                {
-                    model: OrdersInCasting
-                },
-                {
-                    model: OrdersInProduction
-                },
-                {
-                    model: Task
-                }
-            ]
+            include: OrderCustomer
         })
 
-
-        const metadata = await ModelMetadata.findOne({
-            where: {
-                metadataId: orderData['Jewel Order'].metadataId
-            }
-        })
-
-        const order = {
+        let order = {
             orderId: orderData.dataValues.orderId,
-            item: metadata.dataValues.item,
-            setting: metadata.dataValues.setting,
-            sideStoneSize: metadata.dataValues.sideStoneSize,
-            mainStoneSize: metadata.dataValues.mainStoneSize,
-            design: metadata.dataValues.design,
-            size: orderData.dataValues['Jewel Order'].size,
-            metal: orderData.dataValues['Jewel Order'].metal,
-            comments: orderData.dataValues['Jewel Order'].comments,
-            casting: orderData.dataValues['Jewel Order'].casting,
             customerName: orderData.dataValues['Order Customer'].customerName,
             email: orderData.dataValues['Order Customer'].dataValues.email,
             phoneNumber: orderData.dataValues['Order Customer'].dataValues.phoneNumber,
             deadline: orderData.dataValues.deadline,
             status: orderData.dataValues.status,
-            modelId: metadata.dataValues.modelNumber || null,
             price: orderData.dataValues.price || null,
-            castingStatus: orderData.dataValues['Orders in Casting'] ? orderData.dataValues['Orders in Casting'].dataValues.castingStatus : null,
-            productionStatus: orderData.dataValues['Orders in Production'] ? orderData.dataValues['Orders in Production'].dataValues.productionStatus : null,
-            tasks: orderData.dataValues['Tasks'] ? orderData.dataValues['Tasks'].map(task => task.dataValues) : null
+            type: orderData.dataValues.type
         }
+
+        let additionalData
+
+        if (order.type === 3) {
+            additionalData = await getFixOrderData(order.orderId)
+        } else {
+            additionalData = await getJewelOrderData(order.orderId, order.type, order.status, req.permissionLevel)
+        }
+
+        order = {
+            ...order,
+            ...additionalData
+        }
+        
         res.status(200).send({order})
     } catch (e) {
         console.log(e)
@@ -219,7 +201,8 @@ const getAllOrdersTaks = async (req, res, next) => {
             return {
                 taskId: task.taskId,
                 description: task.description,
-                employeeName: `${task.Employee.User.firstName} ${task.Employee.User.lastName}`
+                employeeName: `${task.Employee.User.firstName} ${task.Employee.User.lastName}`,
+                isCompleted: task.isCompleted
             }
         })
 
