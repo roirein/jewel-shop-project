@@ -64,20 +64,27 @@ const OrderDeatils = (props) => {
                                 >
                                     {`${intl.formatMessage(modelsPageMessages.mainStoneSize)}: ${props.mainStoneSize}`}
                                 </Typography>
-                                <Typography
-                                    variant="body1"
-                                >
-                                    {`${intl.formatMessage(ordersPageMessages.casting)}: ${props.casting ? intl.formatMessage(ordersPageMessages.required) : intl.formatMessage(ordersPageMessages.notRequired)}`}
-                                </Typography>
-                                {props.comments && (
-                                <Typography
-                                    variant="body1"
-                                >
-                                    {`${intl.formatMessage(ordersPageMessages.comments)}: ${props.comments}`}
-                                </Typography>
-                                )}
                             </>
                         )}
+                        {props.orderType === 2 && (
+                            <Typography
+                                variant='body1'
+                            >
+                                {intl.formatMessage(ordersPageMessages.pricePaid, {price: props.price})}
+                            </Typography>
+                        )}
+                        {props.comments && (
+                            <Typography
+                                variant="body1"
+                            >
+                                {`${intl.formatMessage(ordersPageMessages.comments)}: ${props.comments}`}
+                            </Typography>
+                        )}
+                        <Typography
+                            variant="body1"
+                        >
+                            {`${intl.formatMessage(ordersPageMessages.casting)}: ${props.casting ? intl.formatMessage(ordersPageMessages.required) : intl.formatMessage(ordersPageMessages.notRequired)}`}
+                        </Typography>
                     </>
                 )}
                 <Typography

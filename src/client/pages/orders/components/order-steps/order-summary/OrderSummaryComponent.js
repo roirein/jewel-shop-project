@@ -3,10 +3,14 @@ import { useIntl } from "react-intl"
 import { useFormContext } from "react-hook-form"
 import { ordersPageMessages } from "../../../../../translations/i18n";
 import { ITEM_ENUMS, METAL_ENUM, ORDER_TYPES, SIZE_ENUM } from "../../../../../const/Enums";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import OrderSummaryComponent from "../../OrderSummary";
 import CustomerDetails from "../../order-summary/CustomerDetails";
 import OrderDeatils from "../../order-summary/OrderDetails";
+import axios from "axios";
+import AppContext from "../../../../../context/AppContext";
+import { getAuthorizationHeader } from "../../../../../utils/utils";
+import ModelComponent from "../existing-model-odrer/ModelComponent";
 
 const OrderSummary = (props) => {
 
@@ -15,6 +19,8 @@ const OrderSummary = (props) => {
 
     const [imageUrl, setImageUrl] = useState();
     const [summaryProps, setSummaryProps] = useState({});
+    const [modelData, setModelData] = useState({})
+    const contextValue = useContext(AppContext)
 
     useEffect(() => {
         if (props.orderData['design']) {
@@ -38,8 +44,21 @@ const OrderSummary = (props) => {
                 detailsProps['sideStoneSize'] = props.orderData['sideStoneSize']
                 detailsProps['mainStoneSize'] = props.orderData['mainStoneSize']
             }
+            if (props.orderType === 2) {
+                detailsProps['price'] = props.orderData['price']
+            }
         }
        setSummaryProps(detailsProps)
+    }, [])
+
+    useEffect(() => {
+        if (props.orderData['modelNumber']) {
+            axios.get(`http://localhost:3002/model/model/${props.orderData['modelNumber']}`, {
+                headers: {
+                    Authorization: getAuthorizationHeader(contextValue.token)
+                }
+            }).then((res) => setModelData(res.data.model))
+        } 
     }, [])
 
     return (
@@ -55,8 +74,8 @@ const OrderSummary = (props) => {
             <Stack
                 width="100%"
                 direction="row"
-                columnGap={theme.spacing(5)}
-            >
+                columnGap={theme.spacing(4)}
+            >   
                 {props.orderType === 1 && (
                     <Stack
                         columnGap={theme.spacing(4)}
@@ -73,6 +92,16 @@ const OrderSummary = (props) => {
                         />
                     </Stack>
                 )}
+                {props.orderType === 2 && (
+                    <ModelComponent
+                        modelNumber={props.orderData['modelNumber']}
+                        title={modelData.title}
+                        image={modelData.image}
+                        description={modelData.description}
+                        price={props.orderData['price']}
+                        selected={false}
+                    />
+                )} 
                 <CustomerDetails
                     customerName={props.orderData['customerName']}
                     email={props.orderData['email']}

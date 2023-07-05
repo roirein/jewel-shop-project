@@ -31,6 +31,8 @@ const createNewModel = async (req, res, next) => {
         } else {
             const modelMetadata = await createModelMetadata(req.body.setting, req.body.sideStoneSize, req.body.mainStoneSize, req.body.item);
             metadataId = modelMetadata.metadataId
+            modelMetadata.modelNumber = req.body.modelNumber
+            await modelMetadata.save()
         }
         const model = await createModel(req.body.modelNumber, req.body.title, req.body.description, req.file.filename, metadataId);
         //await sendNewModelNotification(modelMetadata.metadataId)

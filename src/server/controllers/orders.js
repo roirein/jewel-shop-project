@@ -39,6 +39,19 @@ const createNewOrder = async (req, res, next) => {
                 const metadata = await createModelMetadata(req.body.setting, req.body.sideStoneSize, req.body.mainStoneSize, req.body.item, newOrder.orderId, req.file.filename);
                 modelMetadataId = metadata.metadataId
             }
+            if (req.body.orderType === '2') {
+                newOrder.price === req.body.price
+                newOrder.status = 3
+                await newOrder.save()
+                const meta = await ModelMetadata.findOne({
+                    where: {
+                        modelNumber: req.body.modelNumber
+                    }
+                })
+                console.log(req.body.modelNumber)
+                console.log(meta)
+                metadataId = meta.dataValues.modelNumber
+            }
             const newJewlOrder = await JewelOrder.create({
                 orderId: newOrder.orderId,
                 item: req.body.item,

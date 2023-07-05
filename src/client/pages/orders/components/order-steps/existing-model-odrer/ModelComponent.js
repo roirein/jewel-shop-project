@@ -17,16 +17,18 @@ export const ModelComponent = (props) => {
     const [selectedPrice, setSelectedPrice] = useState()
 
     useEffect(() => {
-        axios.get(`http://localhost:3002/model/image/${props.image}`, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            },
-            responseType: 'blob'
-        }).then((res) => {
-            const image = URL.createObjectURL(res.data);
-            setImageURL(image)
-        })
-    }, [])
+        if (props.image) {
+            axios.get(`http://localhost:3002/model/image/${props.image}`, {
+                headers: {
+                    Authorization: getAuthorizationHeader(contextValue.token)
+                },
+                responseType: 'blob'
+            }).then((res) => {
+                const image = URL.createObjectURL(res.data);
+                setImageURL(image)
+            })
+        }
+    }, [props.image])
 
     return (
         <Stack
@@ -47,31 +49,41 @@ export const ModelComponent = (props) => {
                 description={props.description}
                 image={imageURL}
             />
-            <Typography>
-                {`${intl.formatMessage(modelsPageMessages.materials)}: ${props.materials}`}
-            </Typography>
-            <Stack
-                sx={{
-                    border: selectedPrice === props.priceWith ? `${theme.spacing(2)} solid black` : 'none'
-                }}
-            >
-                <ButtonComponent
-                    label={intl.formatMessage(ordersPageMessages.priceWith, {price: props.priceWith})}
-                    onClick={() => props.onClickPrice(props.priceWith)}
-                    disabled={!props.selected}
-                />
-            </Stack>
-            <Stack
-                sx={{
-                    border: selectedPrice === props.priceWith ? `${theme.spacing(2)} solid black` : 'none'
-                }}
-            >
-                <ButtonComponent
-                    label={intl.formatMessage(ordersPageMessages.priceWithout, {price: props.priceWithout})}
-                    onClick={() => props.onClickPrice(props.priceWithout)}
-                    disabled={!props.selected}
-                />
-            </Stack>
+            {!props.price && (
+                <>
+                    <Typography>
+                        {`${intl.formatMessage(modelsPageMessages.materials)}: ${props.materials}`}
+                    </Typography>
+                    <Stack
+                        sx={{
+                            border: selectedPrice === props.priceWith && props.selected  ? `${theme.spacing(2)} solid black` : 'none'
+                        }}
+                    >
+                        <ButtonComponent
+                            label={intl.formatMessage(ordersPageMessages.priceWith, {price: props.priceWith})}
+                            onClick={() => {
+                                setSelectedPrice(props.priceWith)
+                                props.onClickPrice(props.priceWith)
+                            }}
+                            disabled={!props.selected}
+                        />
+                    </Stack>
+                    <Stack
+                        sx={{
+                            border: selectedPrice === props.priceWithout && props.selected ? `${theme.spacing(2)} solid black` : 'none'
+                        }}
+                    >
+                        <ButtonComponent
+                            label={intl.formatMessage(ordersPageMessages.priceWithout, {price: props.priceWithout})}
+                            onClick={() => {
+                                setSelectedPrice(props.priceWithout)
+                                props.onClickPrice(props.priceWithout)
+                            }}
+                            disabled={!props.selected}
+                        />
+                    </Stack>
+                </>
+            )}
         </Stack>
     )
 }

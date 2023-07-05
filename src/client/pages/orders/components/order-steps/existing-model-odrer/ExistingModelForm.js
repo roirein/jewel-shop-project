@@ -97,10 +97,17 @@ const ExistingModelForm = forwardRef((props, ref) => {
                         fieldLabel={intl.formatMessage(ordersPageMessages.comments)}
                         onBlur={() => {}}
                     />
-                    <FormSwitchComponent
-                        name="casting"
-                        label={intl.formatMessage(ordersPageMessages.casting)}
-                    />
+                    <Stack
+                        sx={{
+                            direction: theme.direction,
+                            alignItems: 'flex-start'
+                        }}
+                    >
+                        <FormSwitchComponent
+                            name="casting"
+                            label={intl.formatMessage(ordersPageMessages.casting)}
+                        />
+                    </Stack>
                 </Stack>
             </form>
         </FormProvider>

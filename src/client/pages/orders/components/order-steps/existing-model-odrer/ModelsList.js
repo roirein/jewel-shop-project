@@ -43,6 +43,7 @@ const ModelsList = (props) => {
                     key={model.modelNumber}
                     modelNumber={model.modelNumber}
                     title={model.title}
+                    description={model.description}
                     image={model.image}
                     materials={model.materials}
                     priceWith={model.priceWithMaterials}
