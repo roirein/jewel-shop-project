@@ -153,5 +153,8 @@
     "orderInDesign": "הזמנה בעיצוב",
     "priceOffer": "הצעת מחיר",
     "acceptPriceOffer": "אשר הצעת מחיר",
-    "price": "מחיר {price}"
+    "price": "מחיר {price}",
+    "position": "עמדה",
+    "taskCompleted": "משימה הושלמה",
+    "taskNotCompleted": "משימה לא הושלמה"
 }

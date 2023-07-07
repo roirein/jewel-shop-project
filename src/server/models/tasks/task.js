@@ -9,6 +9,7 @@ Task.init({
     taskId: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
+        primaryKey: true,
         allowNull: false,
         unique: true
     },
@@ -19,9 +20,7 @@ Task.init({
     employeeId: {
         type: DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4,
-        primaryKey: true,
-        allowNull: false,
-        unique: true 
+        allowNull: false, 
     },
     description: {
         type: DataTypes.TEXT,
@@ -46,7 +45,7 @@ Task.init({
     
 })
 
-Task.belongsTo(Employee, {foreignKey: 'userId'})
+Task.belongsTo(Employee, {foreignKey: 'employeeId'})
 Order.hasMany(Task, {foreignKey: 'orderId'});
 Task.belongsTo(Order, {foreignKey: 'orderId'})
 

@@ -672,5 +672,17 @@ export const ordersPageMessages = defineMessages({
     price: {
         id: 'price',
         defaultMessage: 'price {price}'
+    },
+    position: {
+        id: 'position',
+        defaultMessage: 'position'
+    },
+    taskCompleted: {
+        id: 'taskCompleted',
+        defaultMessage: 'task completed',
+    },
+    taskNotCompleted: {
+        id: 'taskNotCompleted',
+        defaultMessage: 'task not completed'
     }
 })

@@ -75,3 +75,10 @@ export const PRODUCTION_STATUS = {
     [5]: intl.formatMessage(ordersPageMessages.qualityEnsurance),
     [6]: intl.formatMessage(modelsPageMessages.completed)
 }
+
+export const POSITIONS = {
+    [1]: intl.formatMessage(employeesPageMessages.jeweller),
+    [2]: intl.formatMessage(modelsPageMessages.setting),
+    [3]: intl.formatMessage(ordersPageMessages.finishing),
+    [4]: intl.formatMessage(ordersPageMessages.qualityEnsurance)
+}

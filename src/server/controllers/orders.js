@@ -58,12 +58,18 @@ const createNewOrder = async (req, res, next) => {
                     })
                 }
             }
+            let castingValue
+            if (!req.body.casting || req.body.casting === 'undefined') {
+                castingValue = false
+            } else {
+                castingValue = true
+            }
             const newJewlOrder = await JewelOrder.create({
                 orderId: newOrder.orderId,
                 item: req.body.item,
                 size: req.body.size,
                 metal: req.body.metal,
-                casting: req.body.casting ? req.body.casting : false,
+                casting: castingValue,
                 comments: req.body.comments,
                 metadataId: modelMetadataId
             })  
@@ -178,6 +184,7 @@ const setTasksForOrder = async (req, res, next) => {
 
         res.status(201).send({tasks})
     } catch (e) {
+        console.log(e)
         next (e)
     }
 }
@@ -196,13 +203,14 @@ const getAllOrdersTaks = async (req, res, next) => {
                 }
             }
         })
-    
+        console.log(tasksData)
         const tasks = tasksData.map((task) => {
             return {
                 taskId: task.taskId,
                 description: task.description,
                 employeeName: `${task.Employee.User.firstName} ${task.Employee.User.lastName}`,
-                isCompleted: task.isCompleted
+                isCompleted: task.isCompleted,
+                position: task.position
             }
         })
 
@@ -220,6 +228,7 @@ const getTaskByEmployeeAndOrder = async (req, res, next) => {
                 orderId: req.params.orderId
             }
         })
+        res.status(200).send*{task}
     } catch (e) {
         next (e)
     }

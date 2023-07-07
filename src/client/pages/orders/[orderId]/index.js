@@ -5,7 +5,7 @@ import OrderSummaryComponent from "../components/OrderSummary"
 import { useState, useEffect, useContext } from "react"
 import AppContext from "../../../context/AppContext"
 import { ordersPageMessages } from "../../../translations/i18n"
-import { ITEM_ENUMS, METAL_ENUM, SIZE_ENUM } from "../../../const/Enums"
+import { ITEM_ENUMS, METAL_ENUM, POSITIONS, SIZE_ENUM } from "../../../const/Enums"
 import { Stack, Typography, useTheme } from "@mui/material"
 import ButtonComponent from "../../../components/UI/ButtonComponent"
 import OrderModelData from "../components/OrderModelData"
@@ -46,11 +46,23 @@ const OrderPage = (props) => {
 
     useEffect(() => {
         if ((contextValue.permissionLevel === 1 || contextValue.permissionLevel === 3) && props.order['status'] === 6) {
-            axios.get(`localhost:3002/order/tasks/${props.order['orderId']}`, {
+            axios.get(`http://localhost:3002/order/tasks/${props.order['orderId']}`, {
                 headers: {
                     Authorization: getAuthorizationHeader(contextValue.token)
                 }
-            }).then((res) => setTasks(res.data.task))
+            }).then((res) => {
+                const taskData = res.data.tasks
+                const result = taskData.map((task, index) => {
+                    return {
+                        index: index + 1,
+                        employee: task.employeeName,
+                        description: task.description,
+                        position: POSITIONS[task.position],
+                        isCompleted: task.isCompleted
+                    }
+                })
+                setTasks(result)
+            })
         }
     }, [props.order])
 
@@ -315,21 +327,36 @@ const OrderPage = (props) => {
                         )}
                     </>
                )}
-            </Stack>
-            {contextValue.permissionLevel === 3 && props.order['status'] === 6 (
-                <CenteredStack
-                    width="100%"
-                    height="40px"
-                    sx={{
-                        mt: theme.spacing(4)
-                    }}
-                >
-                    <ButtonComponent
-                        label={intl.formatMessage(ordersPageMessages.defineTasks)}
-                        onClick={() => setShowTaskModal(true)}
-                    />
-                </CenteredStack>
+            {contextValue.permissionLevel === 3 && props.order['status'] === 6 && (
+                <>
+                    {tasks.length === 0 && (
+                        <CenteredStack
+                            width="100%"
+                            height="40px"
+                            sx={{
+                                mt: theme.spacing(4)
+                            }}
+                        >
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.defineTasks)}
+                                onClick={() => setShowTaskModal(true)}
+                            />
+                        </CenteredStack>
+                    )}
+                    {tasks.length > 0 && (
+                        <Stack
+                            width="60%"
+                            margin="0 auto"
+                        >
+                            <TaskSummaryComponent
+                                tasks={tasks}
+                                showStatus
+                            />
+                        </Stack>
+                    )}
+                </>
             )}
+            </Stack>
             {contextValue.permissionLevel === 1 && props.order['type'] === 3 && (
                 <PriceOfferModal
                     open={showPriceOfferModal}

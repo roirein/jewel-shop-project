@@ -10,6 +10,7 @@ import axios from 'axios'
 import { getAuthorizationHeader } from '../../../../utils/utils'
 import TaskSummaryComponent from './TasksSummary'
 import { useRouter } from 'next/router'
+import { POSITIONS } from '../../../../const/Enums'
 
 const CreateTasksModal = (props) => {
 
@@ -97,13 +98,19 @@ const CreateTasksModal = (props) => {
             return {
                 index: task.index,
                 employee: employee.label,
-                description: task.description
+                description: task.description,
+                position: POSITIONS[task.position]
             }
         })
     }
 
     const handleSkip = () => {
         setActiveStep(activeStep + 1)
+    }
+
+    const handleClose = () => {
+        setActiveStep(0)
+        setTasks([])
     }
 
     const getEmployeesForStep = (role) => {
@@ -130,7 +137,7 @@ const CreateTasksModal = (props) => {
             }
         })
         if (response.status === 201) {
-            props.onClose();
+            handleClose();
             router.push('/orders')
             contextValue.socket.emit('send-task-to-employee')
         }
@@ -147,7 +154,7 @@ const CreateTasksModal = (props) => {
                     justifyContent="left"
                 >
                     <ButtonComponent
-                        onClick={() => props.onClose()}
+                        onClick={() => handleClose()}
                         label={intl.formatMessage(buttonMessages.close)}
                     >
                     </ButtonComponent>
@@ -187,7 +194,7 @@ const CreateTasksModal = (props) => {
     return (
         <ModalComponent
             title={intl.formatMessage(ordersPageMessages.tasksToOrder)}
-            onClose={props.onClose}
+            onClose={() => handleClose}
             open={props.open}
             width="sm"
             actions={getModalActions()}
