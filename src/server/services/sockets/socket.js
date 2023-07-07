@@ -9,7 +9,8 @@ const Order = require("../../models/orders/order");
 const Comments = require("../../models/models/modelComments");
 const OrdersInCasting = require("../../models/orders/ordersInCasing");
 const OrdersInProduction = require("../../models/orders/ordersInProduction");
-const FixOrder = require('../../models/orders/fixOrder')
+const FixOrder = require('../../models/orders/fixOrder');
+const Task = require("../../models/tasks/task");
 
 let ioInstance = null;
 
@@ -131,6 +132,33 @@ const initSocket = (io) => {
                     orderId: data.orderId
                 }
             })
+        })
+        
+        socket.on('on-task-completion', async (data) => {
+            const currentTask = await Task.findOne({
+                where: {
+                    taskId: data.taskId
+                }
+            })
+            currentTask.isCompleted = true,
+            await currentTask.save()
+            if (currentTask.dataValues.nextTask) {
+                const nextTask = await Task.findOne({
+                    where: {
+                        taskId: currentTask.dataValues.nextTask
+                    }
+                })
+                nextTask.isBlocked = false
+                await nextTask.save()
+            } else {
+                const order = await OrdersInProduction.findOne({
+                    where: {
+                        orderId: data.orderId
+                    }
+                })
+                order.productionStatus = 6
+                await order.save();
+            }
         })
     })
 

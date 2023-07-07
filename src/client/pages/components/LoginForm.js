@@ -42,6 +42,8 @@ const LoginFormComponent = (props) => {
                 contextValue.onLogin(response.data.user)
                 if (response.data.user.permissionLevel === 2) {
                     router.push('/models')
+                } else if (response.data.user.permissionLevel === 4) {
+                    router.push('/employee')
                 } else {
                     router.push('/orders')
                 }

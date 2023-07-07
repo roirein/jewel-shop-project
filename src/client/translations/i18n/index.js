@@ -684,5 +684,9 @@ export const ordersPageMessages = defineMessages({
     taskNotCompleted: {
         id: 'taskNotCompleted',
         defaultMessage: 'task not completed'
+    },
+    completeTask: {
+        id: 'completeTask',
+        defaultMessage: 'complete task'
     }
 })

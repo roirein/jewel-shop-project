@@ -19,6 +19,6 @@ router.post('/tasks/:orderId', authorizeUser, checkPermissions([3]), setTasksFor
 
 router.get('/tasks/:orderId', authorizeUser, checkPermissions([1, 3]), getAllOrdersTaks)
 
-router.get('/task/:emplyeeId/:orderId', authorizeUser, checkPermissions([4]), getTaskByEmployeeAndOrder)
+router.get('/task/:employeeId/:orderId', authorizeUser, checkPermissions([4]), getTaskByEmployeeAndOrder)
 
 module.exports = router

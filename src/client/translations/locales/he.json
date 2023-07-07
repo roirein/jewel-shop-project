@@ -156,5 +156,6 @@
     "price": "מחיר {price}",
     "position": "עמדה",
     "taskCompleted": "משימה הושלמה",
-    "taskNotCompleted": "משימה לא הושלמה"
+    "taskNotCompleted": "משימה לא הושלמה",
+    "completeTask": "השלם משימה"
 }

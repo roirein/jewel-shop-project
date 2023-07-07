@@ -179,7 +179,8 @@ const setTasksForOrder = async (req, res, next) => {
             await tasks[i-1].save()
         }
 
-        tasks[0].blocked = false
+
+        tasks[0].isBlocked = false
         await tasks[0].save();
 
         res.status(201).send({tasks})
@@ -210,7 +211,7 @@ const getAllOrdersTaks = async (req, res, next) => {
                 description: task.description,
                 employeeName: `${task.Employee.User.firstName} ${task.Employee.User.lastName}`,
                 isCompleted: task.isCompleted,
-                position: task.position
+                position: task.position,
             }
         })
 
@@ -222,13 +223,28 @@ const getAllOrdersTaks = async (req, res, next) => {
 
 const getTaskByEmployeeAndOrder = async (req, res, next) => {
     try{
-        const task = await Task.findOne({
+        const taskData = await Task.findOne({
             where: {
-                taskId: req.params.taskId,
+                employeeId: req.params.employeeId,
                 orderId: req.params.orderId
+            },
+            include: {
+                model: Employee,
+                include: {
+                    model: User,
+                    attributes: ['firstName', 'lastName']
+                }
             }
         })
-        res.status(200).send*{task}
+        const task = {
+            taskId: taskData.dataValues.taskId,
+            description: taskData.dataValues.description,
+            employeeName: `${taskData.dataValues.Employee.dataValues.User.dataValues.firstName} ${taskData.dataValues.Employee.dataValues.User.dataValues.lastName}`,
+            isCompleted: taskData.dataValues.isCompleted,
+            position: taskData.dataValues.position,
+            isBlocked: task.isBlocked
+        } 
+        res.status(200).send({task})
     } catch (e) {
         next (e)
     }

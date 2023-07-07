@@ -4,7 +4,7 @@ import { useIntl } from "react-intl"
 import OrderSummaryComponent from "../components/OrderSummary"
 import { useState, useEffect, useContext } from "react"
 import AppContext from "../../../context/AppContext"
-import { ordersPageMessages } from "../../../translations/i18n"
+import { buttonMessages, ordersPageMessages } from "../../../translations/i18n"
 import { ITEM_ENUMS, METAL_ENUM, POSITIONS, SIZE_ENUM } from "../../../const/Enums"
 import { Stack, Typography, useTheme } from "@mui/material"
 import ButtonComponent from "../../../components/UI/ButtonComponent"
@@ -62,6 +62,27 @@ const OrderPage = (props) => {
                     }
                 })
                 setTasks(result)
+            })
+        }
+    }, [props.order])
+
+
+    useEffect(() => {
+        if (contextValue.permissionLevel === 4 && props.order['status'] === 6) {
+            axios.get(`http://localhost:3002/order/task/${contextValue.userId}/${props.order['orderId']}`, {
+                headers: {
+                    Authorization: getAuthorizationHeader(contextValue.token)
+                }
+            }).then((res) => {
+                const taskData = res.data.task
+                const result =  {
+                        index: 1,
+                        employee: taskData.employeeName,
+                        description: taskData.description,
+                        position: POSITIONS[taskData.position],
+                        isCompleted: taskData.isCompleted
+                    }
+                setTasks([result])
             })
         }
     }, [props.order])
@@ -351,6 +372,39 @@ const OrderPage = (props) => {
                             <TaskSummaryComponent
                                 tasks={tasks}
                                 showStatus
+                            />
+                            <Stack
+                                direction="row"
+                                rowGap={theme.spacing(4)}
+                            >
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.completeTask)}
+                                    disabled={tasks[0].isBocked}
+                                    onClick={() => {
+                                        contextValue.socket.emit('on-task-completion', {
+                                            taskId: tasks[0].taskId,
+                                            orderId: props.order['orderId']
+                                        })
+                                    }}
+                                />
+                                <ButtonComponent
+                                    label={intl.formatMessage(buttonMessages.goBack)}
+                                    onClick={() => router.push('/employee')}
+                                />
+                            </Stack>
+                        </Stack>
+                    )}
+                </>
+            )}
+            {contextValue.permissionLevel === 4 && props.order['status'] === 6 && (
+                <>
+                    {tasks.length > 0 && (
+                        <Stack
+                            width="60%"
+                            margin="0 auto"
+                        >
+                            <TaskSummaryComponent
+                                tasks={tasks}
                             />
                         </Stack>
                     )}

@@ -38,6 +38,11 @@ Task.init({
     position: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    isBlocked: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
     }
 }, {
     timestamps: false,
