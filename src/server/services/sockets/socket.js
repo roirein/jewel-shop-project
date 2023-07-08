@@ -12,6 +12,7 @@ const OrdersInProduction = require("../../models/orders/ordersInProduction");
 const FixOrder = require('../../models/orders/fixOrder');
 const Task = require("../../models/tasks/task");
 const OrderCustomer = require("../../models/orders/orderCustomer");
+const OrderTimeline = require("../../models/orders/orderTimeline");
 
 let ioInstance = null;
 
@@ -44,11 +45,26 @@ const initSocket = (io) => {
                     modelNumber: data.modelNumber,
                     content: data.comments
                 })
+            } else {
+                await OrderTimeline.update({
+                    designEnd: Date.now()
+                }, {
+                    where: {
+                        orderId: data.orderId
+                    }
+                })
             }
         })
 
         socket.on('new-design', async (data) => {
             await sendOrderToDesign(data.orderId)
+            await OrderTimeline.update({
+                designStart: Date.now()
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
         })
 
         socket.on('customer-approval', async (data) => {
@@ -77,9 +93,23 @@ const initSocket = (io) => {
             let status
             if (data.castingStatus === 2) {
                 status = 4
+                await OrderTimeline.update({
+                    castingStart: Date.now()
+                }, {
+                    where: {
+                        orderId: data.orderId
+                    }
+                })
             }
             if (data.castingStatus === 3) {
                 status = 5
+                await OrderTimeline.update({
+                    castingEnd: Date.now()
+                }, {
+                    where: {
+                        orderId: data.orderId
+                    }
+                })
             }
             await Order.update({
                 status: status
@@ -100,6 +130,13 @@ const initSocket = (io) => {
             })
             await OrdersInProduction.create({
                 orderId: data.orderId
+            })
+            await OrderTimeline.update({
+                productionStart: Date.now()
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
             })
         })
 
@@ -172,6 +209,13 @@ const initSocket = (io) => {
                     orderId: data.orderId
                 }
             })
+            await OrderTimeline.update({
+                productionEnd: Date.now()
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
         }),
 
         socket.on('update-customer', async (data) => {
@@ -190,6 +234,13 @@ const initSocket = (io) => {
         socket.on('complete-order', async (data) => {
             await Order.update({
                 status: 9
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
+            await OrderTimeline.update({
+                delivered: Date.now()
             }, {
                 where: {
                     orderId: data.orderId

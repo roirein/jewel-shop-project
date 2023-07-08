@@ -3,6 +3,7 @@ const FixOrder = require("../models/orders/fixOrder")
 const JewelOrder = require("../models/orders/jewelOrder")
 const Order = require("../models/orders/order")
 const OrderCustomer = require("../models/orders/orderCustomer")
+const OrderTimeline = require("../models/orders/orderTimeline")
 const OrdersInCasting = require("../models/orders/ordersInCasing")
 const OrdersInProduction = require("../models/orders/ordersInProduction")
 const Task = require("../models/tasks/task")
@@ -72,9 +73,10 @@ const createNewOrder = async (req, res, next) => {
                 casting: castingValue,
                 comments: req.body.comments,
                 metadataId: modelMetadataId
-            })  
+            })
         }
-        // send notification 
+        // send notification
+        await OrderTimeline.create({orderId: newOrder.orderId, createdAt: Date.now()})
         res.status(201).send({
             ...newOrder,
             customerName: customerData.customerName
