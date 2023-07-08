@@ -157,5 +157,17 @@
     "position": "עמדה",
     "taskCompleted": "משימה הושלמה",
     "taskNotCompleted": "משימה לא הושלמה",
-    "completeTask": "השלם משימה"
+    "completeTask": "השלם משימה",
+    "completeProduction": "השלם הכנה",
+    "productionCompleted": "הכנה הושלמה",
+    "updateCustomer": "עדכן לקוח",
+    "customerUpdated": "לקוח עודכן",
+    "orderComplete": "הזמנה הושלמה",
+    "desginStart": "תחילת עיצוב",
+    "designEnd": "סיום עיצוב",
+    "castingStart": "תחילת יציקה",
+    "castingEnd": "סיום יציקה",
+    "productionStart": "תחילת הכנה",
+    "productionEnd": "סיום הכנה",
+    "completeOrder": "השלם הזמנה"
 }

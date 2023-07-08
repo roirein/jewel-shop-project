@@ -77,10 +77,12 @@ const OrderPage = (props) => {
                 const taskData = res.data.task
                 const result =  {
                         index: 1,
+                        taskId: taskData.taskId,
                         employee: taskData.employeeName,
                         description: taskData.description,
                         position: POSITIONS[taskData.position],
-                        isCompleted: taskData.isCompleted
+                        isCompleted: taskData.isCompleted,
+                        isBlocked: taskData.isBlocked
                     }
                 setTasks([result])
             })
@@ -320,6 +322,44 @@ const OrderPage = (props) => {
                             )}
                         </>
                     )}
+                    {props.order['status'] === 7 && (
+                        <CenteredStack
+                            width="100%"
+                            height="40px"
+                            sx={{
+                                mt: theme.spacing(4)
+                            }}
+                        >
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.updateCustomer)}
+                                onClick={() => {
+                                    contextValue.socket.emit('update-customer', {
+                                        orderId: props.order['orderId'],
+                                    })
+                                    router.push('/orders')
+                                }}
+                            />
+                        </CenteredStack>
+                    )}
+                    {props.order['status'] === 8 && (
+                        <CenteredStack
+                            width="100%"
+                            height="40px"
+                            sx={{
+                                mt: theme.spacing(4)
+                            }}
+                        >
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.completeOrder)}
+                                onClick={() => {
+                                    contextValue.socket.emit('complete-order', {
+                                        orderId: props.order['orderId'],
+                                    })
+                                    router.push('/orders')
+                                }}
+                            />
+                        </CenteredStack>
+                    )}
                 </>
                )}
                {contextValue.permissionLevel === 5 && (
@@ -373,25 +413,17 @@ const OrderPage = (props) => {
                                 tasks={tasks}
                                 showStatus
                             />
-                            <Stack
-                                direction="row"
-                                rowGap={theme.spacing(4)}
-                            >
+                            {tasks.every(task => task.isCompleted) && (
                                 <ButtonComponent
-                                    label={intl.formatMessage(ordersPageMessages.completeTask)}
-                                    disabled={tasks[0].isBocked}
+                                    label={intl.formatMessage(ordersPageMessages.completeProduction)}
                                     onClick={() => {
-                                        contextValue.socket.emit('on-task-completion', {
-                                            taskId: tasks[0].taskId,
+                                        contextValue.socket.emit('on-production-complete', {
                                             orderId: props.order['orderId']
                                         })
+                                        router.push('/orders')
                                     }}
                                 />
-                                <ButtonComponent
-                                    label={intl.formatMessage(buttonMessages.goBack)}
-                                    onClick={() => router.push('/employee')}
-                                />
-                            </Stack>
+                            )}
                         </Stack>
                     )}
                 </>
@@ -406,6 +438,30 @@ const OrderPage = (props) => {
                             <TaskSummaryComponent
                                 tasks={tasks}
                             />
+                            <Stack
+                                direction="row"
+                                columnGap={theme.spacing(4)}
+                                sx={{
+                                    width: '80%',
+                                    mx: 'auto',
+                                    mt: theme.spacing(4)
+                                }}
+                            >
+                                <ButtonComponent
+                                    label={intl.formatMessage(buttonMessages.goBack)}
+                                    onClick={() => router.push('/employee')}
+                                />
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.completeTask)}
+                                    disabled={tasks[0].isBlocked}
+                                    onClick={() => {
+                                        contextValue.socket.emit('on-task-completion', {
+                                            taskId: tasks[0].taskId,
+                                            orderId: props.order['orderId']
+                                        })
+                                    }}
+                                />
+                            </Stack>
                         </Stack>
                     )}
                 </>

@@ -60,9 +60,29 @@ const sendVerificationCodeMail = (username, recipient, code) => {
     })
 }
 
+const sendOrderReadyMail = (username, recipient, orderNumber) => {
+
+    const template = fs.readFileSync(path.join(__dirname, '/orderComplete.hbs'), 'utf8')
+    const htmlContent = handlebars.compile(template);
+
+    const mailContent = htmlContent({
+        subject: 'הזמנה מוכנה',
+        name: username,
+        orderNumber
+    })
+
+    mailer.sendMail({
+        from: process.env.EMAIL_USER,
+        to: recipient,
+        subject: 'הזמנה מוכנה',
+        html: mailContent
+    })
+}
+
 
 module.exports = {
     sendRequestApproveMail,
     sendPasswordMail,
-    sendVerificationCodeMail
+    sendVerificationCodeMail,
+    sendOrderReadyMail
 }

@@ -688,5 +688,29 @@ export const ordersPageMessages = defineMessages({
     completeTask: {
         id: 'completeTask',
         defaultMessage: 'complete task'
+    },
+    completeProduction: {
+        id: 'completeProduction',
+        defaultMessage: 'complete production'
+    },
+    completeProduction: {
+        id: 'completeProduction',
+        defaultMessage: 'complete production'
+    },
+    updateCustomer: {
+        id: 'updateCustomer',
+        defaultMessage: 'updateCustomer'
+    },
+    completeOrder: {
+        id: 'completeOrder',
+        defaultMessage: 'complete order'
+    },
+    productionCompleted: {
+        id: 'productionCompleted',
+        defaultMessage: 'production completed'
+    },
+    customerUpdated: {
+        id: 'customerUpdated',
+        defaultMessage: 'customer updated'
     }
 })

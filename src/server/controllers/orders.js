@@ -242,7 +242,7 @@ const getTaskByEmployeeAndOrder = async (req, res, next) => {
             employeeName: `${taskData.dataValues.Employee.dataValues.User.dataValues.firstName} ${taskData.dataValues.Employee.dataValues.User.dataValues.lastName}`,
             isCompleted: taskData.dataValues.isCompleted,
             position: taskData.dataValues.position,
-            isBlocked: task.isBlocked
+            isBlocked: taskData.isBlocked
         } 
         res.status(200).send({task})
     } catch (e) {

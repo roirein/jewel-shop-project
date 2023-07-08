@@ -1,6 +1,6 @@
 const User = require("../../models/users/user");
 const Customer = require('../../models/users/customer');
-const {sendRequestApproveMail} = require("../emails/emails");
+const {sendRequestApproveMail, sendOrderReadyMail} = require("../emails/emails");
 const Request = require('../../models/users/requests');
 const Notifications = require("../../models/notifications/notifications");
 const JewelModel = require("../../models/models/jewelModel");
@@ -11,6 +11,7 @@ const OrdersInCasting = require("../../models/orders/ordersInCasing");
 const OrdersInProduction = require("../../models/orders/ordersInProduction");
 const FixOrder = require('../../models/orders/fixOrder');
 const Task = require("../../models/tasks/task");
+const OrderCustomer = require("../../models/orders/orderCustomer");
 
 let ioInstance = null;
 
@@ -135,6 +136,7 @@ const initSocket = (io) => {
         })
         
         socket.on('on-task-completion', async (data) => {
+            console.log(data)
             const currentTask = await Task.findOne({
                 where: {
                     taskId: data.taskId
@@ -159,6 +161,40 @@ const initSocket = (io) => {
                 order.productionStatus = 6
                 await order.save();
             }
+        })
+
+        socket.on('on-production-complete', async (data) => {
+            console.log(data, 1)
+            await Order.update({
+                status: 7
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
+        }),
+
+        socket.on('update-customer', async (data) => {
+            const order = await Order.findOne({
+                where: {
+                    orderId: data.orderId
+                },
+                include: OrderCustomer
+            })
+            order.status = 8
+            await order.save();
+
+            sendOrderReadyMail(order.dataValues['Order Customer'].dataValues.customerName, order.dataValues['Order Customer'].dataValues.email, order.orderId)
+        })
+        
+        socket.on('complete-order', async (data) => {
+            await Order.update({
+                status: 9
+            }, {
+                where: {
+                    orderId: data.orderId
+                }
+            })
         })
     })
 
