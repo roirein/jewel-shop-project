@@ -22,7 +22,18 @@ class User extends Model{
     static async generateAuthToken(userId) {
         const user = await User.findByPk(userId);
         const authToken = jwt.sign({_id: userId}, process.env.JWT_SECRET)
+        user.token = authToken
+        await user.save()
         return authToken
+    }
+
+    static async getUserByEmail(email) {
+        const user = await User.findOne({
+            where: {
+                email
+            }
+        })
+        return user.dataValues
     }
 }
 

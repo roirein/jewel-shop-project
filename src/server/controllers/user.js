@@ -1,9 +1,8 @@
 const Customer = require("../models/users/customer");
 const User = require("../models/users/user")
 const HttpError = require("../utils/HttpError")
-const bcrypt = require('bcrypt');
 const {Op} = require('sequelize');
-const { createNewUser, createNewCustomer, generateVerificationCode } = require("../utils/user");
+const { createNewUser, createNewCustomer, generateVerificationCode, validateLoginCredentials, validateIsLoginValid } = require("../utils/user");
 const Request = require("../models/users/requests");
 const { sendNewCustomerNotification } = require("../services/sockets/socket");
 const { sendVerificationCodeMail } = require("../services/emails/emails");
@@ -45,48 +44,24 @@ const registerNewUser = async (req, res, next) => {
 
 const loginUser = async (req, res ,next) => {
     try {
-        const user = await User.findOne({
-            where: {
-                email: req.body.email
-            }
-        })
-        let isPasswordMatch;
-        if (user) {
-            isPasswordMatch = await bcrypt.compare(req.body.password, user.dataValues.password)
-        }
-        if (!user || !isPasswordMatch) {
+        const isValidCredentials = await validateLoginCredentials(req.body.email, req.body.password)
+        if (!isValidCredentials) {
             throw new HttpError('authentication error', 401);
         }
-        const token = await User.generateAuthToken(user.dataValues.userId)
-        user.token = token
-        await user.save()
-        if (user.permissionLevel === 5) {
-            const request = await Request.findOne({
-                where: {
-                    customerId: user.dataValues.userId
-                }
-            })
-            if (request.dataValues.status !== 1) {
-                throw new HttpError('user-unapproved', 403)
-            }
-        } else {
-            const employee = await Employee.findOne({
-                where: {
-                    userId: user.dataValues.userId
-                }
-            })
-            if (employee.dataValues.shouldReplacePassword) {
-                throw new HttpError('replace-password', 403)
-            }
+        const isLoginValid = await validateIsLoginValid(req.body.email)
+        if (!isLoginValid.res) {
+                throw new HttpError(isLoginValid.errMessage, 403)
         }
+        const user = await User.getUserByEmail(req.body.email)
+        const token = await User.generateAuthToken(user.userId)
         res.status(200).send({
             user: {
-                id: user.dataValues.userId,
+                id: user.userId,
                 token,
-                username: `${user.dataValues.firstName} ${user.dataValues.lastName}`,
-                permissionLevel: user.dataValues.permissionLevel,
-                email: user.dataValues.email,
-                phoneNumber: user.dataValues.phoneNumber
+                username: await User.getUserFullName(user.userId),
+                permissionLevel: user.permissionLevel,
+                email: user.email,
+                phoneNumber: user.phoneNumber
             }
         })
     } catch (e) {
@@ -188,12 +163,38 @@ const updatePassword = async (req, res, next) => {
     }
 }
 
+const getUserByToken = async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            where: {
+                token: req.params.token
+            }
+        })
+        if (user) {
+            res.status(200).send({
+                user: {
+                    id: user.dataValues.userId,
+                    username: await User.getUserFullName(user.dataValues.userId),
+                    permissionLevel: user.dataValues.permissionLevel,
+                    email: user.dataValues.email,
+                    phoneNumber: user.dataValues.phoneNumber
+                }
+            })
+        } else {
+            throw new HttpError('unauthorized', 401)
+        }
+    } catch (e) {
+        next(e)
+    }
+}
+
 module.exports = {
     registerNewUser,
     loginUser,
     logoutUser,
     sendResetPasswordCode,
     verifyCode,
-    updatePassword
+    updatePassword,
+    getUserByToken
 }
 

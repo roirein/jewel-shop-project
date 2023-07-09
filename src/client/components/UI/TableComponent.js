@@ -1,7 +1,7 @@
 import { Table, TableHead, TableRow, TableCell, TableBody, TableContainer, Paper, useTheme, Link, Checkbox, Stack, Button} from "@mui/material";
 import { useIntl } from "react-intl";
 import { buttonMessages } from "../../translations/i18n";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CenteredStack from "./CenteredStack";
 import ButtonComponent from "./ButtonComponent";
 
@@ -12,7 +12,6 @@ const TableComponent = (props) => {
     const intl = useIntl()
 
     const [selectedRowId, setSelectedRowId] = useState(null)
-    console.log(props.data)
 
     return (
         <CenteredStack
@@ -72,27 +71,27 @@ const TableComponent = (props) => {
                                             checked={row.rowId === selectedRowId}
                                             onChange={() => {
                                                 if (row.rowId === selectedRowId) {
-                                                    console.log(selectedRowId)
                                                     setSelectedRowId(null)
                                                 } else {
-                                                    console.log(1)
-                                                    console.log(row)
                                                     setSelectedRowId(row.rowId)
                                                 }
                                             }}
                                         />
                                     </TableCell>
                                 )}
-                                {row.rowContent.map((column, colIndex) => (
-                                    <TableCell
-                                        key={colIndex}
-                                        sx={{
-                                            textAlign: 'center',
-                                        }}
-                                    >
-                                        {column || 'N/A'}
-                                    </TableCell>
-                                ))}
+                                {row.rowContent.map((column, colIndex) => {
+                                    console.log(row, 1)
+                                    return (
+                                        <TableCell
+                                            key={colIndex}
+                                            sx={{
+                                                textAlign: 'center',
+                                            }}
+                                        >
+                                            {column || 'N/A'}
+                                        </TableCell>
+                                    )
+                                })}
                                 {props.showMore && (
                                     <TableCell
                                         sx={{

@@ -13,6 +13,7 @@ const OrdersPage = (props) => {
 
     const contextValue = useContext(AppContext);
     const [originalData, setOriginalData] = useState(props.orders)
+    const [isLoading, setIsLoading] = useState(false)
     const [tableData, setTableData] = useState([]);
     const router = useRouter()
 
@@ -44,6 +45,8 @@ const OrdersPage = (props) => {
         })
         setTableData(data)
     }, [originalData])
+
+    console.log(tableData)
 
 
     const getTableColumns = () => {

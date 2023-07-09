@@ -16,6 +16,7 @@ const FormDatePickerComponent = (props) => {
                 name={props.name}
                 control={control}
                 rules={props.rules}
+                defaultValue={props.defaultValue || null}
                 render={({field}) => (
                     <Stack
                         sx={{
@@ -26,7 +27,12 @@ const FormDatePickerComponent = (props) => {
                             label={props.fieldLabel}
                         />
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker {...field} format="DD/MM/YYYY"/>
+                            <DatePicker {...field} 
+                                format="DD/MM/YYYY" 
+                                //onChange={field.onChange()}
+                                minDate={props.minDate || null}
+                                maxDate={props.maxDate || null}
+                            />
                         </LocalizationProvider>
                         {errors && errors[props.name] && (
                             <ErrorLabelComponent

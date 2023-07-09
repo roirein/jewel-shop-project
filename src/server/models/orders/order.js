@@ -39,6 +39,10 @@ Order.init({
     price: {
         type: DataTypes.FLOAT,
         allowNull: true
+    },
+    created: {
+        type: DataTypes.DATE,
+        allowNull: false
     }
 }, {
     timestamps: true,

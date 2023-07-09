@@ -3,10 +3,16 @@ import {useState, useEffect} from "react"
 import { useIntl } from "react-intl";
 import io from 'socket.io-client';
 import { notificationMessages } from "../translations/i18n";
+import {getRouteAfterLogin, getTokenFromCookie} from "../utils/utils";
+import { sendHttpRequest } from "../utils/requests";
+import { USER_ROUTES } from "../utils/server-routes";
+import { useRouter } from "next/router";
+import { CircularProgress } from "@mui/material";
 
 const ContextProvider = (props) => {
 
     const intl = useIntl()
+    const router = useRouter()
 
     const [token, setToken] = useState('');
     const [userName, setUserName] = useState('');
@@ -17,6 +23,22 @@ const ContextProvider = (props) => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const userToken = getTokenFromCookie(document.cookie)
+        if (userToken) {
+            setIsLoading(true)
+            sendHttpRequest(USER_ROUTES.USER(userToken), 'GET').then((response) => {
+                setUserData({token: userToken, ...response.data.user})
+                router.push(getRouteAfterLogin(response.data.user.permissionLevel))
+                setIsLoading(false)
+            })
+        }
+        if (!userToken) {
+            router.push('/')
+        }
+    }, [])
 
     useEffect(() => {
         if (socket) {
@@ -31,31 +53,23 @@ const ContextProvider = (props) => {
         }
     }, [socket])
 
-
-    const setCookie = (token, id, permissionLevel, name) => {
-        const values = {
-            token,
-            userId: id,
-            permissionLevel,
-            username: name
-        }
-
-        document.cookie = `userData=${JSON.stringify(values)}`
+    const setUserData = (userData) => {
+        setToken(userData.token)
+        setUserName(userData.username)
+        setUserId(userData.userId)
+        setPermissionLevel(userData.permissionLevel)
+        setEmail(userData.email)
+        setPhoneNumber(userData.phoneNumber)
     }
 
-    const onLogin = (user) => {
-        setToken(user.token),
-        setUserName(user.username)
-        setPermissionLevel(user.permissionLevel);
-        setUserId(user.id)
-        setEmail(user.email)
-        setPhoneNumber(user.phoneNumber)
+    const onLogin = (user, rememberMe) => {
+        setUserData(user)
+        document.cookie=`token=${user.token}`
         const sock = io('http://localhost:3002');
         sock.emit('login', {
             userId: user.id
         })
         setSocket(sock)
-        setCookie(user.token, user.id, user.permissionLevel, user.username)
     }
 
     const onLogout = () => {
@@ -65,7 +79,7 @@ const ContextProvider = (props) => {
         setUserId('')
         socket.disconnect()
         setSocket(null)
-        document.cookie = `userData=`
+        document.cookie = ``
     }
 
 
@@ -83,6 +97,10 @@ const ContextProvider = (props) => {
         setShowNotification,
         notificationMessage,
         setNotificationMessage
+    }
+
+    if (isLoading) {
+        return <CircularProgress/>
     }
 
 

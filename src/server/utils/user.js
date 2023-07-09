@@ -1,6 +1,8 @@
 const Customer = require("../models/users/customer")
 const Employee = require("../models/users/employee")
+const Request = require("../models/users/requests")
 const User = require("../models/users/user")
+const bcrypt = require('bcrypt')
 
 const createNewUser = async (firstName, lastName, email, password, phoneNumber, permissionLevel) => {
     const user = await User.create({
@@ -73,10 +75,73 @@ const generateVerificationCode = () => {
     return randomCode
 }
 
+const validateLoginCredentials = async (email, password) => {
+    const user = await User.findOne({
+        where: {
+            email: email
+        }
+    })
+    let isPasswordMatch;
+    if (user) {
+        isPasswordMatch = await bcrypt.compare(password, user.dataValues.password)
+    }
+    if (!user || !isPasswordMatch) {
+        return false
+    }
+    return true
+}
+
+const checkIfCustomerLoginValid = async (customerId) => {
+     const request = await Request.findOne({
+        where: {
+            customerId
+        }
+     })
+     return request.dataValues.status === 1
+} 
+
+const checkIfEmployeeLoginValid = async (employeeId) => {
+    const employee = await Employee.findOne({
+        where: {
+            userId: employeeId
+        }
+    })
+
+    return employee.dataValues.shouldReplacePassword
+}
+
+const validateIsLoginValid = async (email) => {
+    const user = await User.findOne({
+        where: {
+            email: email
+        }
+    })
+    let errMessage
+    let res
+    if (user.dataValues.permissionLevel === 5) {
+         res = checkIfCustomerLoginValid(user.dataValues.userId)
+         if (!res) {
+            errMessage = 'manager-approval-required'
+         }
+    } else {
+        res = checkIfEmployeeLoginValid(user.dataValues.userId)
+        if (!res) {
+            errMessage = 'replace-password-required'
+         }
+    }
+    return {
+        res,
+        errMessage
+    }
+
+}
+
 module.exports = {
     createNewUser,
     createNewCustomer,
     createNewEmployee,
     genertaePassword,
-    generateVerificationCode
+    generateVerificationCode,
+    validateLoginCredentials,
+    validateIsLoginValid
 }

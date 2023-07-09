@@ -233,6 +233,10 @@ export const tabsMessages = {
     requests: {
         id: 'requests',
         defaultMessage: 'requests'
+    },
+    reports: {
+        id: 'reports',
+        defaultMessage: 'reports'
     }
 }
 

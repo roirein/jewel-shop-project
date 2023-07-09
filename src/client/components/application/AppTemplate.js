@@ -62,8 +62,12 @@ const AppTemplate = (props) => {
     return (
         <Box
             width="100%"
-            height="98vh"
+            minHeight="100vh"
+            overflow="auto"
             border={`${theme.spacing(1)} solid ${theme.palette.primary.main}`}
+            sx={{
+                mt: theme.spacing(4)
+            }}
         >
             <AppBar
                 position="static"

@@ -14,6 +14,10 @@ import { useRouter } from "next/router";
 import { useState, useContext } from "react";
 import ErrorLabelComponent from "../../components/UI/Form/Labels/ErrorLabelComponent";
 import AppContext from "../../context/AppContext";
+import { sendHttpRequest } from "../../utils/requests";
+import { USER_ROUTES } from "../../utils/server-routes";
+import { getRouteAfterLogin } from "../../utils/utils";
+import { getLoginErrorMessage } from "../../utils/error";
 
 const LoginFormComponent = (props) => {
 
@@ -34,31 +38,17 @@ const LoginFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:3002/user/login', {
+            const response = await sendHttpRequest(USER_ROUTES.LOGIN, 'POST', {
                 email: data.email,
                 password: data.password
             })
             if (response.status === 200) {
-                contextValue.onLogin(response.data.user)
-                if (response.data.user.permissionLevel === 2) {
-                    router.push('/models')
-                } else if (response.data.user.permissionLevel === 4) {
-                    router.push('/employee')
-                } else {
-                    router.push('/orders')
-                }
+                contextValue.onLogin(response.data.user, data.rememberMe)
+                router.push(getRouteAfterLogin(response.data.user.permissionLevel))
             }
         } catch(e) {
             console.log(e)
-            if (e.response.status === 403) {
-                if (e.response.data === 'user-unapproved'){
-                    setLoginError(intl.formatMessage(homePageMessages.unapproveError))
-                } 
-                if (e.response.data === 'replace-password') {
-                    setLoginError(intl.formatMessage(homePageMessages.resetPasswrodError))
-                }
-            }
-            setLoginError(intl.formatMessage(homePageMessages.loginError))
+            setLoginError(getLoginErrorMessage(e.response.status, e.response.data))
         }
 
     }

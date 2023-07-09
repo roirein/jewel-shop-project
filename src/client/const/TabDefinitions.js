@@ -23,6 +23,10 @@ export const MANAGER_TABS = [
     {
         label: intl.formatMessage(tabsMessages.models),
         route: '/models'
+    },
+    {
+        label: intl.formatMessage(tabsMessages.reports),
+        route: '/reports'
     }
 ]
 
