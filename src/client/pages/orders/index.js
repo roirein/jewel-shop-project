@@ -108,8 +108,9 @@ export const getServerSideProps = async (context) => {
                 Authorization: getAuthorizationHeader(accessTokenResponse.data.accessToken)
             })
             orders = ordersResponse.data.orders
+        } else {
+            orders = response.data.orders
         }
-        orders = response.data.orders
     } catch (e) {
         console.log(e)
     }
