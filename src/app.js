@@ -78,7 +78,6 @@ nextApp.prepare().then(() => {
     app.use('/order', orderRoute)
 
     app.use((err, req, res, next) => {
-        console.log(err.status)
         res.status(err.status || 500).send(err.message)
     })
 

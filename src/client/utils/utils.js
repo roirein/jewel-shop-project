@@ -4,7 +4,17 @@ import { CLIENT_ROUTES } from './client-routes'
 export const getUserToken = (cookie) => {
     if (cookie) {
         const cookieData = parse(cookie)
-        return cookieData.token
+        const tokens = JSON.parse(cookieData.tokens)
+        return tokens.accessToken
+    } 
+}
+
+export const getRefreshToken = (cookie) => {
+    console.log(cookie)
+    if (cookie) {
+        const cookieData = parse(cookie)
+        const tokens = JSON.parse(cookieData.tokens)
+        return tokens.refreshToken
     } 
 }
 

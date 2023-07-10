@@ -14,7 +14,11 @@ export const sendHttpRequest = async (url, method, data = {}, headers = {}) => {
         const response = await axios.request(requestData)
         return response
     } catch(e) {
-        throw e
+        if (e.response.data === 'token-expired') {
+            return 'token-expired'
+        } else {
+            throw e
+        }
     }
 }
 

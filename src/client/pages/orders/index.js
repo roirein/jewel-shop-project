@@ -2,12 +2,15 @@ import { useState, useContext, useEffect } from "react"
 import AppContext from '../../context/AppContext'
 import { DESIGN_MANAGER_ORDERS_COLUMNS, ORDERS_IN_PRODUCTION_TABLE_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS } from "../../const/TablesColumns"
 import { ITEM_ENUMS, ORDER_STATUS, ORDER_TYPES, PRODUCTION_STATUS } from "../../const/Enums"
-import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
+import { getAuthorizationHeader, getRefreshToken, getUserToken } from "../../utils/utils"
 import axios from "axios"
 import TableComponent from '../../components/UI/TableComponent'
 import { useRouter } from "next/router"
 import PageLayoutComponent from "./components/PageLayout"
 import { parse } from "cookie"
+import { sendHttpRequest } from "../../utils/requests"
+import { headers } from "next/dist/client/components/headers"
+import { USER_ROUTES } from "../../utils/server-routes"
 
 const OrdersPage = (props) => {
 
@@ -33,6 +36,15 @@ const OrdersPage = (props) => {
                 return []
         }
     }
+
+    useEffect(() => {
+        if (props.accessToken) {
+            const cookie = document.cookie.split('=')
+            const tokens = JSON.parse(cookie[1])
+            tokens.accessToken = props.accessToken
+            document.cookie = `tokens=${JSON.stringify(tokens)}`
+        }
+    }, [])
     
     useEffect(() => {
         const data = [];
@@ -80,15 +92,31 @@ const OrdersPage = (props) => {
 
 export const getServerSideProps = async (context) => {
     const token = getUserToken(context.req.headers.cookie)
-    const response = await axios.get('http://localhost:3002/order/orders', {
-        headers: {
-            Authorization: getAuthorizationHeader(token)
+    let orders
+    let accessToken = null
+    try {
+        const response = await sendHttpRequest('http://localhost:3002/order/orders', 'GET', null, {
+                Authorization: getAuthorizationHeader(token)
+            }
+        )
+        if (response === 'token-expired') {
+            const accessTokenResponse = await sendHttpRequest(USER_ROUTES.REFRESH_TOKEN, 'POST', {
+                refreshToken: getRefreshToken(context.req.headers.cookie)
+            })
+            accessToken = accessTokenResponse.data.accessToken
+            const ordersResponse = await sendHttpRequest('http://localhost:3002/order/orders', 'GET', null, {
+                Authorization: getAuthorizationHeader(accessTokenResponse.data.accessToken)
+            })
+            orders = ordersResponse.data.orders
         }
-    })
-
+        orders = response.data.orders
+    } catch (e) {
+        console.log(e)
+    }
     return {
         props: {
-         orders: response.data.orders
+            orders: orders || [],
+            accessToken
         }
     }
 }

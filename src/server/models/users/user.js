@@ -19,13 +19,20 @@ class User extends Model{
         return isValid
     }
 
-    static async generateAuthToken(userId) {
+    static async generateAccessToken(userId) {
         const user = await User.findByPk(userId);
-        const authToken = jwt.sign({_id: userId}, process.env.JWT_SECRET)
-        user.token = authToken
-        await user.save()
-        return authToken
+        const accessToken = jwt.sign({_id: userId, permissions: user.dataValues.permissionLevel}, process.env.JWT_ACCESS_TOKEN_SECRET, {expiresIn: '1m'})
+        return accessToken
     }
+
+    static async generateRefreshToken(userId, rememberMe) {
+        const user = await User.findByPk(userId);
+        const refreshToken = jwt.sign({_id: userId, permissions: user.dataValues.permissionLevel}, process.env.JWT_REFRESH_TOKEN_SECRET, {expiresIn: rememberMe ? '3h' : '1y'})
+        user.token = refreshToken
+        await user.save();
+        return refreshToken
+    }
+
 
     static async getUserByEmail(email) {
         const user = await User.findOne({

@@ -8,6 +8,7 @@ const { sendNewCustomerNotification } = require("../services/sockets/socket");
 const { sendVerificationCodeMail } = require("../services/emails/emails");
 const Codes = require("../models/users/codes");
 const Employee = require("../models/users/employee");
+const jwt = require('jsonwebtoken');
 
 const registerNewUser = async (req, res, next) => {
     try {
@@ -53,11 +54,13 @@ const loginUser = async (req, res ,next) => {
                 throw new HttpError(isLoginValid.errMessage, 403)
         }
         const user = await User.getUserByEmail(req.body.email)
-        const token = await User.generateAuthToken(user.userId)
+        const accessToken = await User.generateAccessToken(user.userId)
+        const refreshToken = await User.generateRefreshToken(user.userId, req.body.rememberMe)
         res.status(200).send({
             user: {
                 id: user.userId,
-                token,
+                accessToken: accessToken,
+                refreshToken: refreshToken,
                 username: await User.getUserFullName(user.userId),
                 permissionLevel: user.permissionLevel,
                 email: user.email,
@@ -188,6 +191,26 @@ const getUserByToken = async (req, res, next) => {
     }
 }
 
+const generateNewAccessToken = async (req, res, next) => {
+    try {
+        const refreshToken = req.body.refreshToken;
+        const decodedToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN_SECRET)
+        const user = await User.findOne({
+            where: {
+                userId: decodedToken._id
+            }
+        })
+        console.log(user.dataValues.token, refreshToken)
+        if (user.dataValues.token !== refreshToken) {
+            throw new HttpError('invalid token', 401)
+        }
+        const accessToken = await User.generateAccessToken(user.dataValues.userId)
+        res.status(200).send({accessToken})
+    } catch(e) {
+        next(e)
+    }
+}
+
 module.exports = {
     registerNewUser,
     loginUser,
@@ -195,6 +218,7 @@ module.exports = {
     sendResetPasswordCode,
     verifyCode,
     updatePassword,
-    getUserByToken
+    getUserByToken,
+    generateNewAccessToken
 }
 

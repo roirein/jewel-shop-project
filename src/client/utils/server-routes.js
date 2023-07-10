@@ -7,5 +7,6 @@ export const USER_ROUTES = {
     RESETPASSWORD:`${serverUrl}/user/resetPassword`,
     VERIFY_CODE: `${serverUrl}/user/verifyCode`,
     UPDATE_PASSWORD: `${serverUrl}/user/updatePassword`,
-    USER: (token) => `${serverUrl}/user/user/${token}`
+    USER: (token) => `${serverUrl}/user/user/${token}`,
+    REFRESH_TOKEN: `${serverUrl}/user/user/refresh-token`
 }

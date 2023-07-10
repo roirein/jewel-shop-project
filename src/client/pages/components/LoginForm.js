@@ -40,7 +40,8 @@ const LoginFormComponent = (props) => {
         try {
             const response = await sendHttpRequest(USER_ROUTES.LOGIN, 'POST', {
                 email: data.email,
-                password: data.password
+                password: data.password,
+                rememberMe: data.rememberMe
             })
             if (response.status === 200) {
                 contextValue.onLogin(response.data.user, data.rememberMe)

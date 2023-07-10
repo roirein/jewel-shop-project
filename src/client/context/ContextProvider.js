@@ -54,7 +54,7 @@ const ContextProvider = (props) => {
     }, [socket])
 
     const setUserData = (userData) => {
-        setToken(userData.token)
+        setToken(userData.accessToken)
         setUserName(userData.username)
         setUserId(userData.userId)
         setPermissionLevel(userData.permissionLevel)
@@ -62,9 +62,13 @@ const ContextProvider = (props) => {
         setPhoneNumber(userData.phoneNumber)
     }
 
-    const onLogin = (user, rememberMe) => {
+    const onLogin = (user) => {
         setUserData(user)
-        document.cookie=`token=${user.token}`
+        const tokens = {
+            accessToken: user.accessToken,
+            refreshToken: user.refreshToken
+        }
+        document.cookie=`tokens=${JSON.stringify(tokens)}`
         const sock = io('http://localhost:3002');
         sock.emit('login', {
             userId: user.id
