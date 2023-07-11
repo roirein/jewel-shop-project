@@ -170,7 +170,7 @@ const getUserByToken = async (req, res, next) => {
     try {
         const user = await User.findOne({
             where: {
-                token: req.params.token
+                token: req.body.token
             }
         })
         if (user) {
@@ -200,14 +200,17 @@ const generateNewAccessToken = async (req, res, next) => {
                 userId: decodedToken._id
             }
         })
-        console.log(user.dataValues.token, refreshToken)
         if (user.dataValues.token !== refreshToken) {
             throw new HttpError('invalid token', 401)
         }
         const accessToken = await User.generateAccessToken(user.dataValues.userId)
         res.status(200).send({accessToken})
     } catch(e) {
-        next(e)
+        if (e.name === 'TokenExpiredError') {
+            res.status(401).send('refresh-token-expired')
+        } else {
+            next(e)
+        }
     }
 }
 

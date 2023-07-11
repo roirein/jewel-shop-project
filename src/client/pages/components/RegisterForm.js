@@ -9,8 +9,10 @@ import FormTextFieldComponent from "../../components/UI/Form/Inputs/FormTextFiel
 import FormPasswordFieldComponent from "../../components/UI/Form/Inputs/FormPasswordFieldComponent";
 import ErrorLabelComponent from "../../components/UI/Form/Labels/ErrorLabelComponent";
 import ButtonComponent from "../../components/UI/ButtonComponent";
-import axios from "axios";
+import sendHttpRequest from '../../utils/requests'
 import { useState } from "react";
+import { USER_ROUTES } from "../../utils/server-routes";
+import { getRegisterErrorMessages } from "../../utils/error";
 
 const RegisterFormComponent = (props) => {
 
@@ -39,17 +41,12 @@ const RegisterFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:3002/user/register', data)
+            const response = await sendHttpRequest(USER_ROUTES.REGISTER, 'POST', document.cookie, data)
             if (response.status === 201) {
                 setIsRegisterSuccessful(true)
             }
         } catch (e) {
-            if (e.response.status === 400) {
-                setRegisterError(intl.formatMessage(homePageMessages.registerError))
-            }
-            if (e.response.status === 409) {
-                setRegisterError(intl.formatMessage(homePageMessages.userExistError))
-            }
+            setRegisterError(getRegisterErrorMessages(e.response.status))
         }
     }
 

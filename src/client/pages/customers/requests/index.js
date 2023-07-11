@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getAuthorizationHeader, getUserToken } from '../../../utils/utils'
+import { getAccessToken, getAuthorizationHeader, getUserToken } from '../../../utils/utils'
 import PageLayout from '../components/PageLayout';
 import CenteredStack from '../../../components/UI/CenteredStack'
 import { useTheme } from '@mui/material';
@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl';
 import { REQUEST_TABLE_COLUMNS } from '../../../const/TablesColumns';
 import { customerPageMessages } from '../../../translations/i18n';
 import RequestModalComponent from '../components/RequestModalComponent';
+import { CUSTOMER_ROUTES } from '../../../utils/server-routes';
 
 const RequestPage = (props) => {
 
@@ -36,7 +37,7 @@ const RequestPage = (props) => {
 
     useEffect(() => {
         const data = [];
-        originalData.forEach((dataElement) => {
+        originalData?.forEach((dataElement) => {
             data.push(
                 {
                     rowId: dataElement.customerId,
@@ -98,16 +99,24 @@ const RequestPage = (props) => {
 }
 
 export const getServerSideProps =  async (context) => {
-    const token = getUserToken(context.req.headers.cookie);
-    const response = await axios.get('http://localhost:3002/customer/getRequests', {
-        headers: {
-            Authorization: getAuthorizationHeader(token)
+    try {
+        const accessToken = getAccessToken(context.req.headers.cookie);
+        const responseData = await sendHttpRequest(CUSTOMER_ROUTES.REQUESTS, 'GET', context.req.headers.cookie, null, {
+            Authorization: `Bearer ${accessToken}`
+        })
+        
+        return {
+            props: {
+                requests: responseData.data.requests || [],
+                accessToken: responseData.accessToken || null
+            }
         }
-    })
-
-    return {
-        props: {
-            requests: response.data.requests
+    } catch(e) {
+        return {
+            props: {
+                requests: null,
+                accessToken: null
+            }
         }
     }
 }

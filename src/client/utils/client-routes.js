@@ -3,8 +3,8 @@ export const CLIENT_ROUTES = {
     ORDERS: '/orders',
     MODELS: '/models',
     REPOERTS: '/reports',
-    CUSTOMER: '/customers',
-    EMPLOYESS: '/employees',
+    CUSTOMERS: '/customers',
+    EMPLOYEES: '/employees',
     ORDER: (id) => `/orders/${id}`,
     EMPLOYEE: '/employee'
 }

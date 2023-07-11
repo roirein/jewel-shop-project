@@ -21,3 +21,12 @@ export const getLoginErrorMessage = (errorStatus, errMessage) => {
     }
     return ''
 }
+
+export const getRegisterErrorMessages = (errorStatus) => {
+        if (errorStatus = 400) {
+            return intl.formatMessage(homePageMessages.registerError)
+        }
+        if (errorStatus === 409) {
+            return intl.formatMessage(homePageMessages.userExistError)
+        }
+}

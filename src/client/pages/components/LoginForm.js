@@ -18,6 +18,7 @@ import { sendHttpRequest } from "../../utils/requests";
 import { USER_ROUTES } from "../../utils/server-routes";
 import { getRouteAfterLogin } from "../../utils/utils";
 import { getLoginErrorMessage } from "../../utils/error";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 
 const LoginFormComponent = (props) => {
 
@@ -38,7 +39,7 @@ const LoginFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await sendHttpRequest(USER_ROUTES.LOGIN, 'POST', {
+            const response = await sendHttpRequest(USER_ROUTES.LOGIN, 'POST', document.cookie, {
                 email: data.email,
                 password: data.password,
                 rememberMe: data.rememberMe
@@ -51,7 +52,6 @@ const LoginFormComponent = (props) => {
             console.log(e)
             setLoginError(getLoginErrorMessage(e.response.status, e.response.data))
         }
-
     }
 
     return (

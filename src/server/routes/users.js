@@ -15,7 +15,7 @@ router.post('/verifyCode', verifyCode);
 
 router.patch('/updatePassword', updatePassword)
 
-router.get('/user/:token', getUserByToken)
+router.post('/user', authorizeUser, getUserByToken)
 
 router.post('/user/refresh-token', generateNewAccessToken)
 

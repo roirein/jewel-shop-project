@@ -3,11 +3,12 @@ import {useState, useEffect} from "react"
 import { useIntl } from "react-intl";
 import io from 'socket.io-client';
 import { notificationMessages } from "../translations/i18n";
-import {getRouteAfterLogin, getTokenFromCookie} from "../utils/utils";
-import { sendHttpRequest } from "../utils/requests";
+import {getAccessToken, getRefreshToken, getRouteAfterLogin, getTokenFromCookie, setNewAcessToken} from "../utils/utils";
+import { getNewAccessToken, sendHttpRequest } from "../utils/requests";
 import { USER_ROUTES } from "../utils/server-routes";
 import { useRouter } from "next/router";
 import { CircularProgress } from "@mui/material";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const ContextProvider = (props) => {
 
@@ -26,17 +27,21 @@ const ContextProvider = (props) => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const userToken = getTokenFromCookie(document.cookie)
-        if (userToken) {
+        const accessToken = getAccessToken(document.cookie)
+        const refreshToken = getRefreshToken(document.cookie)
+        if (accessToken) {
             setIsLoading(true)
-            sendHttpRequest(USER_ROUTES.USER(userToken), 'GET').then((response) => {
-                setUserData({token: userToken, ...response.data.user})
-                router.push(getRouteAfterLogin(response.data.user.permissionLevel))
+            sendHttpRequest(USER_ROUTES.USER, 'POST', document.cookie, {token: refreshToken}, {
+                Authorization: `Bearer ${getAccessToken(document.cookie)}`
+            }).then((res) => {
+                setUserData({accessToken: res.accessToken ? res.accessToken : accessToken, ...res.data.user})
+                if (res.data.accessToken) {
+                    document.cookie = `tokens=${JSON.stringify({accessToken: res.data.accessToken, refreshToken: refreshToken})}`
+                }
                 setIsLoading(false)
             })
-        }
-        if (!userToken) {
-            router.push('/')
+        } else {
+            router.push('/') 
         }
     }, [])
 
@@ -74,6 +79,7 @@ const ContextProvider = (props) => {
             userId: user.id
         })
         setSocket(sock)
+        console.log('did this')
     }
 
     const onLogout = () => {
@@ -104,7 +110,7 @@ const ContextProvider = (props) => {
     }
 
     if (isLoading) {
-        return <CircularProgress/>
+        return <LoadingSpinner/>
     }
 
 

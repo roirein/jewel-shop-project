@@ -21,7 +21,7 @@ class User extends Model{
 
     static async generateAccessToken(userId) {
         const user = await User.findByPk(userId);
-        const accessToken = jwt.sign({_id: userId, permissions: user.dataValues.permissionLevel}, process.env.JWT_ACCESS_TOKEN_SECRET, {expiresIn: '1m'})
+        const accessToken = jwt.sign({_id: userId, permissions: user.dataValues.permissionLevel}, process.env.JWT_ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
         return accessToken
     }
 

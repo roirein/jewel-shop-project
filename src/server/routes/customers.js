@@ -4,12 +4,12 @@ const { checkPermissions } = require('../middleware/authorization')
 const { getNewCustomersRequests, getCustomerById, getCustomers, deleteCustomer } = require('../controllers/customer')
 const router = express.Router()
 
-router.get('/getRequests', authorizeUser, checkPermissions([1]), getNewCustomersRequests);
+router.get('/requests', authorizeUser, checkPermissions([1]), getNewCustomersRequests);
 
-router.get('/getCustomerById/:customerId', authorizeUser, checkPermissions([1]), getCustomerById);
+router.get('/customer/:customerId', authorizeUser, checkPermissions([1]), getCustomerById);
 
-router.get('/getCustomers', authorizeUser, checkPermissions([1]), getCustomers)
+router.get('/customers', authorizeUser, checkPermissions([1]), getCustomers)
 
-router.delete('/deleteCustomer/:customerId', authorizeUser, checkPermissions([1]), deleteCustomer)
+router.delete('/customer/:customerId', authorizeUser, checkPermissions([1]), deleteCustomer)
 
 module.exports = router

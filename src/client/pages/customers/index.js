@@ -1,5 +1,5 @@
 import TableComponent from "../../components/UI/TableComponent";
-import { getAuthorizationHeader, getUserToken } from "../../utils/utils";
+import { getAccessToken, getAuthorizationHeader, getUserToken } from "../../utils/utils";
 import PageLayout from "./components/PageLayout"
 import axios from "axios";
 import CenteredStack from "../../components/UI/CenteredStack";
@@ -9,6 +9,9 @@ import AppContext from "../../context/AppContext";
 import { useTheme } from "@mui/material";
 import { useIntl } from "react-intl";
 import { customerPageMessages } from "../../translations/i18n";
+import { sendHttpRequest } from "../../utils/requests";
+import { CUSTOMER_ROUTES } from "../../utils/server-routes";
+import useCookie from "../../hooks/cookie-hook";
 
 const CustomerPage = (props) => {
 
@@ -29,6 +32,8 @@ const CustomerPage = (props) => {
         })
         setTableData(data)
     }, [originalData])
+
+    useCookie(props.accessToken)
 
     const onDeleteCustomer = async (customerId) => {
         const newData = [...originalData]
@@ -65,16 +70,24 @@ const CustomerPage = (props) => {
 }
 
 export const getServerSideProps = async (context) => {
-    const token = getUserToken(context.req.headers.cookie);
-    const response = await axios.get('http://localhost:3002/customer/getCustomers', {
-        headers: {
-            Authorization: getAuthorizationHeader(token)
+    try {
+        const accessToken = getAccessToken(context.req.headers.cookie);
+        const responseData = await sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, 'GET', context.req.headers.cookie, null, {
+            Authorization: `Bearer ${accessToken}`
+        })
+        
+        return {
+            props: {
+                customers: responseData.data.customers || [],
+                accessToken: responseData.accessToken || null
+            }
         }
-    })
-
-    return {
-        props: {
-            customers: response.data.customers
+    } catch(e) {
+        return {
+            props: {
+                customers: null,
+                accessToken: null
+            }
         }
     }
 }

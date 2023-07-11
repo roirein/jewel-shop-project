@@ -19,12 +19,11 @@ const authorizeUser = async (req, res, next) => {
         next()
     } catch(e) {
         if (e.name === 'TokenExpiredError') {
-            console.log(e)
             res.status(401).send('token-expired')
         } else {
             next(e)   
         }
-        
+
     }
 }
 
