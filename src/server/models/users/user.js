@@ -19,15 +19,10 @@ class User extends Model{
         return isValid
     }
 
-    static async generateAccessToken(userId) {
-        const user = await User.findByPk(userId);
-        const accessToken = jwt.sign({_id: userId, permissions: user.dataValues.permissionLevel}, process.env.JWT_ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
-        return accessToken
-    }
 
-    static async generateRefreshToken(userId, rememberMe) {
+    static async generateAuthToken(userId) {
         const user = await User.findByPk(userId);
-        const refreshToken = jwt.sign({_id: userId, permissions: user.dataValues.permissionLevel}, process.env.JWT_REFRESH_TOKEN_SECRET, {expiresIn: rememberMe ? '3h' : '1y'})
+        const refreshToken = jwt.sign({_id: userId}, process.env.JWT_SECRET)
         user.token = refreshToken
         await user.save();
         return refreshToken

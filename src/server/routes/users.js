@@ -17,6 +17,4 @@ router.patch('/updatePassword', updatePassword)
 
 router.post('/user', authorizeUser, getUserByToken)
 
-router.post('/user/refresh-token', generateNewAccessToken)
-
 module.exports = router;

@@ -1,5 +1,5 @@
 import TableComponent from "../../components/UI/TableComponent";
-import { getAccessToken, getAuthorizationHeader, getUserToken } from "../../utils/utils";
+import { getToken } from "../../utils/utils";
 import PageLayout from "./components/PageLayout"
 import axios from "axios";
 import CenteredStack from "../../components/UI/CenteredStack";
@@ -11,19 +11,30 @@ import { useIntl } from "react-intl";
 import { customerPageMessages } from "../../translations/i18n";
 import { sendHttpRequest } from "../../utils/requests";
 import { CUSTOMER_ROUTES } from "../../utils/server-routes";
-import useCookie from "../../hooks/cookie-hook";
+import LoadingSpinner from "../../components/UI/LoadingSpinner";
 
-const CustomerPage = (props) => {
+const CustomerPage = () => {
 
-    const [originalData, setOriginalData] = useState(props.customers)
+    const [originalData, setOriginalData] = useState([])
     const [tableData, setTableData] = useState([]);
     const theme = useTheme();
     const intl = useIntl();
     const contextValue = useContext(AppContext)
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
+        setIsLoading(true)
+        sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, 'GET', null, {
+            Authorization: `Bearer ${getToken()}`
+        }).then((res) => {
+            setOriginalData(res.data.customers);
+            setIsLoading(false)
+        })
+    }, [])
+    
+    useEffect(() => {
         const data = [];
-        originalData.forEach((dataElement) => {
+        originalData?.forEach((dataElement) => {
             data.push(
                 {
                     rowId: dataElement.id,
@@ -33,7 +44,6 @@ const CustomerPage = (props) => {
         setTableData(data)
     }, [originalData])
 
-    useCookie(props.accessToken)
 
     const onDeleteCustomer = async (customerId) => {
         const newData = [...originalData]
@@ -47,6 +57,10 @@ const CustomerPage = (props) => {
         if (response.status === 200) {
             setOriginalData(newData)
         }
+    }
+
+    if (isLoading) {
+        return <LoadingSpinner/>
     }
 
     return (
@@ -67,29 +81,6 @@ const CustomerPage = (props) => {
             </CenteredStack>
         </PageLayout>
     )
-}
-
-export const getServerSideProps = async (context) => {
-    try {
-        const accessToken = getAccessToken(context.req.headers.cookie);
-        const responseData = await sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, 'GET', context.req.headers.cookie, null, {
-            Authorization: `Bearer ${accessToken}`
-        })
-        
-        return {
-            props: {
-                customers: responseData.data.customers || [],
-                accessToken: responseData.accessToken || null
-            }
-        }
-    } catch(e) {
-        return {
-            props: {
-                customers: null,
-                accessToken: null
-            }
-        }
-    }
 }
 
 export default CustomerPage

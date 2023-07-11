@@ -39,17 +39,15 @@ const LoginFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await sendHttpRequest(USER_ROUTES.LOGIN, 'POST', document.cookie, {
+            const response = await sendHttpRequest(USER_ROUTES.LOGIN, 'POST', {
                 email: data.email,
-                password: data.password,
-                rememberMe: data.rememberMe
+                password: data.password
             })
             if (response.status === 200) {
                 contextValue.onLogin(response.data.user, data.rememberMe)
                 router.push(getRouteAfterLogin(response.data.user.permissionLevel))
             }
         } catch(e) {
-            console.log(e)
             setLoginError(getLoginErrorMessage(e.response.status, e.response.data))
         }
     }

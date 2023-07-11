@@ -9,7 +9,7 @@ import FormTextFieldComponent from "../../components/UI/Form/Inputs/FormTextFiel
 import FormPasswordFieldComponent from "../../components/UI/Form/Inputs/FormPasswordFieldComponent";
 import ErrorLabelComponent from "../../components/UI/Form/Labels/ErrorLabelComponent";
 import ButtonComponent from "../../components/UI/ButtonComponent";
-import sendHttpRequest from '../../utils/requests'
+import { sendHttpRequest } from "../../utils/requests";
 import { useState } from "react";
 import { USER_ROUTES } from "../../utils/server-routes";
 import { getRegisterErrorMessages } from "../../utils/error";
@@ -41,11 +41,12 @@ const RegisterFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await sendHttpRequest(USER_ROUTES.REGISTER, 'POST', document.cookie, data)
+            const response = await sendHttpRequest(USER_ROUTES.REGISTER, 'POST', data, {})
             if (response.status === 201) {
                 setIsRegisterSuccessful(true)
             }
         } catch (e) {
+            console.log(e)
             setRegisterError(getRegisterErrorMessages(e.response.status))
         }
     }

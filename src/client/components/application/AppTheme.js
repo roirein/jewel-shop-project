@@ -4,7 +4,7 @@ const theme = createTheme({
     direction: 'rtl',
     typography: {
         fontFamily: 'Assistant, sans-serif',
-        fontWeightBold: 700
+        fontWeightBold: 700,
     },
     palette: {
         primary: {
@@ -12,7 +12,8 @@ const theme = createTheme({
             contrastText: '#000000'
         },
         secondary: {
-            main: '#ffffff'
+            main: '#d99182',
+            contrastText: '#ffffff'
         },
     },
     spacing: [2, 4, 8, 12, 16, 24, 32 , 48, 64]

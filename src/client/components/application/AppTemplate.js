@@ -1,4 +1,4 @@
-import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab, Link} from '@mui/material';
+import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab, Link, IconButton} from '@mui/material';
 import CenteredStack from '../UI/CenteredStack';
 import { useContext, useState, useEffect } from 'react';
 import AppContext from '../../context/AppContext';
@@ -10,6 +10,7 @@ import axios from 'axios';
 import { homePageMessages } from '../../translations/i18n';
 import { useRouter } from 'next/router';
 import { getAuthorizationHeader } from '../../utils/utils';
+import { Diamond, PersonAddAlt, ShoppingCart } from '@mui/icons-material';
 
 const AppTemplate = (props) => {
 
@@ -38,7 +39,29 @@ const AppTemplate = (props) => {
             contextValue.onLogout();
             router.push('/')
         }
+    }
 
+
+    const getIconsByPermissionLevel = (permissionLevel) => {
+        switch(permissionLevel) {
+            case 1: 
+                return [
+                    {
+                        type: 1,
+                        icon: <PersonAddAlt/>
+                    },
+                    {
+                        type: 2,
+                        icon: <ShoppingCart/>
+                    },
+                    {
+                        type: 3,
+                        icon: <Diamond/>
+                    }
+                ]
+            default: 
+                return []
+        }
     }
 
     const getTabs = () => {
@@ -88,11 +111,27 @@ const AppTemplate = (props) => {
                             direction: `rtl`
                         }}
                     >
-                        <Avatar>
+                        <Avatar
+                            sx={{
+                                backgroundColor: theme.palette.secondary.main
+                            }}
+                        >
                             {avatarData}
                         </Avatar>
+                        <Stack
+                            direction="row"
+                            columnGap=""
+                        >
+                            {getIconsByPermissionLevel(contextValue.permissionLevel).map((icon) => (
+                                <IconButton
+                                    key={icon.type}
+                                >
+                                    {icon.icon}
+                                </IconButton>
+                            ))}
+                        </Stack>
                         <Link
-                            color={theme.palette.secondary.main}
+                            color={theme.palette.secondary.contrastText}
                             variant='body1'
                             onClick={() => onLogout()}
                             sx={{
