@@ -33,12 +33,13 @@ const RequestPage = () => {
     const contextValue = useContext(AppContext)
 
     useEffect(() => {
+        if (contextValue.token)
         sendHttpRequest(CUSTOMER_ROUTES.REQUESTS, 'GET', null, {
             Authorization: contextValue.token
         }).then((response) => {
             setOriginalData(response.data.requests)
         })
-    }, [])
+    }, [contextValue.token])
 
     useEffect(() => {
         const data = [];

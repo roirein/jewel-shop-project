@@ -150,8 +150,9 @@ const AppTemplate = (props) => {
                                             vertical: 'top',
                                             horizontal: 'left'
                                         }}
-                                    />
-                                    {icon.icon}
+                                    >
+                                        {icon.icon}
+                                    </Badge>
                                 </IconButton>
                             ))}
                         </Stack>
