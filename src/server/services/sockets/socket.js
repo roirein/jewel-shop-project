@@ -259,16 +259,17 @@ const sendNewCustomerNotification = async (customerName, customerId) => {
         }
     })
     const socketId = users[manager.dataValues.userId]
-    console.log(socketId, users)
-    // await Notifications.create({
-    //     resource: 'Customer',
-    //     type: 'new_customer',
-    //     resourceId:  customerId,
-    //     recipient: manager.dataValues.userId
-    // })
+    const notificationData = {
+        resource: 'customer',
+        type: 'new_customer',
+        resourceId:  customerId,
+        recipient: manager.dataValues.userId
+    }
+    await Notifications.create(notificationData)
     if (socketId) {
         ioInstance.to(socketId).emit('new-customer', {
-            name: customerName
+            name: customerName,
+            notificationData
         })
     }
 }

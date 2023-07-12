@@ -1,4 +1,4 @@
-import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab, Link, IconButton} from '@mui/material';
+import {Box, AppBar, useTheme, Avatar, Stack, Tabs, Tab, Link, IconButton, Badge} from '@mui/material';
 import CenteredStack from '../UI/CenteredStack';
 import { useContext, useState, useEffect } from 'react';
 import AppContext from '../../context/AppContext';
@@ -19,6 +19,7 @@ const AppTemplate = (props) => {
     const router = useRouter()
     const contextValue = useContext(AppContext)
     const [avatarData, setAvatarData] = useState('')
+
 
     useEffect(() => {
         if (contextValue.token) {
@@ -82,6 +83,19 @@ const AppTemplate = (props) => {
         }
     }
 
+    const getBadgeContent = (type) => {
+        switch(type) {
+            case 1: 
+                return contextValue?.notifications?.customers?.length
+            case 2: 
+                return contextValue?.notifications?.orders?.length
+            case 3: 
+                return contextValue?.notifications?.models?.length
+            default:
+                return 0
+        }
+    }
+
     return (
         <Box
             width="100%"
@@ -120,12 +134,23 @@ const AppTemplate = (props) => {
                         </Avatar>
                         <Stack
                             direction="row"
-                            columnGap=""
+                            columnGap={theme.spacing(3)}
+                            sx={{
+                                mr: theme.spacing(4)
+                            }}
                         >
                             {getIconsByPermissionLevel(contextValue.permissionLevel).map((icon) => (
                                 <IconButton
                                     key={icon.type}
                                 >
+                                    <Badge
+                                        color="secondary"
+                                        badgeContent={getBadgeContent(icon.type)}
+                                        anchorOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'left'
+                                        }}
+                                    />
                                     {icon.icon}
                                 </IconButton>
                             ))}

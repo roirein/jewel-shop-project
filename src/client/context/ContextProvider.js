@@ -23,6 +23,7 @@ const ContextProvider = (props) => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
+    const [notifications, setNotifications] = useState({})
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -46,23 +47,82 @@ const ContextProvider = (props) => {
     }, [])
 
     useEffect(() => {
+        if (token && userId)
+            sendHttpRequest(USER_ROUTES.NOTIFICATIONS(userId), 'GET', null, {
+                Authorization: `Bearer ${token}`
+            }).then((response) => {
+                const customerNotifications = [];
+                const ordersNotifications = [];
+                const modelsNotifications = [];
+                const notificationData = response.data.notifications
+                notificationData.forEach((notification) => {
+                    switch(notification.resource) {
+                        case 'customer': 
+                            customerNotifications.push(notification)
+                            break;
+                        case 'order': 
+                            ordersNotifications.push(notification)
+                            break
+                        case 'model': 
+                            modelsNotifications.push(notification)
+                            break
+                        default:
+                            break
+                    }
+                })
+                return {
+                    customers: customerNotifications,
+                    orders: ordersNotifications,
+                    models: modelsNotifications
+                }
+            }).then((notificationsObj) => setNotifications(notificationsObj))
+    }, [token, userId])
+
+    useEffect(() => {
         if (socket) {
             socket.on('new-customer', (data) => {
-                console.log(data)
                 setNotificationMessage(intl.formatMessage(notificationMessages.joinRequest, {name: data.name}))
                 setShowNotification(true)
+                const customersNotifications = notifications.customers
+                setNotifications({
+                    ...notifications,
+                    customers: [...customersNotifications, data.notificationData]
+                })
             })
 
             return () => {
-                socket.off('newCustomer')
+                socket.off('new-customer')
             }
         }
-    }, [socket])
+    }, [socket, notifications])
+
+    // const onAddNewNotification = (notification) => {
+    //     console.log(notifications)
+    //     switch(notification.resource) {
+    //         case 'customer': 
+    //             const customersNotifications = notifications.customers
+    //             setNotifications({
+    //                 ...notifications,
+    //                 customers: [...customersNotifications, notification]
+    //             })
+    //             break;
+    //             // customerNotifications.push(notification)
+    //             // break;
+    //         case 'order': 
+    //             // ordersNotifications.push(notification)
+    //             // break
+    //         case 'model': 
+    //             // modelsNotifications.push(notification)
+    //             // break
+    //         default:
+    //             break
+    //     }
+    // }
 
     const setUserData = (userData) => {
         setToken(userData.token)
         setUserName(userData.username)
-        setUserId(userData.userId)
+        setUserId(userData.id)
         setPermissionLevel(userData.permissionLevel)
         setEmail(userData.email)
         setPhoneNumber(userData.phoneNumber)
@@ -102,7 +162,8 @@ const ContextProvider = (props) => {
         showNotification,
         setShowNotification,
         notificationMessage,
-        setNotificationMessage
+        setNotificationMessage,
+        notifications
     }
 
     if (isLoading) {

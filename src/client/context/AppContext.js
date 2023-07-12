@@ -13,7 +13,8 @@ const contextValue = {
     showNotification: false,
     setShowNotification: () => {},
     notificationMessage: '',
-    setNotificationMessage: () => {}
+    setNotificationMessage: () => {},
+    notifications: []
 }
 
 const AppContext = createContext(contextValue)

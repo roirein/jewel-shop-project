@@ -5,7 +5,7 @@ const {v4: uuidv4} = require('uuid')
 class Notifications extends Model {}
 
 Notifications.init({
-    notificationsId: {
+    notificationId: {
         type: DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
@@ -20,7 +20,7 @@ Notifications.init({
         type: DataTypes.STRING,
         allowNull: false
     },
-    resouceId: {
+    resourceId: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -37,6 +37,10 @@ Notifications.init({
     sequelize,
     timestamps: false,
     modelName: 'Notifications'
+})
+
+Notifications.beforeCreate((notification) => {
+    notification.notificationsId = uuidv4()
 })
 
 module.exports = Notifications

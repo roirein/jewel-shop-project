@@ -9,6 +9,7 @@ const { sendVerificationCodeMail } = require("../services/emails/emails");
 const Codes = require("../models/users/codes");
 const Employee = require("../models/users/employee");
 const jwt = require('jsonwebtoken');
+const Notifications = require("../models/notifications/notifications");
 
 const registerNewUser = async (req, res, next) => {
     try {
@@ -25,6 +26,7 @@ const registerNewUser = async (req, res, next) => {
         const newUser = await createNewUser(req.body.firstName, req.body.lastName, req.body.email, req.body.password, req.body.phoneNumber, 5);
         await createNewCustomer(newUser.userId, req.body.businessName, req.body.businessId, req.body.businessPhoneNumber);
         await Request.create({customerId: newUser.userId});
+        console.log(newUser.userId, 1)
         await sendNewCustomerNotification(`${req.body.firstName} ${req.body.lastName}`, newUser.userId)
         res.status(201).send()
     } catch (e) {
@@ -178,6 +180,29 @@ const getUserByToken = async (req, res, next) => {
     }
 }
 
+const getNotifications = async (req, res, next) => {
+    try {
+        const notificationsData = await Notifications.findAll({
+            where: {
+                recipient: req.params.userId
+            }
+        })
+        
+        const notifications = notificationsData.map((notification) => {
+            return {
+                id: notification.notificationId,
+                resource: notification.resource,
+                type: notification.type,
+                resourceId: notification.resourceId
+            }
+        })
+
+        res.status(200).send({notifications})
+    } catch(e) {
+        next(e)
+    }
+}
+
 module.exports = {
     registerNewUser,
     loginUser,
@@ -186,5 +211,6 @@ module.exports = {
     verifyCode,
     updatePassword,
     getUserByToken,
+    getNotifications
 }
 

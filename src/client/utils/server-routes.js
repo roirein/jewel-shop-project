@@ -8,7 +8,7 @@ export const USER_ROUTES = {
     VERIFY_CODE: `${serverUrl}/user/verifyCode`,
     UPDATE_PASSWORD: `${serverUrl}/user/updatePassword`,
     USER: `${serverUrl}/user/user`,
-    REFRESH_TOKEN: `${serverUrl}/user/user/refresh-token`
+    NOTIFICATIONS: (id) => `${serverUrl}/user/notifications/${id}`
 }
 
 export const CUSTOMER_ROUTES = {
