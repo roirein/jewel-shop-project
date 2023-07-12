@@ -11,8 +11,9 @@ import { REQUEST_TABLE_COLUMNS } from '../../../const/TablesColumns';
 import { customerPageMessages } from '../../../translations/i18n';
 import RequestModalComponent from '../components/RequestModalComponent';
 import { CUSTOMER_ROUTES } from '../../../utils/server-routes';
+import { sendHttpRequest } from '../../../utils/requests';
 
-const RequestPage = (props) => {
+const RequestPage = () => {
 
     const intl = useIntl();
 
@@ -32,8 +33,12 @@ const RequestPage = (props) => {
     const contextValue = useContext(AppContext)
 
     useEffect(() => {
-        setOriginalData(props.requests)
-    }, [props.requests])
+        sendHttpRequest(CUSTOMER_ROUTES.REQUESTS, 'GET', null, {
+            Authorization: contextValue.token
+        }).then((response) => {
+            setOriginalData(response.data.requests)
+        })
+    }, [])
 
     useEffect(() => {
         const data = [];
@@ -96,29 +101,6 @@ const RequestPage = (props) => {
             />
         </PageLayout>
     )
-}
-
-export const getServerSideProps =  async (context) => {
-    try {
-        const accessToken = getAccessToken(context.req.headers.cookie);
-        const responseData = await sendHttpRequest(CUSTOMER_ROUTES.REQUESTS, 'GET', context.req.headers.cookie, null, {
-            Authorization: `Bearer ${accessToken}`
-        })
-        
-        return {
-            props: {
-                requests: responseData.data.requests || [],
-                accessToken: responseData.accessToken || null
-            }
-        }
-    } catch(e) {
-        return {
-            props: {
-                requests: null,
-                accessToken: null
-            }
-        }
-    }
 }
 
 export default RequestPage

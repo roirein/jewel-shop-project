@@ -1,4 +1,4 @@
-const {DataTypes, Model, Sequelize} = require('sequelize');
+const {DataTypes, Model, Sequelize, Op} = require('sequelize');
 const sequelize = require('../../database/connection');
 const jwt = require('jsonwebtoken')
 const {v4: uuidv4} = require('uuid')
@@ -36,6 +36,18 @@ class User extends Model{
             }
         })
         return user.dataValues
+    }
+
+    static async isUserExist(email, phoneNumber) {
+        const user = await User.findOne({
+            where: {
+                [Op.or]: [
+                    {email},
+                    {phoneNumber}
+                ]
+            }
+        })
+        return !!user
     }
 }
 

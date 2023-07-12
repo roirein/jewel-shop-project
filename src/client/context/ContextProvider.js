@@ -47,7 +47,8 @@ const ContextProvider = (props) => {
 
     useEffect(() => {
         if (socket) {
-            socket.on('newCustomer', (data) => {
+            socket.on('new-customer', (data) => {
+                console.log(data)
                 setNotificationMessage(intl.formatMessage(notificationMessages.joinRequest, {name: data.name}))
                 setShowNotification(true)
             })

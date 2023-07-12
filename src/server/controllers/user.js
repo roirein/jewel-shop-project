@@ -15,21 +15,10 @@ const registerNewUser = async (req, res, next) => {
         if (req.body.password !== req.body.confirmPassword) {
             throw new HttpError('password-confirm-error', 400);
         }
-        const user = await User.findOne({
-            where: {
-                [Op.or]: [
-                    {email: req.body.email},
-                    {phoneNumber: req.body.phoneNumber}
-                ]
-            }
-        })
-        const customer = await Customer.findOne({
-            where: {
-                businessId: req.body.businessId
-            }
-        })
+        const user = await User.isUserExist(req.body.email, req.body.phoneNumber)
+        const customer =  await Customer.isCustomerExist(req.body.businessId)
 
-        if (user || customer) {
+        if (user && customer) {
             throw new HttpError('user-exist-error', 409)
         }
 

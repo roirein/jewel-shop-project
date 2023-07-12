@@ -2,7 +2,21 @@ const {DataTypes, Model, Sequelize} = require('sequelize');
 const sequelize = require('../../database/connection');
 const User = require('./user');
 
-class Customer extends Model{}
+class Customer extends Model{
+
+    static async isCustomerExist(businessId){
+        const customer = await Customer.findOne({
+            where: {
+                businessId
+            }
+        })
+
+        console.log(customer, !customer, !!customer)
+        return !!customer
+    }
+
+}
+
 
 Customer.init({
     userId: {
