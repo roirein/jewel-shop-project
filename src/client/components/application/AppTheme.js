@@ -15,8 +15,12 @@ const theme = createTheme({
             main: '#d99182',
             contrastText: '#ffffff'
         },
+        grey: {
+            main: '#888888'
+        },
+        
     },
-    spacing: [2, 4, 8, 12, 16, 24, 32 , 48, 64]
+    spacing: [2, 4, 8, 12, 16, 24, 32 , 40, 48, 64]
 })
 
 export default theme

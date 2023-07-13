@@ -11,6 +11,7 @@ import { homePageMessages } from '../../translations/i18n';
 import { useRouter } from 'next/router';
 import { getAuthorizationHeader } from '../../utils/utils';
 import { Diamond, PersonAddAlt, ShoppingCart } from '@mui/icons-material';
+import NotificationDropdown from '../UI/Notifications/NotificationDropdown';
 
 const AppTemplate = (props) => {
 
@@ -43,21 +44,24 @@ const AppTemplate = (props) => {
     }
 
 
-    const getIconsByPermissionLevel = (permissionLevel) => {
+    const getDropdownsProps = (permissionLevel) => {
         switch(permissionLevel) {
             case 1: 
                 return [
                     {
                         type: 1,
-                        icon: <PersonAddAlt/>
+                        icon: <PersonAddAlt/>,
+                        notifications: contextValue.notifications.customers
                     },
                     {
                         type: 2,
-                        icon: <ShoppingCart/>
+                        icon: <ShoppingCart/>,
+                        notifications: contextValue.notifications.orders
                     },
                     {
                         type: 3,
-                        icon: <Diamond/>
+                        icon: <Diamond/>,
+                        notifications: contextValue.notifications.models
                     }
                 ]
             default: 
@@ -80,19 +84,6 @@ const AppTemplate = (props) => {
         }
         else {
             return []
-        }
-    }
-
-    const getBadgeContent = (type) => {
-        switch(type) {
-            case 1: 
-                return contextValue?.notifications?.customers?.length
-            case 2: 
-                return contextValue?.notifications?.orders?.length
-            case 3: 
-                return contextValue?.notifications?.models?.length
-            default:
-                return 0
         }
     }
 
@@ -139,21 +130,12 @@ const AppTemplate = (props) => {
                                 mr: theme.spacing(4)
                             }}
                         >
-                            {getIconsByPermissionLevel(contextValue.permissionLevel).map((icon) => (
-                                <IconButton
-                                    key={icon.type}
-                                >
-                                    <Badge
-                                        color="secondary"
-                                        badgeContent={getBadgeContent(icon.type)}
-                                        anchorOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'left'
-                                        }}
-                                    >
-                                        {icon.icon}
-                                    </Badge>
-                                </IconButton>
+                            {getDropdownsProps(contextValue.permissionLevel).map((dropdownProps) => (
+                                <NotificationDropdown
+                                    icon={dropdownProps.icon}
+                                    key={dropdownProps.type}
+                                    notifications={dropdownProps.notifications || []}
+                                />
                             ))}
                         </Stack>
                         <Link

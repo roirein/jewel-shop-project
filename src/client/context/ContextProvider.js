@@ -3,11 +3,12 @@ import {useState, useEffect} from "react"
 import { useIntl } from "react-intl";
 import io from 'socket.io-client';
 import { notificationMessages } from "../translations/i18n";
-import {getRouteAfterLogin, getToken} from "../utils/utils";
+import {createNotification, generateCustomerNotificationMessage, getRouteAfterLogin, getToken} from "../utils/utils";
 import {sendHttpRequest } from "../utils/requests";
 import { USER_ROUTES } from "../utils/server-routes";
 import { useRouter } from "next/router";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
+import RequestModalComponent from "../pages/customers/components/RequestModalComponent";
 
 const ContextProvider = (props) => {
 
@@ -25,6 +26,8 @@ const ContextProvider = (props) => {
     const [notificationMessage, setNotificationMessage] = useState('');
     const [notifications, setNotifications] = useState({})
     const [isLoading, setIsLoading] = useState(false);
+    const [showRequestModal, setShowRequestModal] = useState(false);
+    const [modalResouceId, setModalResourceId] = useState(null);
 
     useEffect(() => {
         const authToken = getToken();
@@ -58,7 +61,7 @@ const ContextProvider = (props) => {
                 notificationData.forEach((notification) => {
                     switch(notification.resource) {
                         case 'customer': 
-                            customerNotifications.push(notification)
+                            customerNotifications.push(createNotification(notification))
                             break;
                         case 'order': 
                             ordersNotifications.push(notification)
@@ -81,12 +84,14 @@ const ContextProvider = (props) => {
     useEffect(() => {
         if (socket) {
             socket.on('new-customer', (data) => {
-                setNotificationMessage(intl.formatMessage(notificationMessages.joinRequest, {name: data.name}))
+                const notification = createNotification(data)
+                console.log(data, notification)
+                setNotificationMessage(notification.message)
                 setShowNotification(true)
                 const customersNotifications = notifications.customers
                 setNotifications({
                     ...notifications,
-                    customers: [...customersNotifications, data.notificationData]
+                    customers: [...customersNotifications, notification]
                 })
             })
 
@@ -148,6 +153,11 @@ const ContextProvider = (props) => {
         localStorage.removeItem('accessToken')
     }
 
+    const onShowRequestModal = (customerId) => {
+        setModalResourceId(customerId)
+        setShowRequestModal(true)
+    }
+
 
     const contextValue = {
         userId,
@@ -163,7 +173,8 @@ const ContextProvider = (props) => {
         setShowNotification,
         notificationMessage,
         setNotificationMessage,
-        notifications
+        notifications,
+        onShowRequestModal
     }
 
     if (isLoading) {
@@ -171,9 +182,27 @@ const ContextProvider = (props) => {
     }
 
 
+    console.log('customerId', modalResouceId)
+
     return (
         <AppContext.Provider value={contextValue}>
             {props.children}
+            <RequestModalComponent
+                open={showRequestModal}
+                onClose={() => {
+                    setShowRequestModal(false);
+                    setModalResourceId('')
+                }}
+                userId={modalResouceId}
+                onResponse={(response) => {
+                    socket.emit('request-response', {
+                        status: response ? 1 : -1,
+                        customerId: modalResouceId
+                    })
+                    setShowRequestModal(false);
+                    setModalResourceId('')
+                }}
+            />
         </AppContext.Provider>
     )
 }

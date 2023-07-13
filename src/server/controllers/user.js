@@ -193,7 +193,9 @@ const getNotifications = async (req, res, next) => {
                 id: notification.notificationId,
                 resource: notification.resource,
                 type: notification.type,
-                resourceId: notification.resourceId
+                resourceId: notification.resourceId,
+                read: notification.read,
+                data: notification.data
             }
         })
 

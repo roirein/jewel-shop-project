@@ -28,8 +28,8 @@ const initSocket = (io) => {
             users[data.userId] = socket.id
         })
 
-        socket.on('requestResponse', (data) => {
-            updateRequestStatus(data.status, data.customerId, data.requestId)
+        socket.on('request-response', (data) => {
+            updateRequestStatus(data.status, data.customerId)
         })
 
         socket.on('model-response', async (data) => {
@@ -263,14 +263,14 @@ const sendNewCustomerNotification = async (customerName, customerId) => {
         resource: 'customer',
         type: 'new_customer',
         resourceId:  customerId,
-        recipient: manager.dataValues.userId
+        recipient: manager.dataValues.userId,
+        data: {
+            name: customerName
+        }
     }
-    await Notifications.create(notificationData)
+    const notification = await Notifications.create(notificationData)
     if (socketId) {
-        ioInstance.to(socketId).emit('new-customer', {
-            name: customerName,
-            notificationData
-        })
+        ioInstance.to(socketId).emit('new-customer', notification)
     }
 }
 

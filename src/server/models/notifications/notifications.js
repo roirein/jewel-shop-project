@@ -32,6 +32,10 @@ Notifications.init({
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+    },
+    data: {
+        type: DataTypes.JSON,
+        allowNull: false
     }
 }, {
     sequelize,
