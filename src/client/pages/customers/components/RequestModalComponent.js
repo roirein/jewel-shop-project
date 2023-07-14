@@ -1,7 +1,7 @@
 import ModalComponent from "../../../components/UI/ModalComponent"
 import { useIntl } from "react-intl"
 import { buttonMessages, customerPageMessages, notificationMessages } from "../../../translations/i18n";
-import { Typography, useTheme, Stack } from "@mui/material";
+import { Typography, useTheme, Stack, Button } from "@mui/material";
 import { useState, useEffect, useContext } from "react";
 import AppContext from '../../../context/AppContext'
 import axios from "axios";
@@ -21,6 +21,10 @@ const RequestModalComponent = (props) => {
     const [isLoading, setIsLoading] = useState(false)
     const contextValue = useContext(AppContext)
 
+    const markNotificationAsRead = () => {
+        contextValue.readNotification('customer', props.userId, 'new-customer')
+    }
+
     useEffect(() => {
         setIsLoading(true)
         if (props.userId) {
@@ -28,10 +32,20 @@ const RequestModalComponent = (props) => {
                 Authorization: `Bearer ${contextValue.token}`
             }).then((res) => {
                 setUser(res.data.customer)
+
+                markNotificationAsRead()
                 setIsLoading(false)
             })
         }
     }, [props.userId])
+
+    const onResponse = (response) => {
+        contextValue.socket.emit('request-response', {
+            customerId: props.userId,
+            status: response ? 1 : -1
+        })
+        props.onClose(true)
+    }
 
     const getButtonActions = () => {
         return (
@@ -39,28 +53,8 @@ const RequestModalComponent = (props) => {
                 direction="row"
                 width="100%"
                 flexDirection="row-reverse"
+                justifyContent="flex-end"
             >
-                <Stack
-                    width="50%"
-                    direction="row"
-                    flexDirection="row-reverse"
-                    columnGap={theme.spacing(4)}
-                >
-                    <Stack
-                        width="25%"
-                    >
-                         <ButtonComponent
-                            label={intl.formatMessage(buttonMessages.approve)}
-                            onClick={() => props.onResponse(true)}
-                        />
-                    </Stack>
-                    <Stack>
-                        <ButtonComponent
-                            label={intl.formatMessage(buttonMessages.reject)}
-                            onClick={() => props.onResponse(false)}
-                        />
-                    </Stack>
-                </Stack>
                 <Stack
                     width="50%"
                 >
@@ -69,7 +63,7 @@ const RequestModalComponent = (props) => {
                     >
                         <ButtonComponent
                             label={intl.formatMessage(buttonMessages.close)}
-                            onClick={() => props.onClose()}
+                            onClick={() => props.onClose(false)}
                         />
                     </Stack>
                 </Stack>
@@ -103,7 +97,11 @@ const RequestModalComponent = (props) => {
                     >
                         {intl.formatMessage(customerPageMessages.contactDetails)}
                     </Typography>
-                    <Typography>
+                    <Typography
+                        sx={{
+                            direction: theme.direction
+                        }}
+                    >
                         {`${intl.formatMessage(customerPageMessages.businessName)}: ${user.businessName}`}
                     </Typography>
                     <Typography
@@ -121,6 +119,45 @@ const RequestModalComponent = (props) => {
                             {`${intl.formatMessage(customerPageMessages.businessPhoneNumber)}: ${user.businessPhone}`}
                         </Typography>
                     )}
+                    <Stack
+                        direction="row"
+                        columnGap={theme.spacing(3)}
+                    >
+                        {props.status === 0 && (
+                            <>     
+                                <Button
+                                    variant="text"
+                                    color="success"
+                                    onClick={() => onResponse(true)}
+                                >
+                                    {intl.formatMessage(buttonMessages.approve)}
+                                </Button>
+                                <Button
+                                    variant="text"
+                                    color="error"
+                                    onClick={() => onResponse(false)}
+                                >
+                                    {intl.formatMessage(buttonMessages.reject)}
+                                </Button>
+                            </>
+                        )}
+                        {props.status === -1 && (
+                            <Typography
+                                varinat="body1"
+                                color="error"
+                            >
+                                {intl.formatMessage(customerPageMessages.requestDeclined)}
+                            </Typography>
+                        )}
+                        {props.status === 1 && (
+                            <Typography
+                                varinat="body1"
+                                color="green"
+                            >
+                                {intl.formatMessage(customerPageMessages.requestApproved)}
+                            </Typography>
+                        )}
+                    </Stack>
                 </Stack>
             )}
         </ModalComponent>

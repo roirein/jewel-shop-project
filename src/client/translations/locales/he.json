@@ -173,5 +173,9 @@
     "reports": "דוחות",
     "performance": "ביצועים",
     "totalIncomes": "סך הכנסות",
-    "totalOrder": "סך הזמנות"
+    "totalOrder": "סך הזמנות",
+    "showAll": "הצג הכל",
+    "filterBy": ":סנן לפי",
+    "requestApproved": "בקשה אושרה",
+    "requestDeclined": "בקשה נדחתה"
 }

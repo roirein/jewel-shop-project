@@ -37,10 +37,13 @@ const ContextProvider = (props) => {
                 Authorization: `Bearer ${authToken}`
             }).then((res) => {
                 setUserData({token: authToken, ...res.data.user})
-                setIsLoading(false)
-                const navigationType = (window.performance.getEntriesByType('navigation')[0]).type;
-                const route = getRouteAfterLogin(res.data.user.permissionLevel)
-                if (navigationType !== 'reload') {
+                const sock = io('http://localhost:3002');
+                sock.emit('login', {
+                    userId: res.data.userId
+                })
+                setSocket(socket)
+                if (router.pathname === '/') {
+                    const route = getRouteAfterLogin(res.data.user.permissionLevel)
                     router.push(route)
                 }
             })
@@ -101,28 +104,28 @@ const ContextProvider = (props) => {
         }
     }, [socket, notifications])
 
-    // const onAddNewNotification = (notification) => {
-    //     console.log(notifications)
-    //     switch(notification.resource) {
-    //         case 'customer': 
-    //             const customersNotifications = notifications.customers
-    //             setNotifications({
-    //                 ...notifications,
-    //                 customers: [...customersNotifications, notification]
-    //             })
-    //             break;
-    //             // customerNotifications.push(notification)
-    //             // break;
-    //         case 'order': 
-    //             // ordersNotifications.push(notification)
-    //             // break
-    //         case 'model': 
-    //             // modelsNotifications.push(notification)
-    //             // break
-    //         default:
-    //             break
-    //     }
-    // }
+
+    const readNotification = (resource, resourceId, type) => {
+        switch(resource) {
+            case 'customer':
+                const notificationIndex = notifications.customers.findIndex((not) => not.resourceId === resourceId && type === not.type)
+                if (notificationIndex !== - 1) {
+                    const newCustomerNotificationArray = [...notifications.customers]
+                    newCustomerNotificationArray[notificationIndex].read = true
+                    setNotifications({
+                        ...notifications,
+                        customers: newCustomerNotificationArray
+                    })
+                    socket.emit('read-notification', {
+                        notificationId: newCustomerNotificationArray[notificationIndex].notificationId
+                    })
+                }
+                break
+            default:
+                break
+        }
+
+    }
 
     const setUserData = (userData) => {
         setToken(userData.token)
@@ -174,6 +177,7 @@ const ContextProvider = (props) => {
         notificationMessage,
         setNotificationMessage,
         notifications,
+        readNotification,
         onShowRequestModal
     }
 

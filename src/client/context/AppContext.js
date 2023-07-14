@@ -15,6 +15,7 @@ const contextValue = {
     notificationMessage: '',
     setNotificationMessage: () => {},
     notifications: [],
+    readNotification: () => {},
     onShowRequestModal: () => {}
 }
 

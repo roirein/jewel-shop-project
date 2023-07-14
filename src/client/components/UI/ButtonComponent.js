@@ -22,7 +22,7 @@ const ButtonComponent = (props) => {
             <Typography
                 variant="button"
                 fontWeight="bold"
-                color="secondary"
+                color={theme.palette.secondary.contrastText}
             >
                 {props.label}
             </Typography>

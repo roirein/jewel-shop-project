@@ -210,6 +210,14 @@ export const buttonMessages = defineMessages({
     skip: {
         id: 'skip',
         defaultMessage: 'skip'
+    },
+    showAll: {
+        id: 'showAll',
+        defaultMessage: 'show all'
+    },
+    filterBy: {
+        id: 'filterBy',
+        defaultMessage: 'filter by:'
     }
 })
 
@@ -295,6 +303,14 @@ export const customerPageMessages = defineMessages({
     removeCustomer: {
         id: 'removeCustomer',
         defaultMessage: 'remove customer'
+    },
+    requestApproved: {
+        id: 'requestApproved',
+        defaultMessage: 'requestApproved'
+    },
+    requestDeclined: {
+        id: 'requestDeclined',
+        defaultMessage: 'request declined'
     }
 })
 

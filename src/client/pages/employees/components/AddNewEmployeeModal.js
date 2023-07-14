@@ -13,6 +13,9 @@ import { ROLES_ENUM } from "../../../const/Enums";
 import ButtonComponent from "../../../components/UI/ButtonComponent";
 import axios from "axios";
 import { getAuthorizationHeader } from "../../../utils/utils";
+import ErrorLabelComponent from "../../../components/UI/Form/Labels/ErrorLabelComponent";
+import { sendHttpRequest } from "../../../utils/requests";
+import { EMPLOYEES_ROUTES } from "../../../utils/server-routes";
 
 const AddNewEmployeeModalComponent = (props) => {
 
@@ -35,32 +38,40 @@ const AddNewEmployeeModalComponent = (props) => {
     const [newEmployeeError, setNewEmployeeError] = useState(null);
 
     const getRoleOptions = () => {
-        return [
-            {
-                value: 4,
-                label: ROLES_ENUM[4]
-            },
-            {
-                value: 5,
-                label: ROLES_ENUM[5]
+        const { 1: manager, 2: designManager, 3: productionManager, ...rest} = ROLES_ENUM;
+        return Object.entries(rest).map((entry) => {
+            return {
+                value: entry[0],
+                label: entry[1]
             }
-        ]
+        })
+    }
+
+    const clearFields = () => {
+        methods.setValue('firstName', '')
+        methods.setValue('lastName', '')
+        methods.setValue('email', '')
+        methods.setValue('phoneNumber', '')
+        methods.setValue('role', '')
+    }
+
+    const handleClose = () => {
+        clearFields()
+        props.onClose();
     }
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:3002/employee/addNewEmployee', data, {
-                headers: {
-                    Authorization: getAuthorizationHeader(contextValue.token)
-                }
+            const response = await sendHttpRequest(EMPLOYEES_ROUTES.ADD_EMPLOYEE, 'POST', data, {
+                Authorization: `Bearer ${contextValue.token}`
             })
             if (response.status === 201) {
+                clearFields()
                 props.onAddNewEmployee(response.data.employee)
             }
         } catch (e) {
-            console.log(e)
             if (e.response.status === 409) {
-                setNewEmployeeError(homePageMessages.registerError)
+                setNewEmployeeError(intl.formatMessage(homePageMessages.userExistError))
             }
         }
     }
@@ -92,7 +103,7 @@ const AddNewEmployeeModalComponent = (props) => {
                 >
                     <ButtonComponent
                         label={intl.formatMessage(buttonMessages.close)}
-                        onClick={() => props.onClose()}
+                        onClick={() => handleClose()}
                     />
                 </Stack>
             </Stack>
@@ -102,7 +113,7 @@ const AddNewEmployeeModalComponent = (props) => {
     return (
         <ModalComponent
             title={intl.formatMessage(employeesPageMessages.addNewEmployee)}
-            onClose={props.onClose}
+            onClose={handleClose}
             open={props.open}
             width="sm"
             actions={getModalActions()}
@@ -153,10 +164,18 @@ const AddNewEmployeeModalComponent = (props) => {
                                 name="role"
                                 fieldLabel={intl.formatMessage(employeesPageMessages.role)}
                                 items={getRoleOptions()}
+                                onChange={(value) => {
+                                    methods.setValue('role', value)
+                                }}
                             />
                     </Stack>
                 </form>
             </FormProvider>
+            {newEmployeeError && (
+                <ErrorLabelComponent
+                    label={newEmployeeError}
+                />
+            )}
         </ModalComponent>
     )
 }

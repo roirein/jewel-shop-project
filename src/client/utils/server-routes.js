@@ -16,3 +16,10 @@ export const CUSTOMER_ROUTES = {
     CUSTOMER: (customerId) => `${serverUrl}/customer/customer/${customerId}`,
     CUSTOMERS: `${serverUrl}/customer/customers`
 }
+
+export const EMPLOYEES_ROUTES = {
+    EMPLOYEES: `${serverUrl}/employee/employees`,
+    ADD_EMPLOYEE: `${serverUrl}/employee/employee`,
+    DELETE_EMPLOYEE: (id) => `${serverUrl}/employee/employee/${id}`,
+    EMPLOYEES_ROLE: `${serverUrl}/employee/employee/employee-role`
+}

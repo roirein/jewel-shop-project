@@ -23,6 +23,12 @@ const FormSelectComponent = (props) => {
                         {...field}
                         fullWidth
                         inputRef={null}
+                        onChange={(e) => {
+                            if (props.onChange) {
+                                field.onChange(e.target.value)
+                                props.onChange(e.target.value)
+                            }
+                        }}
                     >
                         {props.items.map((item, index) => (
                             <MenuItem

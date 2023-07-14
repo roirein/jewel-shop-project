@@ -1,6 +1,5 @@
-import axios from "axios"
-import { getAuthorizationHeader, getUserToken } from "../../utils/utils"
 import { Button, Stack, Typography, useTheme } from "@mui/material"
+import ButtonComponent from "../../components/UI/ButtonComponent"
 import { Add } from "@mui/icons-material"
 import { useIntl } from "react-intl"
 import { employeesPageMessages } from "../../translations/i18n"
@@ -11,19 +10,36 @@ import { ROLES_ENUM } from "../../const/Enums"
 import CenteredStack from "../../components/UI/CenteredStack"
 import TableComponent from "../../components/UI/TableComponent"
 import AddNewEmployeeModalComponent from "./components/AddNewEmployeeModal"
+import { sendHttpRequest } from "../../utils/requests";
+import { EMPLOYEES_ROUTES } from "../../utils/server-routes"
 
-const EmployeesPage = (props) => {
+const EmployeesPage = () => {
 
     const intl = useIntl();
     const theme = useTheme();
-    const [originalData, setOriginalData] = useState(props.employees)
+    const [originalData, setOriginalData] = useState()
+    const [selectedEmployee, setSelectedEmployee] = useState({})
     const [tableData, setTableData] = useState([]);
     const [showModal, setShowModal] = useState(false)
-    const contextValue = useContext(AppContext)
+    const contextValue = useContext(AppContext);
+
+    const fecthEmployees = async () => {
+        const response = await sendHttpRequest(EMPLOYEES_ROUTES.EMPLOYEES, 'GET', null, {
+            Authorization: `Bearer ${contextValue.token}`
+        })
+        return response.data.employees
+    }
+
+
+    useEffect(() => {
+        if (contextValue.token) {
+            fecthEmployees().then((employees) => setOriginalData(employees))
+        }
+    }, [contextValue.token])
 
     useEffect(() => {
         const data = [];
-        originalData.forEach((dataElement) => {
+        originalData?.forEach((dataElement) => {
             data.push(
                 {
                     rowId: dataElement.id,
@@ -33,22 +49,30 @@ const EmployeesPage = (props) => {
         setTableData(data)
     }, [originalData])
 
-    const onAddNewEmployee = (employee) => {
-        setOriginalData([...originalData, employee])
-        setShowModal(false)
+    const onAddNewEmployee = async () => {
+        fecthEmployees().then((employees) => {
+            setOriginalData(employees)
+            setShowModal(false)
+        })
     }
 
-    const onDeleteEmployee = async (employeeId) => {
-        const newData = [...originalData]
-        const employeeIndex = newData.findIndex((employee) => employee.id === employee);
-        newData.splice(employeeIndex, 1)
-        const response = await axios.delete(`http://localhost:3002/employee/deleteEmployee/${employeeId}`, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            }
+    const onSelectRow = (rowId) => {
+        if (rowId) {
+            const user = originalData?.find((usr) => usr.id === rowId)
+            setSelectedEmployee(user)
+        } else {
+            setSelectedEmployee({})
+        }
+    }
+
+    const onDeleteEmployee = async () => {
+        const response = await sendHttpRequest(EMPLOYEES_ROUTES.DELETE_EMPLOYEE(selectedEmployee?.id), 'DELETE', null, {
+            Authorization: `Bearer ${contextValue.token}`
         })
         if (response.status === 200) {
-            setOriginalData(newData)
+            const updatedData = await fecthEmployees()
+            setOriginalData(updatedData)
+            setSelectedEmployee({})
         }
     }
 
@@ -91,10 +115,24 @@ const EmployeesPage = (props) => {
                 <TableComponent
                     columns={EMPLOYEES_TABLE_COLUMNS}
                     data={tableData}
-                    allowDelete
-                    deleteButtonLabel={intl.formatMessage(employeesPageMessages.removeEmployee)}
-                    onDeleteRow={(rowId) => onDeleteEmployee(rowId)}
+                    selectedRowId={selectedEmployee?.id}
+                    onSelectRow={(rowId) => onSelectRow(rowId)}
                 />
+                <CenteredStack
+                    width="100%"
+                    direction="row"
+                    columnGap={theme.spacing(4)}
+                >
+                    <Stack
+                        width="15%"
+                    >
+                        <ButtonComponent
+                            label={intl.formatMessage(employeesPageMessages.removeEmployee)}
+                            onClick={() => onDeleteEmployee()}
+                            disabled={!selectedEmployee}
+                        />
+                    </Stack>
+                </CenteredStack>
             </CenteredStack>
             <AddNewEmployeeModalComponent
                 open={showModal}
@@ -105,19 +143,5 @@ const EmployeesPage = (props) => {
     )
 }
 
-export const getServerSideProps = async (context) => {
-    const token = getUserToken(context.req.headers.cookie)
-    const response = await axios.get('http://localhost:3002/employee/getEmployees', {
-        headers: {
-            Authorization: getAuthorizationHeader(token)
-        }
-    })
-
-    return {
-        props: {
-            employees: response.data.employees
-        }
-    }
-}
 
 export default EmployeesPage

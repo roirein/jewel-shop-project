@@ -1,36 +1,37 @@
 import TableComponent from "../../components/UI/TableComponent";
-import { getToken } from "../../utils/utils";
 import PageLayout from "./components/PageLayout"
-import axios from "axios";
 import CenteredStack from "../../components/UI/CenteredStack";
 import { CUSTOMER_TABLE_COLUMNS } from "../../const/TablesColumns";
 import { useState, useEffect, useContext } from "react";
 import AppContext from "../../context/AppContext";
-import { useTheme } from "@mui/material";
+import { useTheme, Stack } from "@mui/material";
 import { useIntl } from "react-intl";
 import { customerPageMessages } from "../../translations/i18n";
 import { sendHttpRequest } from "../../utils/requests";
 import { CUSTOMER_ROUTES } from "../../utils/server-routes";
-import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import ButtonComponent from "../../components/UI/ButtonComponent";
 
 const CustomerPage = () => {
 
     const [originalData, setOriginalData] = useState([])
     const [tableData, setTableData] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState({})
     const theme = useTheme();
     const intl = useIntl();
     const contextValue = useContext(AppContext)
-    const [isLoading, setIsLoading] = useState(false)
+
+    const fecthCustomers = async () => {
+        const response = await sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, 'GET', null, {
+            Authorization: `Bearer ${contextValue.token}`
+        })
+        return response.data.customers
+    }
 
     useEffect(() => {
-        setIsLoading(true)
-        sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, 'GET', null, {
-            Authorization: `Bearer ${getToken()}`
-        }).then((res) => {
-            setOriginalData(res.data.customers);
-            setIsLoading(false)
-        })
-    }, [])
+        if (contextValue.token) {
+            fecthCustomers().then((customers) => setOriginalData(customers))
+        }
+    }, [contextValue.token])
     
     useEffect(() => {
         const data = [];
@@ -44,23 +45,24 @@ const CustomerPage = () => {
         setTableData(data)
     }, [originalData])
 
-
-    const onDeleteCustomer = async (customerId) => {
-        const newData = [...originalData]
-        const customerIndex = newData.findIndex((cust) => cust.id === customerId);
-        newData.splice(customerIndex, 1)
-        const response = await axios.delete(`http://localhost:3002/customer/deleteCustomer/${customerId}`, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            }
-        })
-        if (response.status === 200) {
-            setOriginalData(newData)
+    const onSelectRow = (rowId) => {
+        if (rowId) {
+            const user = originalData.find((usr) => usr.id === rowId)
+            setSelectedCustomer(user)
+        } else {
+            setSelectedCustomer({})
         }
     }
 
-    if (isLoading) {
-        return <LoadingSpinner/>
+    const onDeleteCustomer = async () => {
+        const response = await sendHttpRequest(CUSTOMER_ROUTES.CUSTOMER(selectedCustomer?.id), 'DELETE', null, {
+            Authorization: `Bearer ${contextValue.token}`
+        })
+        if (response.status === 200) {
+            const updatedData = await fecthCustomers()
+            setOriginalData(updatedData)
+            setSelectedCustomer({})
+        }
     }
 
     return (
@@ -74,10 +76,24 @@ const CustomerPage = () => {
                 <TableComponent
                     columns={CUSTOMER_TABLE_COLUMNS}
                     data={tableData}
-                    allowDelete
-                    deleteButtonLabel={intl.formatMessage(customerPageMessages.removeCustomer)}
-                    onDeleteRow={(rowId) => onDeleteCustomer(rowId)}
+                    selectedRowId={selectedCustomer?.id}
+                    onSelectRow={(rowId) => onSelectRow(rowId)}
                 />
+                <CenteredStack
+                    width="100%"
+                    direction="row"
+                    columnGap={theme.spacing(4)}
+                >
+                    <Stack
+                        width="15%"
+                    >
+                        <ButtonComponent
+                            label={intl.formatMessage(customerPageMessages.removeCustomer)}
+                            onClick={() => onDeleteCustomer()}
+                            disabled={!selectedCustomer}
+                        />
+                    </Stack>
+                </CenteredStack>
             </CenteredStack>
         </PageLayout>
     )

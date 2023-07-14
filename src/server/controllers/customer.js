@@ -75,10 +75,10 @@ const getCustomerById = async (req, res, next) => {
                 attributes: ['firstName', 'lastName', 'email', 'phoneNumber']
             }
         })
-
+        const customerFullName = await User.getUserFullName(customerData.dataValues.userId)
         const customer = {
             id: customerData.dataValues.userId,
-            name: `${customerData.dataValues.User.dataValues.firstName} ${customerData.dataValues.User.dataValues.lastName}`,
+            name: customerFullName,
             businessName: customerData.dataValues.businessName,
             email: customerData.dataValues.User.dataValues.email,
             phoneNumber: customerData.dataValues.User.dataValues.phoneNumber,
