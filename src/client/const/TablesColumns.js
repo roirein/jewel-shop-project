@@ -89,3 +89,10 @@ export const ORDERS_IN_DESIGN_TABLE_COLUMNS = [
     intl.formatMessage(ordersPageMessages.deadline),
     intl.formatMessage(modelsPageMessages.status)
 ]
+
+export const ORDER_CUSTOMER_TABEL_COLUMNS = [
+    intl.formatMessage(ordersPageMessages.orderNumber),
+    intl.formatMessage(ordersPageMessages.orderType),
+    intl.formatMessage(modelsPageMessages.status),
+    intl.formatMessage(ordersPageMessages.deadline)
+]

@@ -30,6 +30,9 @@ export const getRouteAfterLogin = (permissionLevel) => {
         case 4:
             route = CLIENT_ROUTES.EMPLOYEE
             break
+        case 5:
+            route = CLIENT_ROUTES.ORDERS
+            break;
         default:
             route = null
     }

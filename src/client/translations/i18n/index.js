@@ -776,5 +776,29 @@ export const ordersPageMessages = defineMessages({
     customerUpdated: {
         id: 'customerUpdated',
         defaultMessage: 'customer updated'
+    },
+    incomingOrders: {
+        id: 'incomingOrders',
+        defaultMessage: 'incoming orders'
+    },
+    ordersInApproval: {
+        id: 'ordersInApproval',
+        defaultMessage: 'orders in approval'
+    },
+    rejectedOrders: {
+        id: 'rejectedOrders',
+        defaultMessage: 'rejectedOrders'
+    },
+    ordersHistory: {
+        id: 'ordersHistory',
+        defaultMessage: 'ordersHistory'
+    },
+    approvedByManager: {
+        id: 'approvedByManager',
+        defaultMessage: 'approved by manager'
+    },
+    waitToCustomerApproval: {
+        id: 'waitToCustomerApproval',
+        defaultMessage: 'waiting for customer approval'
     }
 })

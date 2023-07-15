@@ -48,6 +48,7 @@ const LoginFormComponent = (props) => {
                 router.push(getRouteAfterLogin(response.data.user.permissionLevel))
             }
         } catch(e) {
+            console.log(e)
             setLoginError(getLoginErrorMessage(e.response.status, e.response.data))
         }
     }

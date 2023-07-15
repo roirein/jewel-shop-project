@@ -10,116 +10,106 @@ import PageLayoutComponent from "./components/PageLayout"
 import { parse } from "cookie"
 import { sendHttpRequest } from "../../utils/requests"
 import { headers } from "next/dist/client/components/headers"
-import { USER_ROUTES } from "../../utils/server-routes"
+import { ORDERS_ROUTES, USER_ROUTES } from "../../utils/server-routes"
+import CustomerInterface from "./interfaces/customer"
 
-const OrdersPage = (props) => {
+const OrdersPage = () => {
 
-    const contextValue = useContext(AppContext);
-    const [originalData, setOriginalData] = useState(props.orders)
-    const [isLoading, setIsLoading] = useState(false)
-    const [tableData, setTableData] = useState([]);
-    const router = useRouter()
-
-    const getTableContent = (dataElement) => {
-        switch (contextValue.permissionLevel) {
-            case 1:
-                return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
-            case 2: 
-                return [dataElement.orderId, dataElement.customerName, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, 
-                            new Date(dataElement.created).toLocaleDateString('he-IL'), new Date(dataElement.deadline).toLocaleDateString('he-IL')]
-            case 3: 
-                return [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName,
-                            new Date(dataElement.created).toLocaleDateString('he-IL'), PRODUCTION_STATUS[dataElement.productionStatus]]
-            case 5: 
-                return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
-            default:
-                return []
-        }
-    }
+    const [orders, setOrders] = useState([]);
+    const contextValue = useContext(AppContext)
 
     useEffect(() => {
-        if (props.accessToken) {
-            const cookie = document.cookie.split('=')
-            const tokens = JSON.parse(cookie[1])
-            tokens.accessToken = props.accessToken
-            document.cookie = `tokens=${JSON.stringify(tokens)}`
+        if (contextValue.token) {
+            sendHttpRequest(ORDERS_ROUTES.GET_ORDERS, 'GET', null, {
+                Authorization: `Bearer ${contextValue.token}`
+            }).then((response) => setOrders(response.data.orders))
         }
-    }, [])
-    
-    useEffect(() => {
-        const data = [];
-        originalData.forEach((dataElement) => {
-            data.push(
-                {
-                    rowId: dataElement.orderId,
-                    rowContent: getTableContent(dataElement)
-                });
-        })
-        setTableData(data)
-    }, [originalData])
-
-    console.log(tableData)
-
-
-    const getTableColumns = () => {
-        switch (contextValue.permissionLevel) {
-            case 1: 
-                return ORDERS_MANAGER_TABLE_COLUMNS
-            case 2:
-                return DESIGN_MANAGER_ORDERS_COLUMNS
-            case 3:
-                return ORDERS_IN_PRODUCTION_TABLE_COLUMNS
-            case 5: 
-                return ORDERS_MANAGER_TABLE_COLUMNS
-            default: 
-                return []
-        }
-    }
+    }, [contextValue.token])
 
     return (
-        <PageLayoutComponent>
-            <TableComponent
-                columns={getTableColumns()}
-                data={tableData}
-                showMore
-                onClickShowMore={(rowId) => {
-                    router.push(`/orders/${rowId}`)
-                }}
-            />
-        </PageLayoutComponent>
+        <>
+            {contextValue.permissionLevel === 5 && (
+                <CustomerInterface
+                    orders={orders}
+                />
+            )}
+        </>
     )
+    // const con textValue = useContext(AppContext);
+    // const [originalData, setOriginalData] = useState(props.orders)
+    // const [isLoading, setIsLoading] = useState(false)
+    // const [tableData, setTableData] = useState([]);
+    // const router = useRouter()
+
+    // const getTableContent = (dataElement) => {
+    //     switch (contextValue.permissionLevel) {
+    //         case 1:
+    //             return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
+    //         case 2: 
+    //             return [dataElement.orderId, dataElement.customerName, ITEM_ENUMS[dataElement.item], dataElement.setting, dataElement.sideStoneSize, dataElement.mainStoneSize, 
+    //                         new Date(dataElement.created).toLocaleDateString('he-IL'), new Date(dataElement.deadline).toLocaleDateString('he-IL')]
+    //         case 3: 
+    //             return [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName,
+    //                         new Date(dataElement.created).toLocaleDateString('he-IL'), PRODUCTION_STATUS[dataElement.productionStatus]]
+    //         case 5: 
+    //             return[dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.customerName, ORDER_STATUS[dataElement.status], dataElement.created, dataElement.deadline]
+    //         default:
+    //             return []
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     if (props.accessToken) {
+    //         const cookie = document.cookie.split('=')
+    //         const tokens = JSON.parse(cookie[1])
+    //         tokens.accessToken = props.accessToken
+    //         document.cookie = `tokens=${JSON.stringify(tokens)}`
+    //     }
+    // }, [])
+    
+    // useEffect(() => {
+    //     const data = [];
+    //     originalData.forEach((dataElement) => {
+    //         data.push(
+    //             {
+    //                 rowId: dataElement.orderId,
+    //                 rowContent: getTableContent(dataElement)
+    //             });
+    //     })
+    //     setTableData(data)
+    // }, [originalData])
+
+    // console.log(tableData)
+
+
+    // const getTableColumns = () => {
+    //     switch (contextValue.permissionLevel) {
+    //         case 1: 
+    //             return ORDERS_MANAGER_TABLE_COLUMNS
+    //         case 2:
+    //             return DESIGN_MANAGER_ORDERS_COLUMNS
+    //         case 3:
+    //             return ORDERS_IN_PRODUCTION_TABLE_COLUMNS
+    //         case 5: 
+    //             return ORDERS_MANAGER_TABLE_COLUMNS
+    //         default: 
+    //             return []
+    //     }
+    // }
+
+    // return (
+    //     <PageLayoutComponent>
+    //         <TableComponent
+    //             columns={getTableColumns()}
+    //             data={tableData}
+    //             showMore
+    //             onClickShowMore={(rowId) => {
+    //                 router.push(`/orders/${rowId}`)
+    //             }}
+    //         />
+    //     </PageLayoutComponent>
+    // )
 }
 
-export const getServerSideProps = async (context) => {
-    const token = getUserToken(context.req.headers.cookie)
-    let orders
-    let accessToken = null
-    try {
-        const response = await sendHttpRequest('http://localhost:3002/order/orders', 'GET', null, {
-                Authorization: getAuthorizationHeader(token)
-            }
-        )
-        if (response === 'token-expired') {
-            const accessTokenResponse = await sendHttpRequest(USER_ROUTES.REFRESH_TOKEN, 'POST', {
-                refreshToken: getRefreshToken(context.req.headers.cookie)
-            })
-            accessToken = accessTokenResponse.data.accessToken
-            const ordersResponse = await sendHttpRequest('http://localhost:3002/order/orders', 'GET', null, {
-                Authorization: getAuthorizationHeader(accessTokenResponse.data.accessToken)
-            })
-            orders = ordersResponse.data.orders
-        } else {
-            orders = response.data.orders
-        }
-    } catch (e) {
-        console.log(e)
-    }
-    return {
-        props: {
-            orders: orders || [],
-            accessToken
-        }
-    }
-}
  
 export default OrdersPage;

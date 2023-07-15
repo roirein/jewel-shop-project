@@ -33,3 +33,8 @@ export const MODELS_ROUTES = {
     IMAGE: (imagePath) => `${serverUrl}/model/image/${imagePath}`,
     UPDATE: (id) => `${serverUrl}/model/model/${id}`
 }
+
+export const ORDERS_ROUTES = {
+    ADD_ORDER: `${serverUrl}/order/order`,
+    GET_ORDERS: `${serverUrl}/order/orders`
+}

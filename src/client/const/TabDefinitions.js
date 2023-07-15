@@ -92,3 +92,63 @@ export const DESIGN_MANGER_MODELS_PAGE_TABS = [
         route: '/models/ready'
     },
 ]
+
+export const MANAGER_ORDERS_TABS = [
+    {
+        label: intl.formatMessage(tabsMessages.orders)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.incomingOrders)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.rejectedOrders)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.orderInDesign)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInApproval)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInCasting)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInProduction)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.orderCompleted)
+    }
+]
+
+export const DESIGN_MANAGER_ORDERS_TABS = [
+    {
+        label: intl.formatMessage(tabsMessages.orders)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.orderInDesign)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInProduction)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.orderCompleted)
+    }
+]
+
+export const CUSTOMER_ORDERS_TABS = [
+    {
+        label: intl.formatMessage(tabsMessages.orders)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.rejectedOrders)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersInApproval)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.orderCompleted)
+    },
+    {
+        label: intl.formatMessage(ordersPageMessages.ordersHistory)
+    }
+]

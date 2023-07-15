@@ -51,15 +51,17 @@ export const ORDER_TYPES = {
 export const ORDER_STATUS = {
     [-1]: intl.formatMessage(modelsPageMessages.rejeceted),
     [0]: intl.formatMessage(modelsPageMessages.created),
-    [1]: intl.formatMessage(ordersPageMessages.inDesign),
-    [2]: intl.formatMessage(ordersPageMessages.designCompleted),
-    [3]: intl.formatMessage(ordersPageMessages.customerApproved),
-    [4]: intl.formatMessage(ordersPageMessages.inCasting),
-    [5]: intl.formatMessage(ordersPageMessages.castingCompleted),
-    [6]: intl.formatMessage(ordersPageMessages.inProduction),
-    [7]: intl.formatMessage(ordersPageMessages.productionCompleted),
-    [8]: intl.formatMessage(ordersPageMessages.customerUpdated),
-    [9]: intl.formatMessage(ordersPageMessages.orderCompleted)
+    [1]: intl.formatMessage(ordersPageMessages.approvedByManager),
+    [2]: intl.formatMessage(ordersPageMessages.inDesign),
+    [3]: intl.formatMessage(ordersPageMessages.designCompleted),
+    [4]: intl.formatMessage(ordersPageMessages.waitToCustomerApproval),
+    [5]: intl.formatMessage(ordersPageMessages.customerApproved),
+    [6]: intl.formatMessage(ordersPageMessages.inCasting),
+    [7]: intl.formatMessage(ordersPageMessages.castingCompleted),
+    [8]: intl.formatMessage(ordersPageMessages.inProduction),
+    [9]: intl.formatMessage(ordersPageMessages.productionCompleted),
+    [10]: intl.formatMessage(ordersPageMessages.customerUpdated),
+    [11]: intl.formatMessage(ordersPageMessages.orderCompleted)
 }
 
 export const CASTING_STATUS = {

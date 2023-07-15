@@ -188,5 +188,11 @@
     "newModel": "מודל חדש שמספרו {number} ונקרא {name} נוסף למערכת",
     "modelApproved": "מודל מספר {number} אושר על ידי המנהל",
     "modelReject": "מודל מספר {number} נדחה על ידי המנהל",
-    "modelUpdated": "מודל מספר {number} עודכן"
+    "modelUpdated": "מודל מספר {number} עודכן",
+    "incomingOrders": "הזמנות נכנסות",
+    "ordersInApproval": "הזמנות באישור",
+    "rejectedOrders": "הזמנות שנדחו",
+    "ordersHistory": "היסטוריית הזמנות",
+    "approvedByManager": "מנהל אישר",
+    "waitToCustomerApproval": "ממתין לאישור לקוח"
 }
