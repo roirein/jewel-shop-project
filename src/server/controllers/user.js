@@ -41,7 +41,7 @@ const loginUser = async (req, res ,next) => {
             throw new HttpError('authentication error', 401);
         }
         const isLoginValid = await validateIsLoginValid(req.body.email)
-        if (!isLoginValid.res) {
+        if (isLoginValid.errMessage) {
                 throw new HttpError(isLoginValid.errMessage, 403)
         }
         const user = await User.getUserByEmail(req.body.email)

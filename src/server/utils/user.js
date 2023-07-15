@@ -106,7 +106,7 @@ const checkIfEmployeeLoginValid = async (employeeId) => {
             userId: employeeId
         }
     })
-
+    console.log(employee)
     return employee.dataValues.shouldReplacePassword
 }
 
@@ -119,13 +119,13 @@ const validateIsLoginValid = async (email) => {
     let errMessage
     let res
     if (user.dataValues.permissionLevel === 5) {
-         res = checkIfCustomerLoginValid(user.dataValues.userId)
+         res = await checkIfCustomerLoginValid(user.dataValues.userId)
          if (!res) {
             errMessage = 'manager-approval-required'
          }
     } else {
-        res = checkIfEmployeeLoginValid(user.dataValues.userId)
-        if (!res) {
+        res = await checkIfEmployeeLoginValid(user.dataValues.userId)
+        if (res) {
             errMessage = 'replace-password-required'
          }
     }

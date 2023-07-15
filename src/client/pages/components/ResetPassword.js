@@ -7,7 +7,7 @@ import EmailFormComponent from "./reset-password-form/EmailForm"
 import CodeFormComponent from "./reset-password-form/CodeForm"
 import PasswordFormComponent from "./reset-password-form/PasswordForm"
 
-const RestePasswordComponent = () => {
+const RestePasswordComponent = (props) => {
 
     const theme = useTheme()
     const intl = useIntl()
@@ -17,6 +17,7 @@ const RestePasswordComponent = () => {
     return (
         <CenteredStack
             rowGap={theme.spacing(4)}
+            width="100%"
         >
             <Typography
                 variant="h4"
