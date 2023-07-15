@@ -177,5 +177,16 @@
     "showAll": "הצג הכל",
     "filterBy": ":סנן לפי",
     "requestApproved": "בקשה אושרה",
-    "requestDeclined": "בקשה נדחתה"
+    "requestDeclined": "בקשה נדחתה",
+    "modelsInProgress": "מודלים בהכנה",
+    "modelsApproved": "מודלים שאושרו",
+    "carat": "קראט",
+    "dragImage": "גרור תמונה לכאן",
+    "selectOrDrop": "בחר או גרור תמונה לכאן",
+    "imageOnly": "קובץ חייב להיות בפורמט של תמונה",
+    "positive": "ערך חייב להיות מספר חיובי",
+    "newModel": "מודל חדש שמספרו {number} ונקרא {name} נוסף למערכת",
+    "modelApproved": "מודל מספר {number} אושר על ידי המנהל",
+    "modelReject": "מודל מספר {number} נדחה על ידי המנהל",
+    "modelUpdated": "מודל מספר {number} עודכן"
 }

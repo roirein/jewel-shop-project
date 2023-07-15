@@ -51,7 +51,7 @@ ModelMetadata.init({
         allowNull: true
     }
 }, {
-    timestamps: false,
+    timestamps: true,
     sequelize,
     modelName: 'Model Metadata'
 })

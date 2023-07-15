@@ -39,6 +39,14 @@ export const MODELS_TABL_COLUMNS = [
     intl.formatMessage(modelsPageMessages.status)
 ]
 
+export const MODELS_TABL_BY_STATUS_COLUMNS = [
+    intl.formatMessage(modelsPageMessages.modelNumber),
+    intl.formatMessage(modelsPageMessages.item),
+    intl.formatMessage(modelsPageMessages.setting),
+    intl.formatMessage(modelsPageMessages.mainStoneSize),
+    intl.formatMessage(modelsPageMessages.sideStoneSize),
+]
+
 export const ORDERS_MANAGER_TABLE_COLUMNS = [
     intl.formatMessage(ordersPageMessages.orderNumber),
     intl.formatMessage(ordersPageMessages.orderType),

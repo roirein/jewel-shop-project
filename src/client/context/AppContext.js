@@ -16,7 +16,8 @@ const contextValue = {
     setNotificationMessage: () => {},
     notifications: [],
     readNotification: () => {},
-    onShowRequestModal: () => {}
+    onShowRequestModal: () => {},
+    onShowModelModal: () => {}
 }
 
 const AppContext = createContext(contextValue)

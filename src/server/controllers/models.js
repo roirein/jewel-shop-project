@@ -6,7 +6,7 @@ const ModelPrice = require("../models/models/modelPrice")
 const Order = require("../models/orders/order")
 const { sendNewModelNotification } = require("../services/sockets/socket")
 const HttpError = require('../utils/HttpError')
-const { createModelMetadata, createModel } = require("../utils/models")
+const { createModelMetadata, createModel, preapareModels, getModelByStatus } = require("../utils/models")
 const path = require('path')
 
 const createNewModel = async (req, res, next) => {
@@ -20,7 +20,7 @@ const createNewModel = async (req, res, next) => {
             throw new HttpError('model-exist', 409)
         }
         let metadataId = req.body.metadataId
-        if (metadataId !== 'undefined') {
+        if (metadataId && metadataId !== 'undefined') {
             await ModelMetadata.update({
                 modelNumber: req.body.modelNumber
             }, {
@@ -35,7 +35,6 @@ const createNewModel = async (req, res, next) => {
             await modelMetadata.save()
         }
         const model = await createModel(req.body.modelNumber, req.body.title, req.body.description, req.file.filename, metadataId);
-        //await sendNewModelNotification(modelMetadata.metadataId)
         res.status(201).send({model:{
             id: metadataId,
             modelNumber: model.dataValues.modelNumber,
@@ -44,6 +43,7 @@ const createNewModel = async (req, res, next) => {
             sideStoneSize: req.body.sideStoneSize,
             mainStoneSize: req.body.mainStoneSize,
             status: model.dataValues.status,
+            title: model.dataValues.title,
         }})
     } catch (e) {
         next(e)
@@ -56,23 +56,23 @@ const getModelsMetadata = async (req, res, next) => {
             include: {
                 model: JewelModel,
                 attributes: ['status', 'modelNumber']
-            }
+            },
         })
 
-        const models = modelsMetadata.map((model) => {
-            return {
-                id: model.metadataId,
-                modelNumber: model['Jewel Model']?.modelNumber ||  null,
-                item: model.item,
-                setting: model.setting,
-                sideStoneSize: model.sideStoneSize,
-                mainStoneSize: model.mainStoneSize,
-                status: model['Jewel Model']?.status === null ? -1 : model['Jewel Model']?.status 
-            }
-        })
+        const models = preapareModels(modelsMetadata)
         res.status(200).send({models})
     } catch (e) {
         console.log(e)
+        next(e)
+    }
+}
+
+
+const getModelsMetadataByStatus = async (req, res, next) => {
+    try {
+        const models = await getModelByStatus(req.params.status)
+        res.status(200).send({models})
+    } catch (e) {
         next(e)
     }
 }
@@ -141,7 +141,7 @@ const updateModel = async (req, res, next) => {
             title: req.body.title,
             description: req.body.description,
             image: req.file.filename,
-            status: 2
+            status: 1
         },{
             where: {
                 modelNumber: req.params.modelNumber
@@ -151,7 +151,7 @@ const updateModel = async (req, res, next) => {
             title: req.body.title,
             description: req.body.description,
             image: req.body.image,
-            status: 2
+            status: 1
         }})
     } catch(e) {
         next(e)
@@ -275,5 +275,6 @@ module.exports = {
     updateModel,
     updateModelPrice,
     getPriceData,
-    getModelsForOrders
+    getModelsForOrders,
+    getModelByStatus
 }

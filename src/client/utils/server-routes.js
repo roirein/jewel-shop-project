@@ -23,3 +23,13 @@ export const EMPLOYEES_ROUTES = {
     DELETE_EMPLOYEE: (id) => `${serverUrl}/employee/employee/${id}`,
     EMPLOYEES_ROLE: `${serverUrl}/employee/employee/employee-role`
 }
+
+export const MODELS_ROUTES = {
+    ADD_MODEL: `${serverUrl}/model/model`,
+    GET_MODELS_METADATA: `${serverUrl}/model/metadata`,
+    GET_MODEL: (id) => `${serverUrl}/model/model/${id}`,
+    COMMENTS: (id) => `${serverUrl}/model/model/comments/${id}`,
+    PRICE: (id) => `${serverUrl}/model/price/${id}`,
+    IMAGE: (imagePath) => `${serverUrl}/model/image/${imagePath}`,
+    UPDATE: (id) => `${serverUrl}/model/model/${id}`
+}

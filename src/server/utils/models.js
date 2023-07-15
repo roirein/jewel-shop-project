@@ -27,7 +27,45 @@ const createModel = async (modelNumber, title, description, image, metadataId) =
     return model
 }
 
+
+const preapareModels = (modelsList) => {
+    const models = modelsList.map((model) => {
+        return {
+            id: model.metadataId,
+            modelNumber: model['Jewel Model']?.modelNumber ||  null,
+            item: model.item,
+            setting: model.setting,
+            sideStoneSize: model.sideStoneSize,
+            mainStoneSize: model.mainStoneSize,
+            status: model['Jewel Model']?.status === null ? -1 : model['Jewel Model']?.status 
+        }
+    })
+
+    return models
+}
+
+
+const getModelByStatus = async (status) => {
+    let models = await ModelMetadata.findAll({
+        include: {
+            model: JewelModel,
+            attributes: ['status', 'modelNumber']
+        },
+        order: [['updatedAt', 'DESC']]
+    })
+
+    if (status === 'ready') {
+        models = models.filter((model) => model['JewelModel'].status === 3)
+    } else {
+        models = models.filter((model) => model['JewelModel'].status !== 3)
+    }
+
+    return preapareModels(models)
+}
+
 module.exports = {
     createModelMetadata,
-    createModel
+    createModel,
+    getModelByStatus,
+    preapareModels
 }

@@ -13,6 +13,7 @@ const FixOrder = require('../../models/orders/fixOrder');
 const Task = require("../../models/tasks/task");
 const OrderCustomer = require("../../models/orders/orderCustomer");
 const OrderTimeline = require("../../models/orders/orderTimeline");
+const ModelPrice = require("../../models/models/modelPrice");
 
 let ioInstance = null;
 
@@ -28,32 +29,25 @@ const initSocket = (io) => {
             users[data.userId] = socket.id
         })
 
-        socket.on('request-response', (data) => {
-            updateRequestStatus(data.status, data.customerId)
+        socket.on('request-response', async (data) => {
+            await updateRequestStatus(data.status, data.customerId)
         })
 
-        socket.on('model-response', async (data) => {
-            await JewelModel.update({
-                status: data.status
-            }, {
-                where: {
-                    modelNumber: data.modelNumber
-                }
-            })
-            if (data.comments) {
-                await Comments.create({
-                    modelNumber: data.modelNumber,
-                    content: data.comments
-                })
-            } else {
-                await OrderTimeline.update({
-                    designEnd: Date.now()
-                }, {
-                    where: {
-                        orderId: data.orderId
-                    }
-                })
-            }
+
+        socket.on('new-model', async (data) => {
+            await onCreateNewModel(data.modelNumber, data.title)
+        })
+
+        socket.on('model-approve', async (data) => {
+            await onModelApprove(data)
+        })
+
+        socket.on('model-reject', async (data) => {
+            await onModelReject(data)
+        })
+
+        socket.on('model-update', async (data) => {
+            await onModelUpdate(data)
         })
 
         socket.on('new-design', async (data) => {
@@ -274,6 +268,126 @@ const sendNewCustomerNotification = async (customerName, customerId) => {
     }
 }
 
+const onCreateNewModel = async (modelNumber, modelTitle) => {
+    const manager = await User.findOne({
+        where: {
+            permissionLevel: 1
+        }
+    })
+    const socketId = users[manager.dataValues.userId]
+    const notificationData = {
+        resource: 'model',
+        type: 'new-model',
+        resourceId: modelNumber,
+        recipient: manager.dataValues.userId,
+        data: {
+            modelNumber,
+            modelTitle
+        }
+    }
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('new-model', notification)
+    }
+
+}
+
+
+const onModelApprove = async (modelData) => {
+    await ModelPrice.create({
+        modelNumber: modelData.modelNumber,
+        materials: modelData.materials,
+        priceWithMaterials: modelData.priceWithMaterials,
+        priceWithoutMaterials: modelData.priceWithoutMaterials
+    })
+
+    await JewelModel.update({
+        status: 2
+    }, {
+        where: {
+            modelNumber: modelData.modelNumber
+        }
+    })
+    
+    const designManager = await User.findOne({
+        where: {
+            permissionLevel: 2
+        }
+    })
+    const socketId = users[designManager.dataValues.userId]
+    const notificationData = {
+        resource: 'model',
+        type: 'model-approve',
+        resourceId: modelData.modelNumber,
+        recipient: designManager.dataValues.userId,
+        data: {
+            modelNumber: modelData.modelNumber
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('new-model', notification)
+    }
+}
+
+const onModelReject = async (data) => {
+    await JewelModel.update({
+        status: data.status
+    }, {
+        where: {
+            modelNumber: data.modelNumber
+        }
+    })
+    await Comments.create({
+        modelNumber: data.modelNumber,
+        content: data.comments
+    })
+
+    const designManager = await User.findOne({
+        where: {
+            permissionLevel: 2
+        }
+    })
+    const socketId = users[designManager.dataValues.userId]
+    const notificationData = {
+        resource: 'model',
+        type: 'model-reject',
+        resourceId: data.modelNumber,
+        recipient: designManager.dataValues.userId,
+        data: {
+            modelNumber: data.modelNumber
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('model-reject', notification)
+    }
+}
+
+const onModelUpdate = async (data) => {
+    const manager = await User.findOne({
+        where: {
+            permissionLevel: 1
+        }
+    })
+    const socketId = users[manager.dataValues.userId]
+    const notificationData = {
+        resource: 'model',
+        type: 'model-update',
+        resourceId: data.modelNumber,
+        recipient: manager.dataValues.userId,
+        data: {
+            modelNumber: data.modelNumber
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('model-update', notification)
+    }
+}
 
 const sendNewModelNotification = async (modelId) => {
     const manager = await User.findOne({

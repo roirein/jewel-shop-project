@@ -76,6 +76,22 @@ export const formMessages = defineMessages({
     passwordChanged: {
         id: 'passwordChanged',
         defaultMessage: 'password changed successfully'
+    },
+    dragImage: {
+        id: 'dragImage',
+        defaultMessage: 'drag image here'
+    },
+    selectOrDrop: {
+        id: 'selectOrDrop',
+        defaultMessage: 'select or drop image here'
+    },
+    imageOnly: {
+        id: 'imageOnly',
+        defaultMessage: 'file must be in image format'
+    },
+    positive: {
+        id: 'positive',
+        defaultMessage: 'value must be a positive value'
     }
 })
 
@@ -252,6 +268,22 @@ export const notificationMessages = defineMessages({
     joinRequest: {
         id: 'joinRequest',
         defaultMessage: 'joining request from {name}'
+    },
+    newModel: {
+        id: 'newModel',
+        defaultMessage: 'model number {number} that called {name} was uploaded to the system'
+    },
+    modelApproved: {
+        id: `modelApproved`,
+        defaultMessage: 'model number {number} approved by the manager'
+    },
+    modelReject: {
+        id: 'modelReject',
+        defaultMessage: 'model number {number} was rejected by the manager'
+    },
+    modelUpdated: {
+        id: 'modelUpdated',
+        defaultMessage: 'model number {numner} was updated'
     }
 })
 
@@ -457,6 +489,18 @@ export const modelsPageMessages = defineMessages({
     priceWithoutMaterials: {
         id: 'priceWithoutMaterials',
         defaultMessage: 'price without materials'
+    },
+    modelsInProgress: {
+        id: 'modelsInProgress',
+        defaultMessage: 'models in progress'
+    },
+    modelsApproved: {
+        id: 'modelsApproved',
+        defaultMessage: 'models approved'
+    },
+    carat: {
+        id: 'carat',
+        defaultMessage: 'carat'
     }
 })
 

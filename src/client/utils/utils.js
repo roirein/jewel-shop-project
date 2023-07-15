@@ -41,10 +41,28 @@ const generateCustomerNotificationMessage = (notificationData) => {
     return intl.formatMessage(notificationMessages.joinRequest, {name: notificationData.name})
 }
 
+const generateModelNotificationsMessage = (notificationData, type) => {
+    switch(type) {
+        case 'new-model':
+            return intl.formatMessage(notificationMessages.newModel, {number: notificationData.modelNumber, name: notificationData.modelTitle})
+        case 'model-approve': 
+            return intl.formatMessage(notificationMessages.modelApproved, {number: notificationData.modelNumber})
+        case 'model-reject': 
+            return intl.formatMessage(notificationMessages.modelReject, {number: notificationData.modelNumber})
+        case 'model-update': 
+            return intl.formatMessage(notificationMessages.modelUpdated, {number: notificationData.modelNumber})
+    }
+}
+
 const getNotificationMessage = (resource, type, data) => {
     if (resource === 'customer') {
         return generateCustomerNotificationMessage(data)
     }
+    if (resource === 'model') {
+        const res = generateModelNotificationsMessage(data, type)
+        return res
+    }
+    
 }
 
 export const createNotification = (notificatioData) => {

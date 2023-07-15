@@ -29,10 +29,16 @@ const NotificationDropdown = (props) => {
 
     }
 
-    const onNotificationClick = (resourceId) => {
+    const onNotificationClick = (resourceId, type, resource) => {
+        console.log(1)
         setShowdropdown(false)
-        console.log(resourceId)
-        contextValue.onShowRequestModal(resourceId)
+        if (resource === 'customer') {
+            contextValue.onShowRequestModal(resourceId)
+        }
+        if (resource === 'model') {
+            console.log(2)
+            contextValue.onShowModelModal(resourceId)
+        }
         onClosePopover()
     }
 
@@ -79,7 +85,7 @@ const NotificationDropdown = (props) => {
                             resourceType={notification.resource}
                             message={notification.message}
                             icon={<PersonAdd/>}
-                            onClick={() => onNotificationClick(notification.resourceId)}
+                            onClick={() => onNotificationClick(notification.resourceId, notification.type, notification.resource)}
                             //onClick={on}
                         />
                     ))}

@@ -23,12 +23,10 @@ export const ITEM_ENUMS = {
 }
 
 export const MODEL_STATUS_ENUM = {
-    [-1]: intl.formatMessage(modelsPageMessages.notCreated),
-    [0]: intl.formatMessage(modelsPageMessages.rejeceted),
-    [1]: intl.formatMessage(modelsPageMessages.created),
-    [2]: intl.formatMessage(modelsPageMessages.updated),
-    [3]: intl.formatMessage(modelsPageMessages.approved),
-    [4]: intl.formatMessage(modelsPageMessages.completed),
+    [-1]: intl.formatMessage(modelsPageMessages.rejeceted),
+    [0]: intl.formatMessage(modelsPageMessages.created),
+    [1]: intl.formatMessage(modelsPageMessages.updated),
+    [2]: intl.formatMessage(modelsPageMessages.approved),
 }
 
 export const SIZE_ENUM = {

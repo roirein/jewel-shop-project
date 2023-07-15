@@ -33,9 +33,9 @@ JewelModel.init({
     status: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 1,
+        defaultValue: 0,
         validate: {
-            min: 0,
+            min: -1,
             max: 4
         }
     }

@@ -7,6 +7,8 @@ import { buttonMessages, formMessages, modelsPageMessages } from "../../../trans
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import ButtonComponent from "../../../components/UI/ButtonComponent"
+import CenteredStack from "../../../components/UI/CenteredStack"
+import ImageUploader from "../../../components/UI/Form/Inputs/ImageUploader"
 
 const UpdateForm = (props) => {
 
@@ -15,7 +17,13 @@ const UpdateForm = (props) => {
 
     const validationSchema = yup.object().shape({
         title: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        description: yup.string().required(intl.formatMessage(formMessages.emptyFieldError))
+        description: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
+        model: yup.mixed().required(intl.formatMessage(formMessages.emptyFieldError)).test('file type', intl.formatMessage(formMessages.imageOnly), (value) => {
+            if (!value) {
+                return true
+            }
+            return ['image/jpeg', 'image/jpg', 'image/png'].includes(value.type);
+        })
     })
 
     const methods = useForm({
@@ -51,13 +59,15 @@ const UpdateForm = (props) => {
                         fieldLabel={intl.formatMessage(modelsPageMessages.description)}
                         onBlur={() => {}}
                     />
-                    <input
-                        type="file"
-                        {...methods.register('model', {required: true})}
-                        style={{
-                            marginTop: '16px'
+                    <CenteredStack
+                        sx={{
+                            mt: theme.spacing(3)
                         }}
-                    />
+                    >
+                        <ImageUploader
+                            name="model"
+                        />
+                    </CenteredStack>
                     <Stack
                         direction="row"
                         columnGap={theme.spacing(4)}

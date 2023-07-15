@@ -1,6 +1,6 @@
 import { createIntl } from "react-intl";
 import messages from '../translations/locales/he.json'
-import { ordersPageMessages, tabsMessages } from "../translations/i18n";
+import { modelsPageMessages, ordersPageMessages, tabsMessages } from "../translations/i18n";
 
 const intl = createIntl({
     locale: 'he',
@@ -76,4 +76,19 @@ export const MANAGER_ORDERS_PAGE_TABS = [
         label: intl.formatMessage(ordersPageMessages.ordersInProduction),
         route: '/orders/production'
     }
+]
+
+export const DESIGN_MANGER_MODELS_PAGE_TABS = [
+    {
+        label: intl.formatMessage(tabsMessages.models),
+        route: '/models'
+    },
+    {
+        label: intl.formatMessage(modelsPageMessages.modelsInProgress),
+        route: '/models/inProgress'
+    },
+    {
+        label: intl.formatMessage(modelsPageMessages.modelsApproved),
+        route: '/models/ready'
+    },
 ]

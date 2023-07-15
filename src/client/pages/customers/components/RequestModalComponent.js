@@ -27,7 +27,7 @@ const RequestModalComponent = (props) => {
 
     useEffect(() => {
         setIsLoading(true)
-        if (props.userId) {
+        if (props.userId && props.open) {
             sendHttpRequest(CUSTOMER_ROUTES.CUSTOMER(props.userId), "GET", null, {
                 Authorization: `Bearer ${contextValue.token}`
             }).then((res) => {

@@ -12,6 +12,8 @@ import { useRouter } from 'next/router';
 import { getAuthorizationHeader } from '../../utils/utils';
 import { Diamond, PersonAddAlt, ShoppingCart } from '@mui/icons-material';
 import NotificationDropdown from '../UI/Notifications/NotificationDropdown';
+import { sendHttpRequest } from '../../utils/requests';
+import { USER_ROUTES } from '../../utils/server-routes';
 
 const AppTemplate = (props) => {
 
@@ -29,20 +31,16 @@ const AppTemplate = (props) => {
         }
     }, [contextValue])
 
+
     const onLogout = async () => {
-        const response = await axios.post('http://localhost:3002/user/logout', {
-            userId: contextValue.userId
-        }, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            }
+        const response = await sendHttpRequest(USER_ROUTES.LOGOUT, 'POST', {userId: contextValue.userId}, {
+            Authorization: `Bearer ${contextValue.token}`
         })
         if (response.status === 200) {
             contextValue.onLogout();
             router.push('/')
         }
     }
-
 
     const getDropdownsProps = (permissionLevel) => {
         switch(permissionLevel) {
@@ -53,6 +51,19 @@ const AppTemplate = (props) => {
                         icon: <PersonAddAlt/>,
                         notifications: contextValue.notifications.customers
                     },
+                    {
+                        type: 2,
+                        icon: <ShoppingCart/>,
+                        notifications: contextValue.notifications.orders
+                    },
+                    {
+                        type: 3,
+                        icon: <Diamond/>,
+                        notifications: contextValue.notifications.models
+                    }
+                ]
+            case 2: 
+                return [
                     {
                         type: 2,
                         icon: <ShoppingCart/>,

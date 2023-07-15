@@ -13,6 +13,9 @@ import CommentsForm from './CommentForm';
 import { Typography } from '@mui/material';
 import UpdateForm from './updateForm';
 import UpdatePriceForm from './updatePriceForm';
+import {sendHttpRequest} from '../../../utils/requests'
+import { MODELS_ROUTES } from '../../../utils/server-routes';
+
 
 const ModelModalComponent = (props) => {
 
@@ -24,56 +27,40 @@ const ModelModalComponent = (props) => {
     const [comments, setComments] = useState();
     const [priceData, setPriceData] = useState({});
     const [imageUrl, setImageUrl] = useState('');
-    const [showCommentsForm, setShowCommentsForm] = useState(false);
     const [showUpdateForm, setShowUpdateForm] = useState(false);
     const [showUpdatePriceForm, setShowUpdatePriceForm] = useState(false)
+    const [status, setStatus] = useState(0)
 
-    const handleClose = () => {
-        setShowCommentsForm(false)
-        setShowUpdateForm(false)
-        setShowUpdatePriceForm(false)
+    const handleClose = (toFecthModels) => {
         setComments('')
+        props.onClose(toFecthModels)
     }
 
     useEffect(() => {
-        if(props.modelNumber) {
-            axios.get(`http://localhost:3002/model/model/${props.modelNumber}`, {
-                headers: {
-                    Authorization: getAuthorizationHeader(contextValue.token)
+        if(props.modelNumber && props.open) {
+            sendHttpRequest(MODELS_ROUTES.GET_MODEL(props.modelNumber), 'GET', null, {
+                Authorization: `Bearer ${contextValue.token}`
+            }).then((response) => {
+                setModel(response.data.model)
+                if (response.data.model.status === -1 ) {
+                    sendHttpRequest(MODELS_ROUTES.COMMENTS(props.modelNumber), 'GET', null, {
+                        Authorization: `Bearer ${contextValue.token}`
+                    }).then((res) => setComments(res.data.comment))
                 }
-            }).then((resp) => {
-                setModel(resp.data.model)
-                if (resp.data.model.status === 0) {
-                    axios.get(`http://localhost:3002/model/comments/${props.modelNumber}`, {
-                        headers: {
-                            Authorization: getAuthorizationHeader(contextValue.token)
-                        }
-                    }).then((response) => {
-                        setComments(response.data.comment)
-                    })
+                if (response.data.model.status === 2) {
+                    sendHttpRequest(MODELS_ROUTES.PRICE(props.modelNumber), 'GET', null, {
+                        Authorization: `Bearer ${contextValue.token}`
+                    }).then((res) => setPriceData(res.data.price))
                 }
-                if (resp.data.model.status === 4) {
-                    axios.get(`http://localhost:3002/model/price/${props.modelNumber}`, {
-                        headers: {
-                            Authorization: getAuthorizationHeader(contextValue.token)
-                        }
-                    }).then((response) => {
-                        setPriceData(response.data.price)
-                    })
-                }
-
             })
         }
     }, [props.modelNumber])
 
     useEffect(() => {
         if (model.modelNumber) {
-            axios.get(`http://localhost:3002/model/image/${model.image}`, {
-                headers: {
-                    Authorization: getAuthorizationHeader(contextValue.token)
-                },
-                responseType: 'blob'
-            }).then((res) => {
+            sendHttpRequest(MODELS_ROUTES.IMAGE(model.image), 'GET', null, {
+                Authorization: `Bearer ${contextValue.token}`
+            }, 'blob').then((res) => {
                 const image = URL.createObjectURL(res.data);
                 setImageUrl(image)
             })
@@ -88,8 +75,7 @@ const ModelModalComponent = (props) => {
                 <ButtonComponent
                     label={intl.formatMessage(buttonMessages.close)}
                     onClick={() => {
-                        handleClose()
-                        props.onClose()
+                        handleClose(false)
                     }}
                 />
             </Stack>
@@ -100,38 +86,33 @@ const ModelModalComponent = (props) => {
         const formData = new FormData()
         formData.append('title', data.title)
         formData.append('description', data.description),
-        formData.append('model', data.model[0])
-        axios.put(`http://localhost:3002/model/model/${model.modelNumber}`, formData, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            }
-        }).then((response) => {
-            if (response.status === 200) {
-                props.onClose(model.modelNumber, 2)
-            }
+        formData.append('model', data.model)
+        const response = await sendHttpRequest(MODELS_ROUTES.UPDATE(props.modelNumber), 'PUT', formData, {
+            Authorization: `Bearer ${contextValue.token}`
         })
+        if (response.status === 200) {
+            contextValue.socket.emit('model-update', {
+                modelNumber: props.modelNumber,
+            })
+            handleClose(true)
+        }
     }
 
     const onUpdatePrice = async (data) => {
-        axios.post(`http://localhost:3002/model/price/${model.modelNumber}`, {
+        contextValue.socket.emit('model-approve', {
+            modelNumber: model.modelNumber,
+            status: 2,
             materials: data.materials,
             priceWithMaterials: data.priceWithMaterials,
             priceWithoutMaterials: data.priceWithoutMaterials
-        }, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            }  
-        }).then((response) => {
-            if (response.status === 201) {
-                props.onClose(model.modelNumber, 4)
-            }
         })
+        handleClose(true)
     }
 
     return (
         <ModalComponent
             open={props.open}
-            onClose={() => props.onClose()}
+            onClose={() => props.onClose(false)}
             title={intl.formatMessage(modelsPageMessages.numberOfModel, {number: model.modelNumber})}
             width="sm"
             actions={getModalActions()}
@@ -153,56 +134,39 @@ const ModelModalComponent = (props) => {
             >
                 {contextValue.permissionLevel === 1 && (
                     <>
-                        {(model.status === 1 || model.status === 2)  &&  (
+                        {(model.status === 0 || model.status === 1)  &&  (
                             <>
-                                {!showCommentsForm && (
+                                {status === 0 && (
                                     <>
                                         <ButtonComponent
                                             label={intl.formatMessage(buttonMessages.approve)}
                                             onClick={() => {
-                                                contextValue.socket.emit('model-response', {
-                                                    status: 3,
-                                                    modelNumber: model.modelNumber
-                                                })
-                                                handleClose()
-                                                props.onClose(model.modelNumber, 3)
+                                                setStatus(1)
                                             }}
                                         />
                                         <ButtonComponent
                                             label={intl.formatMessage(buttonMessages.reject)}
-                                            onClick={() => setShowCommentsForm(true)}
+                                            onClick={() => setStatus(-1)}
                                         />
                                     </>
                                 )}
-                                {showCommentsForm && (
+                                {status === -1 && (
                                     <CommentsForm
-                                        onCancel={() => setShowCommentsForm(false)}
+                                        onCancel={() => setStatus(0)}
                                         onSubmit={(data) => {
-                                            contextValue.socket.emit('model-response', {
-                                                status: 0,
+                                            contextValue.socket.emit('model-reject', {
+                                                status: -1,
                                                 modelNumber: model.modelNumber,
                                                 comments: data.comments
                                             })
-                                            handleClose()
-                                            props.onClose(model.modelNumber, 0)
+                                            handleClose(true)
                                         }}
                                     />
                                 )}
-                            </>
-                        )}
-                        {model.status === 3 && (
-                            <>
-                                {!showUpdatePriceForm && (
-                                    <ButtonComponent
-                                        label={intl.formatMessage(modelsPageMessages.updatePrice)}
-                                        onClick={() => setShowUpdatePriceForm(true)}
-                                    />
-                                )}
-                                {showUpdatePriceForm && (
+                                {status === 1 && (
                                     <UpdatePriceForm
-                                        onCancel={() => setShowUpdatePriceForm(false)}
+                                        onCancel={() => setStatus(0)}
                                         onSubmit={(data) => {
-                                            handleClose()
                                             onUpdatePrice(data)
                                         }}
                                     />
@@ -211,7 +175,7 @@ const ModelModalComponent = (props) => {
                         )}
                     </>
                 )}
-                {model.status === 0 && (
+                {model.status === -1 && (
                     <>
                         {comments && (
                             <Stack
@@ -235,10 +199,7 @@ const ModelModalComponent = (props) => {
                                         {showUpdateForm && (
                                             <UpdateForm
                                                 onCancel={() => setShowUpdateForm(false)}
-                                                onSubmit={(data) => {
-                                                    setShowUpdateForm(false)
-                                                    onUpdateModel(data)
-                                                }}
+                                                onSubmit={(data) => onUpdateModel(data)}
                                             />
                                         )}
                                     </>
@@ -247,7 +208,7 @@ const ModelModalComponent = (props) => {
                         )}
                     </>
                 )}
-                {model.status === 4 && (
+                {model.status === 2 && (
                     <Stack
                         width="100%"
                         rowGap={theme.spacing(3)}

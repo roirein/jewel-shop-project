@@ -9,6 +9,7 @@ import { USER_ROUTES } from "../utils/server-routes";
 import { useRouter } from "next/router";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import RequestModalComponent from "../pages/customers/components/RequestModalComponent";
+import ModelModalComponent from "../pages/models/components/ModelModal";
 
 const ContextProvider = (props) => {
 
@@ -27,6 +28,7 @@ const ContextProvider = (props) => {
     const [notifications, setNotifications] = useState({})
     const [isLoading, setIsLoading] = useState(false);
     const [showRequestModal, setShowRequestModal] = useState(false);
+    const [showModelModal, setShowModelModal] = useState(false);
     const [modalResouceId, setModalResourceId] = useState(null);
 
     useEffect(() => {
@@ -67,10 +69,10 @@ const ContextProvider = (props) => {
                             customerNotifications.push(createNotification(notification))
                             break;
                         case 'order': 
-                            ordersNotifications.push(notification)
+                            ordersNotifications.push(createNotification(notification))
                             break
                         case 'model': 
-                            modelsNotifications.push(notification)
+                            modelsNotifications.push(createNotification(notification))
                             break
                         default:
                             break
@@ -88,7 +90,6 @@ const ContextProvider = (props) => {
         if (socket) {
             socket.on('new-customer', (data) => {
                 const notification = createNotification(data)
-                console.log(data, notification)
                 setNotificationMessage(notification.message)
                 setShowNotification(true)
                 const customersNotifications = notifications.customers
@@ -98,8 +99,57 @@ const ContextProvider = (props) => {
                 })
             })
 
+
+            socket.on('new-model', (data) => {
+                const notification = createNotification(data)
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const modelsNotifications = notifications.models
+                setNotifications({
+                    ...notifications,
+                    models: [...modelsNotifications, notification]
+                })
+            })
+
+            socket.on('model-approve', (data) => {
+                const notification = createNotification(data)
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const modelsNotifications = notifications.models
+                setNotifications({
+                    ...notifications,
+                    models: [...modelsNotifications, notification]
+                })
+            })
+
+            socket.on('model-reject', (data) => {
+                const notification = createNotification(data)
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const modelsNotifications = notifications.models
+                setNotifications({
+                    ...notifications,
+                    models: [...modelsNotifications, notification]
+                })
+            })
+
+            socket.on('model-update', (data) => {
+                const notification = createNotification(data)
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const modelsNotifications = notifications.models
+                setNotifications({
+                    ...notifications,
+                    models: [...modelsNotifications, notification]
+                })
+            })
+
             return () => {
                 socket.off('new-customer')
+                socket.off('new-model')
+                socket.off('model-approve')
+                socket.off('model-reject')
+                socket.off('model-update')
             }
         }
     }, [socket, notifications])
@@ -153,12 +203,17 @@ const ContextProvider = (props) => {
         setUserId('')
         socket.disconnect()
         setSocket(null)
-        localStorage.removeItem('accessToken')
+        sessionStorage.removeItem('token')
     }
 
     const onShowRequestModal = (customerId) => {
         setModalResourceId(customerId)
         setShowRequestModal(true)
+    }
+
+    const onShowModelModal = (modelNumber) => {
+        setModalResourceId(modelNumber)
+        setShowModelModal(true)
     }
 
 
@@ -178,7 +233,8 @@ const ContextProvider = (props) => {
         setNotificationMessage,
         notifications,
         readNotification,
-        onShowRequestModal
+        onShowRequestModal,
+        onShowModelModal
     }
 
     if (isLoading) {
@@ -206,6 +262,14 @@ const ContextProvider = (props) => {
                     setShowRequestModal(false);
                     setModalResourceId('')
                 }}
+            />
+            <ModelModalComponent
+                open={showModelModal}
+                onClose={() => {
+                    setShowModelModal(false)
+                    setModalResourceId('')
+                }}
+                modelNumber={modalResouceId}
             />
         </AppContext.Provider>
     )
