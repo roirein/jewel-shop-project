@@ -33,7 +33,6 @@ const initSocket = (io) => {
             await updateRequestStatus(data.status, data.customerId)
         })
 
-
         socket.on('new-model', async (data) => {
             await onCreateNewModel(data.modelNumber, data.title)
         })
@@ -48,6 +47,10 @@ const initSocket = (io) => {
 
         socket.on('model-update', async (data) => {
             await onModelUpdate(data)
+        })
+
+        socket.on('new-order', async (data) => {
+            await onCreateNewOrder(data)
         })
 
         socket.on('new-design', async (data) => {
@@ -386,6 +389,30 @@ const onModelUpdate = async (data) => {
     const notification = await Notifications.create(notificationData)
     if (socketId) {
         ioInstance.to(socketId).emit('model-update', notification)
+    }
+}
+
+
+const onCreateNewOrder = async (data) => {
+    const manager = await User.findOne({
+        where: {
+            permissionLevel: 1
+        }
+    })
+    const socketId = users[manager.dataValues.userId]
+    const notificationData = {
+        resource: 'order',
+        type: 'new-order',
+        resourceId: data.orderId,
+        recipient: manager.dataValues.userId,
+        data: {
+            customerName: data.customerName,
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('new-order', notification)
     }
 }
 

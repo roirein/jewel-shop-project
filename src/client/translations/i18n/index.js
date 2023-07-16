@@ -284,6 +284,10 @@ export const notificationMessages = defineMessages({
     modelUpdated: {
         id: 'modelUpdated',
         defaultMessage: 'model number {numner} was updated'
+    },
+    newOrder: {
+        id: 'newOrder',
+        defaultMessage: 'new order from {name}'
     }
 })
 

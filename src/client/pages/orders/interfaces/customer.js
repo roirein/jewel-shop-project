@@ -21,10 +21,12 @@ const CustomerInterface = (props) => {
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [tableColumns, setTableColumns] = useState(ORDER_CUSTOMER_TABEL_COLUMNS)
     const [tableData, setTableData] = useState([])
-    const [displayedOrders, setDisplayedOrders] = useState([])
+    const [displayedOrders, setDisplayedOrders] = useState(props.orders)
 
     useEffect(() => {
-        setDisplayedOrders(props.order)
+        if (props.orders) {
+            setDisplayedOrders(props.orders)
+        }
     }, [props.orders])
 
     useEffect(() => {
@@ -33,7 +35,7 @@ const CustomerInterface = (props) => {
             data.push(
                 {
                     rowId: dataElement.orderId,
-                    rowContent: [dataElement.orderId, ORDER_TYPES[dataElement.order], ORDER_STATUS[dataElement.status], dataElement.deadline]
+                    rowContent: [dataElement.orderId, ORDER_TYPES[dataElement.type], ORDER_STATUS[dataElement.status], dataElement.deadline]
                 });
         })
         setTableData(data)
@@ -99,7 +101,7 @@ const CustomerInterface = (props) => {
                     columns={tableColumns}
                     data={tableData}
                     showMore
-                    onClickShowMore={(rowId) => router.push(`/orders/${orderId}`)}
+                    onClickShowMore={(rowId) => router.push(`/orders/${rowId}`)}
                 />
             </CenteredStack>
             <CreateOrderModal

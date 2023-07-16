@@ -29,6 +29,9 @@ const FormSelectComponent = (props) => {
                                 props.onChange(e.target.value)
                             }
                         }}
+                        inputProps={{
+                            disabled: props.disabled || false
+                        }}
                     >
                         {props.items.map((item, index) => (
                             <MenuItem

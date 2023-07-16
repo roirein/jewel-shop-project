@@ -45,7 +45,7 @@ Order.init({
         allowNull: false
     }
 }, {
-    timestamps: true,
+    timestamps: false,
     sequelize,
     modelName: 'Orders'
 })

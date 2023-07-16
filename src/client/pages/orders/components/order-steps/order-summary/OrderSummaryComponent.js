@@ -27,7 +27,7 @@ const OrderSummary = (props) => {
             reader.onload = () => {
                 setImageUrl(reader.result)
             }
-            reader.readAsDataURL(props.orderData['design'][0])
+            reader.readAsDataURL(props.orderData['design'])
         }
     }, [])
 
@@ -74,23 +74,11 @@ const OrderSummary = (props) => {
                 width="100%"
                 direction="row"
                 columnGap={theme.spacing(4)}
+                justifyContent="center"
+                sx={{
+                    mt: theme.spacing(4)
+                }}
             >   
-                {props.orderType === 1 && (
-                    <Stack
-                        columnGap={theme.spacing(4)}
-                    >
-                        <Typography
-                            variant="h5"
-                        >
-                            {intl.formatMessage(ordersPageMessages.design)}
-                        </Typography>
-                        <img
-                            width="300px"
-                            height="300px"
-                            src={imageUrl}
-                        />
-                    </Stack>
-                )}
                 {props.orderType === 2 && (
                     <ModelComponent
                         modelNumber={props.orderData['modelNumber']}
@@ -100,20 +88,49 @@ const OrderSummary = (props) => {
                         price={props.orderData['price']}
                         selected={false}
                     />
-                )} 
-                <CustomerDetails
-                    customerName={props.orderData['customerName']}
-                    email={props.orderData['email']}
-                    phoneNumber={props.orderData['phoneNumber']}
-                />
-                <OrderDeatils
-                    orderType={props.orderType}
-                    item={ITEM_ENUMS[props.orderData['item']]}
-                    casting={props.orderData['casting']}
-                    comments={props.orderData['comments']}
-                    deadline={new Date(props.orderData['deadline']).toLocaleDateString('he-IL')}
-                    {...summaryProps}
-                />
+                )}
+                <Stack
+                    rowGap={theme.spacing(4)}
+                >
+                    <CustomerDetails
+                        customerName={props.orderData['customerName']}
+                        email={props.orderData['email']}
+                        phoneNumber={props.orderData['phoneNumber']}
+                    />
+                    {props.orderType === 1 && (
+                        <Stack
+                            columnGap={theme.spacing(4)}
+                            width="35%"
+                        >
+                            <Typography
+                                variant="h5"
+                                fontWeight="bold"
+                                sx={{
+                                    mb: theme.spacing(3)
+                                }}
+                            >
+                                {intl.formatMessage(ordersPageMessages.design)}
+                            </Typography>
+                            <img
+                                width="150px"
+                                height="150px"
+                                src={imageUrl}
+                            />
+                        </Stack>
+                    )}
+                </Stack>
+                <Stack
+                    width="35%"
+                >
+                    <OrderDeatils
+                        orderType={props.orderType}
+                        item={ITEM_ENUMS[props.orderData['item']]}
+                        casting={props.orderData['casting']}
+                        comments={props.orderData['comments']}
+                        deadline={new Date(props.orderData['deadline']).toLocaleDateString('he-IL')}
+                        {...summaryProps}
+                    />
+                </Stack>
             </Stack>
         </Stack>
     )

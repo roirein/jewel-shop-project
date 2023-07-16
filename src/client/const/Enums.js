@@ -85,3 +85,39 @@ export const POSITIONS = {
     [3]: intl.formatMessage(ordersPageMessages.finishing),
     [4]: intl.formatMessage(ordersPageMessages.qualityEnsurance)
 }
+
+export const RING_SIZES = [
+    '1/41',
+    '2/42',
+    '3/43',
+    '4/44',
+    '5/45',
+    '6/46',
+    '7/47',
+    '8/48',
+    '9/49',
+    '10/50',
+    '11/51',
+    '12/52',
+    '13/53',
+    '14/54',
+    '15/55',
+    '16/56',
+    '17/57',
+    '18/58',
+    '19/59'
+]
+
+export const PENDANT_SIZES = [
+    '38 CM',
+    '42 CM',
+    '45 CM',
+    '50 CM'
+]
+
+export const BRACELET_SIZES = [
+    'XS - 15-16 CM',
+    'S - 16.5-17 CM',
+    'M - 17-18 CM',
+    'L - 18-18.5 CM'
+]

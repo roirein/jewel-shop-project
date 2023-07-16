@@ -5,7 +5,7 @@ const { authorizeUser } = require('../middleware/authentication');
 const { checkPermissions } = require('../middleware/authorization');
 const router = express.Router();
 
-router.post('/order',authorizeUser, checkPermissions([1, 5]), designUpload.single('design'), createNewOrder)
+router.post('/order', designUpload.single('design'), createNewOrder)
 
 router.get('/orders', authorizeUser, checkPermissions([1,2,3,4,5]), getOrders)
 

@@ -36,12 +36,8 @@ JewelOrder.init({
         }
     },
     size: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-            min: 1,
-            max: 3
-        }
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     comments: {
         type: DataTypes.TEXT,

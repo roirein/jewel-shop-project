@@ -57,12 +57,23 @@ const generateModelNotificationsMessage = (notificationData, type) => {
     }
 }
 
+const generateOrderNotificationMessage = (notificationData, type) => {
+    switch(type) {
+        case 'new-order':
+            return intl.formatMessage(notificationMessages.newOrder, {name: notificationData.customerName})
+    }
+}
+
 const getNotificationMessage = (resource, type, data) => {
     if (resource === 'customer') {
         return generateCustomerNotificationMessage(data)
     }
     if (resource === 'model') {
         const res = generateModelNotificationsMessage(data, type)
+        return res
+    }
+    if (resource === 'order') {
+        const res = generateOrderNotificationMessage(data, type)
         return res
     }
     

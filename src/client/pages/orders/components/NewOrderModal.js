@@ -17,6 +17,8 @@ import OrderSummary from "./order-steps/order-summary/OrderSummaryCOmponent";
 import { useRouter } from "next/router";
 import FixOrderForm from "./order-steps/order-detail/FixOrderForm";
 import ExistingModelForm from "./order-steps/existing-model-odrer/ExistingModelForm";
+import {sendHttpRequest} from '../../../utils/requests'
+import { ORDERS_ROUTES } from "../../../utils/server-routes";
 
 
 const CreateOrderModal = (props) => {
@@ -57,8 +59,6 @@ const CreateOrderModal = (props) => {
 
     const [steps, setSteps] = useState(initialSteps);
 
-    console.log(orderDetails)
-
     const handleUpdateNextStep = (nextStep) => {
         const updatedSteps = [...steps];
         updatedSteps[activeStep].completed = true,
@@ -80,6 +80,11 @@ const CreateOrderModal = (props) => {
             ...data
         })
         handleUpdateNextStep(3)
+    }
+
+
+    const handleGoBack = () => {
+        setActiveStep(activeStep - 1)
     }
 
 
@@ -113,22 +118,21 @@ const CreateOrderModal = (props) => {
     const onSubmit = async () => {
         const formData = new FormData()
         Object.entries(orderDetails).forEach((entry) => {
-            if (entry[0] === 'design') {
-                formData.append(entry[0], entry[1][0])
-            } else {
-                formData.append(entry[0], entry[1]);
-            }
+            formData.append(entry[0], entry[1]);
         })
-        const response = await axios.post('http://localhost:3002/order/newOrder', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': getAuthorizationHeader(contextValue.token)
-            }
+        const response = await sendHttpRequest(ORDERS_ROUTES.ADD_ORDER, 'POST', formData, {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${contextValue.token}`
         })
         if (response.status === 201) {
             handleClose()
-            console.log(response.data)
-            router.push(`orders/${response.data.dataValues.orderId}`)
+            if (contextValue.permissionLevel === 5) {
+                contextValue.socket.emit('new-order', {
+                    customerName: orderDetails.customerName,
+                    orderId: response.data.orderId
+                })
+            }
+            router.push(`/orders/${response.data.orderId}`)
         }
     }
     
@@ -161,7 +165,7 @@ const CreateOrderModal = (props) => {
                     {activeStep > 0 && (
                         <ButtonComponent
                             label={intl.formatMessage(buttonMessages.goBack)}
-                            onClick={() => {}}
+                            onClick={() => handleGoBack()}
                         /> 
                     )}
                     {activeStep < steps.length - 1 && (
@@ -192,6 +196,9 @@ const CreateOrderModal = (props) => {
         >
             <Stepper
                 activeStep={activeStep}
+                sx={{
+                    direction: theme.direction
+                }}
             >
                 {steps.map((step) => (
                     <Step key={step.id}>

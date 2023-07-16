@@ -194,5 +194,6 @@
     "rejectedOrders": "הזמנות שנדחו",
     "ordersHistory": "היסטוריית הזמנות",
     "approvedByManager": "מנהל אישר",
-    "waitToCustomerApproval": "ממתין לאישור לקוח"
+    "waitToCustomerApproval": "ממתין לאישור לקוח",
+    "newOrder": "התקבלה הזמנה חדשה מ{name}"
 }

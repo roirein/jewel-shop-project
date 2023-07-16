@@ -144,12 +144,24 @@ const ContextProvider = (props) => {
                 })
             })
 
+            socket.on('new-order', (data) => {
+                const notification = createNotification(data);
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const ordersNotifications = notifications.orders
+                setNotifications({
+                    ...notifications,
+                    orders: [...ordersNotifications, notification]
+                })
+            })
+
             return () => {
                 socket.off('new-customer')
                 socket.off('new-model')
                 socket.off('model-approve')
                 socket.off('model-reject')
                 socket.off('model-update')
+                socket.off('new-order')
             }
         }
     }, [socket, notifications])

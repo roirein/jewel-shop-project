@@ -1,3 +1,4 @@
+const dayjs = require("dayjs")
 const ModelMetadata = require("../models/models/modelMetadata")
 const FixOrder = require("../models/orders/fixOrder")
 const JewelOrder = require("../models/orders/jewelOrder")
@@ -19,7 +20,8 @@ const createNewOrder = async (req, res, next) => {
             type: req.body.orderType, 
             customerId: req.userId, 
             status: 0, 
-            deadline: new Date(req.body.deadline)
+            deadline: dayjs(req.body.deadline),
+            created: dayjs()
         })
         const customerData = await OrderCustomer.create({
             orderId: newOrder.orderId,
@@ -51,7 +53,6 @@ const createNewOrder = async (req, res, next) => {
                         modelNumber: req.body.modelNumber
                     }
                 })
-                console.log(meta.dataValues)
                 modelMetadataId = meta.dataValues.metadataId
                 if (req.body.casting || req.body.casting === 'false') {
                     await OrdersInCasting.create({
@@ -75,10 +76,9 @@ const createNewOrder = async (req, res, next) => {
                 metadataId: modelMetadataId
             })
         }
-        // send notification
-        await OrderTimeline.create({orderId: newOrder.orderId, createdAt: Date.now()})
+        await OrderTimeline.create({orderId: newOrder.orderId, createdAt: dayjs()})
         res.status(201).send({
-            ...newOrder,
+            ...newOrder.dataValues,
             customerName: customerData.customerName
         })
     } catch (e) {

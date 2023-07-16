@@ -3,6 +3,7 @@ import { useState, useContext } from "react"
 import Notification from "./Notification"
 import { PersonAdd } from "@mui/icons-material"
 import AppContext from "../../../context/AppContext"
+import { useRouter } from "next/router"
 
 const NotificationDropdown = (props) => {
 
@@ -10,6 +11,7 @@ const NotificationDropdown = (props) => {
     const [popoverAnchor, setPopoverAnchor] = useState(null);
     const theme = useTheme();
     const contextValue = useContext(AppContext)
+    const router = useRouter()
 
     const onOpenPopover = (e) => {
         setPopoverAnchor(e.target)
@@ -25,10 +27,6 @@ const NotificationDropdown = (props) => {
         return props.notifications.filter(notification => !notification.read).length
     }
 
-    const getNotificationIcon = (resource, type) => {
-
-    }
-
     const onNotificationClick = (resourceId, type, resource) => {
         console.log(1)
         setShowdropdown(false)
@@ -38,6 +36,9 @@ const NotificationDropdown = (props) => {
         if (resource === 'model') {
             console.log(2)
             contextValue.onShowModelModal(resourceId)
+        }
+        if (resource === 'order') {
+            router.push(`/orders/${resourceId}`)
         }
         onClosePopover()
     }
