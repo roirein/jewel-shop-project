@@ -75,6 +75,7 @@ const AppTemplate = (props) => {
                         notifications: contextValue.notifications.models
                     }
                 ]
+            case 3:
             case 5: 
                 return [
                     {
