@@ -75,25 +75,10 @@ const initSocket = (io) => {
             await endCasting(data)
         })
 
-        socket.on('send-order-to-production', async (data) => {
-            await Order.update({
-                status: data.status,
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-            await OrdersInProduction.create({
-                orderId: data.orderId
-            })
-            await OrderTimeline.update({
-                productionStart: Date.now()
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
+        socket.on('production-start', async (data) => {
+            await startProduction(data)
         })
+
 
         socket.on('read-notification', async (data) => {
             await Notifications.update({
@@ -542,6 +527,49 @@ const endCasting = async (data) => {
             orderId: data.orderId
         }
     })
+}
+
+const startProduction = async (data) => {
+    await OrdersInProduction.create({
+        orderId: data.orderId
+    })
+
+    await Order.update({
+        status: 8
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    await OrderTimeline.update({
+        productionStart: dayjs()
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    const productionManager = await User.findOne({
+        where: {
+            permissionLevel: 3
+        }
+    })
+    const socketId = users[productionManager.dataValues.userId]
+    const notificationData = {
+        resource: 'order',
+        type: 'production-start',
+        resourceId: data.orderId,
+        recipient: productionManager.dataValues.userId,
+        data: {
+            orderId: data.orderId,
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('production-start', notification)
+    }
 }
 
 const sendNewModelNotification = async (modelId) => {

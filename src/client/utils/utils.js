@@ -31,6 +31,7 @@ export const getRouteAfterLogin = (permissionLevel) => {
         case 4:
             route = CLIENT_ROUTES.EMPLOYEE
             break
+        case 3:
         case 5:
             route = CLIENT_ROUTES.ORDERS
             break;
@@ -68,6 +69,8 @@ const generateOrderNotificationMessage = (notificationData, type) => {
             return intl.formatMessage(notificationMessages.designCompletedForOrder, {number: notificationData.orderId})
         case 'customer-order-approval':
             return intl.formatMessage(notificationMessages.orderApprovedByCustomer, {number: notificationData.orderId})
+        case 'production-start':
+            return intl.formatMessage(notificationMessages.newOrderToProduction, {number: notificationData.orderId})
     }
 }
 

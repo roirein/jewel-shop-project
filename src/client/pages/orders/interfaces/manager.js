@@ -3,8 +3,8 @@ import { CUSTOMER_INTERFACE_TABS, CUSTOMER_ORDERS_TABS, MANAGER_ORDERS_TABS } fr
 import { useContext, useEffect, useState } from "react"
 import { Add } from "@mui/icons-material"
 import TableComponent from "../../../components/UI/TableComponent"
-import { CUSTOMER_TABLE_COLUMNS, ORDERS_IN_CASTING_TABLE_COLUMNS, ORDERS_IN_DESIGN_MANAGER_TABLE_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS, ORDER_CUSTOMER_TABEL_COLUMNS } from "../../../const/TablesColumns"
-import { CASTING_STATUS, MODEL_STATUS_ENUM, ORDER_STATUS, ORDER_TYPES } from "../../../const/Enums"
+import { CUSTOMER_TABLE_COLUMNS, ORDERS_IN_CASTING_TABLE_COLUMNS, ORDERS_IN_DESIGN_MANAGER_TABLE_COLUMNS, ORDERS_IN_PRODUCTION_TABLE_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS, ORDER_CUSTOMER_TABEL_COLUMNS } from "../../../const/TablesColumns"
+import { CASTING_STATUS, MODEL_STATUS_ENUM, ORDER_STATUS, ORDER_TYPES, PRODUCTION_STATUS } from "../../../const/Enums"
 import { useRouter } from "next/router"
 import { useIntl } from "react-intl"
 import CreateOrderModal from "../components/NewOrderModal"
@@ -106,6 +106,14 @@ const ManagerInterface = (props) => {
                                         ]
                         });
                 })
+            case 6:
+                displayedOrders?.forEach((dataElement) => {
+                    data.push(
+                        {
+                            rowId: dataElement.orderId,
+                            rowContent: [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.deadline, PRODUCTION_STATUS[dataElement.productionStatus]]
+                        });
+                })
             default:
                 break;
         }
@@ -143,6 +151,12 @@ const ManagerInterface = (props) => {
         if (selectedTab === 5) {
             setTableColumns(ORDERS_IN_CASTING_TABLE_COLUMNS)
             sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('casting'), "GET", {}, {
+                Authorization: `Bearer ${contextValue.token}`
+            }).then((res) => setDisplayedOrders(res.data.orders))
+        }
+        if (selectedTab === 6) {
+            setTableColumns(ORDERS_IN_PRODUCTION_TABLE_COLUMNS)
+            sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('production'), "GET", {}, {
                 Authorization: `Bearer ${contextValue.token}`
             }).then((res) => setDisplayedOrders(res.data.orders))
         }

@@ -14,6 +14,7 @@ import { ORDERS_ROUTES, USER_ROUTES } from "../../utils/server-routes"
 import CustomerInterface from "./interfaces/customer"
 import ManagerInterface from "./interfaces/manager"
 import DesignManagerInterface from "./interfaces/design-manager"
+import ProductionManagerInterface from "./interfaces/production-manager"
 
 const OrdersPage = () => {
 
@@ -39,6 +40,9 @@ const OrdersPage = () => {
                 <DesignManagerInterface
                     orders={orders}
                 />
+            )}
+            {contextValue.permissionLevel === 3 && (
+                <ProductionManagerInterface/>
             )}
             {contextValue.permissionLevel === 5 && (
                 <CustomerInterface

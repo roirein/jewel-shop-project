@@ -127,6 +127,14 @@ const OrderPage = () => {
         fetchOrder().then((order) => setOrder(order))
     }
 
+    const sendOrderToProduction = () => {
+        contextValue.socket.emit('production-start', {
+            orderId: order.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
     return (
         <CenteredStack
             width="100%"
@@ -310,7 +318,7 @@ const OrderPage = () => {
                                 {order?.casting && (
                                     <ButtonComponent
                                         label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
-                                        onClick={() => {}}
+                                        onClick={() => sendOrderToProduction()}
                                     />
                                 )}
                             </Stack>

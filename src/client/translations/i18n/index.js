@@ -300,6 +300,10 @@ export const notificationMessages = defineMessages({
     orderApprovedByCustomer: {
         id: 'orderApprovedByCustomer',
         defaultMessage: 'order number {number} approved by customer'
+    },
+    newOrderToProduction: {
+        id: 'newOrderToProduction',
+        defaultMessage: 'order number {number} is ready for production'
     }
 })
 

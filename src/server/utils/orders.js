@@ -147,7 +147,9 @@ const getOrdersInCasting = async () => {
 const getOrdersInProduction= async () => {
     const orderData = await Order.findAll({
         where: {
-            status: 6
+            status: {
+                [Op.or]: [8, 9]
+            }
         },
         include: [OrderCustomer, OrdersInProduction]
     })

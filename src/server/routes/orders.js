@@ -13,7 +13,7 @@ router.get('/order/:orderId', authorizeUser, checkPermissions([1,2,3,4,5]), getO
 
 router.get('/image/:imagePath', authorizeUser, getOrderImage)
 
-router.get('/status/:type', authorizeUser, checkPermissions([1]), getOrderByStatus)
+router.get('/status/:type', authorizeUser, checkPermissions([1, 3]), getOrderByStatus)
 
 router.post('/tasks/:orderId', authorizeUser, checkPermissions([3]), setTasksForOrder)
 

@@ -78,7 +78,6 @@ export const ORDERS_IN_CASTING_TABLE_COLUMNS = [
 export const ORDERS_IN_PRODUCTION_TABLE_COLUMNS = [
     intl.formatMessage(ordersPageMessages.orderNumber),
     intl.formatMessage(ordersPageMessages.orderType),
-    intl.formatMessage(customerPageMessages.customerName),
     intl.formatMessage(ordersPageMessages.deadline),
     intl.formatMessage(modelsPageMessages.status)
 ]

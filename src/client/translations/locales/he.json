@@ -201,5 +201,6 @@
     "newDesign": "התקבלה בקשה לעיצוב חדש מהזמנה מספר {number}",
     "sendToCustomerApproval": "שלח לאישור לקוח",
     "designCompletedForOrder": "עיצוב הושלם עבור הזמנה מספר {number}",
-    "orderApprovedByCustomer": "הזמנה מספר {number} אושרה על ידי הלקוח"
+    "orderApprovedByCustomer": "הזמנה מספר {number} אושרה על ידי הלקוח",
+    "newOrderToProduction": "הזמנה מספר {number} מוכנה לתחילת ייצור"
 }
