@@ -85,9 +85,17 @@ export const ORDERS_IN_PRODUCTION_TABLE_COLUMNS = [
 
 export const ORDERS_IN_DESIGN_TABLE_COLUMNS = [
     intl.formatMessage(ordersPageMessages.orderNumber),
+    intl.formatMessage(ordersPageMessages.deadline),
+    intl.formatMessage(modelsPageMessages.modelNumber),
+    intl.formatMessage(modelsPageMessages.modelStatus),
+]
+
+export const ORDERS_IN_DESIGN_MANAGER_TABLE_COLUMNS = [
+    intl.formatMessage(ordersPageMessages.orderNumber),
     intl.formatMessage(customerPageMessages.customerName),
     intl.formatMessage(ordersPageMessages.deadline),
-    intl.formatMessage(modelsPageMessages.status)
+    intl.formatMessage(modelsPageMessages.modelNumber),
+    intl.formatMessage(modelsPageMessages.modelStatus),
 ]
 
 export const ORDER_CUSTOMER_TABEL_COLUMNS = [

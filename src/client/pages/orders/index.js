@@ -13,6 +13,7 @@ import { headers } from "next/dist/client/components/headers"
 import { ORDERS_ROUTES, USER_ROUTES } from "../../utils/server-routes"
 import CustomerInterface from "./interfaces/customer"
 import ManagerInterface from "./interfaces/manager"
+import DesignManagerInterface from "./interfaces/design-manager"
 
 const OrdersPage = () => {
 
@@ -31,6 +32,11 @@ const OrdersPage = () => {
         <>
             {contextValue.permissionLevel === 1 && (
                 <ManagerInterface
+                    orders={orders}
+                />
+            )}
+            {contextValue.permissionLevel === 2 && (
+                <DesignManagerInterface
                     orders={orders}
                 />
             )}

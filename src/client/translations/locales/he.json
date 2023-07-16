@@ -196,5 +196,7 @@
     "approvedByManager": "מנהל אישר",
     "waitToCustomerApproval": "ממתין לאישור לקוח",
     "newOrder": "התקבלה הזמנה חדשה מ{name}",
-    "rejectOrder": "דחה הזמנה"
+    "rejectOrder": "דחה הזמנה",
+    "modelStatus": "סטטוס מודל",
+    "newDesign": "התקבלה בקשה לעיצוב חדש מהזמנה מספר {number}"
 }

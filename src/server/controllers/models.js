@@ -8,6 +8,7 @@ const { sendNewModelNotification } = require("../services/sockets/socket")
 const HttpError = require('../utils/HttpError')
 const { createModelMetadata, createModel, preapareModels, getModelByStatus } = require("../utils/models")
 const path = require('path')
+const { Op } = require("sequelize")
 
 const createNewModel = async (req, res, next) => {
     try {
@@ -55,7 +56,12 @@ const getModelsMetadata = async (req, res, next) => {
         const modelsMetadata = await ModelMetadata.findAll({
             include: {
                 model: JewelModel,
-                attributes: ['status', 'modelNumber']
+                attributes: ['status', 'modelNumber'],
+                where: {
+                    modelNumber: {
+                        [Op.not]: null
+                    }
+                }
             },
         })
 
@@ -63,16 +69,6 @@ const getModelsMetadata = async (req, res, next) => {
         res.status(200).send({models})
     } catch (e) {
         console.log(e)
-        next(e)
-    }
-}
-
-
-const getModelsMetadataByStatus = async (req, res, next) => {
-    try {
-        const models = await getModelByStatus(req.params.status)
-        res.status(200).send({models})
-    } catch (e) {
         next(e)
     }
 }
@@ -168,43 +164,6 @@ const getModelImage = async (req, res, next) => {
     }
 }
 
-const updateModelPrice = async (req, res, next) => {
-    try {
-        await ModelPrice.create({
-            modelNumber: req.params.modelNumber,
-            materials: req.body.materials,
-            priceWithMaterials: req.body.priceWithMaterials,
-            priceWithoutMaterials: req.body.priceWithoutMaterials
-        })
-        await JewelModel.update({
-            status: 4
-        }, {
-            where: {
-                modelNumber: req.params.modelNumber
-            }
-        })
-        const modelMetadata = await ModelMetadata.findOne({
-            where: {
-                modelNumber: req.params.modelNumber
-            }
-        })
-
-        if (modelMetadata && modelMetadata.dataValues.orderId) {
-            await Order.update({
-                status: 2
-            }, {
-                where: {
-                    orderId: modelMetadata.dataValues.orderId
-                }
-            })
-        }
-        res.status(201).send();
-    } catch (e) {
-        console.log(e)
-        next(e)
-    }
-}
-
 const getPriceData = async (req, res, next) => {
     try {
         const priceData = await ModelPrice.findOne({
@@ -273,7 +232,6 @@ module.exports = {
     getModelImage,
     getModelComments,
     updateModel,
-    updateModelPrice,
     getPriceData,
     getModelsForOrders,
     getModelByStatus

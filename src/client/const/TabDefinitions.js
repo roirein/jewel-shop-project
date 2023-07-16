@@ -125,9 +125,6 @@ export const DESIGN_MANAGER_ORDERS_TABS = [
         label: intl.formatMessage(tabsMessages.orders)
     },
     {
-        label: intl.formatMessage(ordersPageMessages.orderInDesign)
-    },
-    {
         label: intl.formatMessage(ordersPageMessages.ordersInProduction)
     },
     {

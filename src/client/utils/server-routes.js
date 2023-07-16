@@ -38,5 +38,6 @@ export const ORDERS_ROUTES = {
     ADD_ORDER: `${serverUrl}/order/order`,
     GET_ORDERS: `${serverUrl}/order/orders`,
     GET_ORDER: (id) => `${serverUrl}/order/order/${id}`,
-    IMAGE: (imagePath) => `${serverUrl}/order/image/${imagePath}`
+    IMAGE: (imagePath) => `${serverUrl}/order/image/${imagePath}`,
+    ORDETS_BY_STATUS: (orderStatus) => `${serverUrl}/order/status/${orderStatus}`
 }

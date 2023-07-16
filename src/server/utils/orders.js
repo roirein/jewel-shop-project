@@ -14,7 +14,7 @@ const getOrdersInDesign = async () => {
     const ordersData = await Order.findAll({
         where: {
             status: {
-                [Op.or]: [1, 2]
+                [Op.gte]: 1
             },
             type: 1
         },
@@ -27,7 +27,7 @@ const getOrdersInDesign = async () => {
                 attributes: ['customerName']
             }
         ],
-        attributes: ['orderId', 'createdAt', 'deadline'],
+        attributes: ['orderId', 'created', 'deadline'],
     })
 
     let metadata = await ModelMetadata.findAll({
@@ -36,6 +36,7 @@ const getOrdersInDesign = async () => {
             attributes: ['status']
         },
     })
+    
 
     metadata.filter((met) => met.orderId !== null)
 
@@ -43,15 +44,23 @@ const getOrdersInDesign = async () => {
 
         const orderModel = metadata.find((model) => model.orderId === order.orderId)
 
+        let status = null;
+        if (orderModel['Jewel Model']) {
+            status = orderModel['Jewel Model'].status
+        }
+
         return {
             orderId: order.orderId,
             customerName: order['Order Customer'].customerName,
-            created: order.createdAt,
+            created: order.created,
             deadline: order.deadline,
             item: orderModel.dataValues.item,
             setting: orderModel.setting,
             sideStoneSize: orderModel.sideStoneSize,
             mainStoneSize: orderModel.mainStoneSize,
+            modelNumber: orderModel.modelNumber,
+            modelStatus: status,
+            modelMetadataId: orderModel.metadataId
         }
     })
 
@@ -176,7 +185,7 @@ const getOrdersInDesignForManager = async () => {
     const ordersData = await Order.findAll({
         where: {
             status: {
-                [Op.or]: [1, 2]
+                [Op.or]: [2, 3]
             },
             type: 1
         },
@@ -189,7 +198,7 @@ const getOrdersInDesignForManager = async () => {
                 attributes: ['customerName']
             }
         ],
-        attributes: ['orderId', 'createdAt', 'deadline'],
+        attributes: ['orderId', 'created', 'deadline'],
     })
 
     let metadata = await ModelMetadata.findAll({
@@ -204,13 +213,15 @@ const getOrdersInDesignForManager = async () => {
     const orders = ordersData.map((order) => {
 
         const orderModel = metadata.find((model) => model.orderId === order.orderId)
+        console.log(orderModel?.dataValues['Jewel Model'].dataValues.status)
 
         return {
             orderId: order.orderId,
             customerName: order['Order Customer'].customerName,
             deadline: order.deadline,
             item: orderModel.dataValues.item,
-            modelNumber: orderModel.dataValues.modelNumber || null
+            modelNumber: orderModel?.dataValues.modelNumber || null,
+            modelStatus: orderModel?.dataValues['Jewel Model'].dataValues.status
         }
     })
 
@@ -240,13 +251,16 @@ const getModelDataDForOrder = async (modelMetadataId, orderId, orderType, orderS
                     metadataId: modelData.dataValues.metadataId
                 }
             })
-            
-            model = {
-                ...model,
-                title: orderModelData.dataValues.title,
-                description: orderModelData.dataValues.description,
-                image: orderModelData.dataValues.image
+
+            if (orderModelData) {
+                model = {
+                    ...model,
+                    title: orderModelData.dataValues.title,
+                    description: orderModelData.dataValues.description,
+                    image: orderModelData.dataValues.image
+                }
             }
+            
             if (permissionLevel === 5 && orderStatus === 2) {
                 const priceData = await ModelPrice.findOne({
                     where: {

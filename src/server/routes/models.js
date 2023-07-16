@@ -19,8 +19,6 @@ router.get('/model/comments/:modelNumber', authorizeUser, checkPermissions([1,2]
 
 router.put('/model/:modelNumber', authorizeUser, checkPermissions([2]), modelUpload.single('model') ,updateModel)
 
-router.post('/model/price/:modelNumber', authorizeUser, checkPermissions([1]), updateModelPrice)
-
 router.get('/price/:modelNumber', authorizeUser, checkPermissions([1,2,5]), getPriceData)
 
 router.get('/models', authorizeUser, checkPermissions([1, 5]), getModelsForOrders)

@@ -52,7 +52,7 @@ export const ORDER_STATUS = {
     [-1]: intl.formatMessage(modelsPageMessages.rejeceted),
     [0]: intl.formatMessage(modelsPageMessages.created),
     [1]: intl.formatMessage(ordersPageMessages.approvedByManager),
-    [2]: intl.formatMessage(ordersPageMessages.inDesign),
+    [2]: intl.formatMessage(ordersPageMessages.orderInDesign),
     [3]: intl.formatMessage(ordersPageMessages.designCompleted),
     [4]: intl.formatMessage(ordersPageMessages.waitToCustomerApproval),
     [5]: intl.formatMessage(ordersPageMessages.customerApproved),

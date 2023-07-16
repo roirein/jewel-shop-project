@@ -14,6 +14,8 @@ const Task = require("../../models/tasks/task");
 const OrderCustomer = require("../../models/orders/orderCustomer");
 const OrderTimeline = require("../../models/orders/orderTimeline");
 const ModelPrice = require("../../models/models/modelPrice");
+const dayjs = require("dayjs");
+const ModelMetadata = require("../../models/models/modelMetadata");
 
 let ioInstance = null;
 
@@ -54,14 +56,7 @@ const initSocket = (io) => {
         })
 
         socket.on('new-design', async (data) => {
-            await sendOrderToDesign(data.orderId)
-            await OrderTimeline.update({
-                designStart: Date.now()
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
+            await onNewDesignRequest(data)
         })
 
         socket.on('customer-approval', async (data) => {
@@ -245,8 +240,6 @@ const initSocket = (io) => {
             })
         })
     })
-
-
 }
 
 const sendNewCustomerNotification = async (customerName, customerId) => {
@@ -297,20 +290,34 @@ const onCreateNewModel = async (modelNumber, modelTitle) => {
 
 
 const onModelApprove = async (modelData) => {
-    await ModelPrice.create({
-        modelNumber: modelData.modelNumber,
-        materials: modelData.materials,
-        priceWithMaterials: modelData.priceWithMaterials,
-        priceWithoutMaterials: modelData.priceWithoutMaterials
-    })
+    // await ModelPrice.create({
+    //     modelNumber: modelData.modelNumber,
+    //     materials: modelData.materials,
+    //     priceWithMaterials: modelData.priceWithMaterials,
+    //     priceWithoutMaterials: modelData.priceWithoutMaterials
+    // })
 
-    await JewelModel.update({
-        status: 2
-    }, {
+    const jewelModel = await JewelModel.findOne({
         where: {
             modelNumber: modelData.modelNumber
-        }
+        },
+        include: ModelMetadata
     })
+
+    console.log(jewelModel.dataValues)
+
+    if (jewelModel.dataValues['Model Metadatum'].dataValues.orderId) {
+        await Order.update({
+            status: 3
+        }, {
+            where: {
+                orderId: jewelModel.dataValues['Model Metadatum'].dataValues.orderId
+            }
+        })
+    }
+
+    jewelModel.status = 2
+    await jewelModel.save()
     
     const designManager = await User.findOne({
         where: {
@@ -413,6 +420,45 @@ const onCreateNewOrder = async (data) => {
     const notification = await Notifications.create(notificationData)
     if (socketId) {
         ioInstance.to(socketId).emit('new-order', notification)
+    }
+}
+
+const onNewDesignRequest = async (data) => {
+    await Order.update({
+        status: 2
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    await OrderTimeline.update({
+        designStart: dayjs()
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    const designManager = await User.findOne({
+        where: {
+            permissionLevel: 2
+        }
+    })
+    const socketId = users[designManager.dataValues.userId]
+    const notificationData = {
+        resource: 'order',
+        type: 'new-design',
+        resourceId: data.orderId,
+        recipient: designManager.dataValues.userId,
+        data: {
+            orderId: data.orderId,
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('new-design', notification)
     }
 }
 

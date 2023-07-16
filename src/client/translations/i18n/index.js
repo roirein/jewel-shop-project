@@ -288,6 +288,10 @@ export const notificationMessages = defineMessages({
     newOrder: {
         id: 'newOrder',
         defaultMessage: 'new order from {name}'
+    },
+    newDesign: {
+        id: 'newDesign',
+        defaultMessage: 'new design request from order number {number}'
     }
 })
 
@@ -505,6 +509,10 @@ export const modelsPageMessages = defineMessages({
     carat: {
         id: 'carat',
         defaultMessage: 'carat'
+    },
+    modelStatus: {
+        id: 'modelStatus',
+        defaultMessage: 'model status'
     }
 })
 
