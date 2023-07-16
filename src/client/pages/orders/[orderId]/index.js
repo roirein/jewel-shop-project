@@ -73,6 +73,14 @@ const OrderPage = () => {
        setOrderSummary(detailsProps)
     }, [order])
 
+    const sendOrderToDesign = () => {
+        contextValue.socket.emit('new-design', {
+            orderId: order?.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
     return (
         <CenteredStack
             width="100%"
@@ -144,6 +152,45 @@ const OrderPage = () => {
                     </Typography>
                 </Stack>
             </Stack>
+            {contextValue.permissionLevel === 1 && (
+                <>
+                    {order?.status === 0 && (
+                        <Stack
+                            direction="row"
+                            columnGap={theme.spacing(4)}
+                            sx={{
+                                mt: theme.spacing(4)
+                            }}
+                            width="20%"
+                        >
+                            {order?.type === 1 && (
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.sendToDesignManager)}
+                                    onClick={() => sendOrderToDesign()}
+                                />
+                            )}
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.rejectOrder)}
+                                onClick={() => {}}
+                            />
+                        </Stack>
+                    )}
+                    {order?.status === 1 && (
+                        <Stack
+                            direction="row"
+                            columnGap={theme.spacing(2)}
+                        >
+                            <Typography
+                                variant="body1"
+                                fontSize="22px"
+                                fontWeight="bold"
+                            >
+                                {intl.formatMessage(ordersPageMessages.orderInDesign)}
+                            </Typography>
+                        </Stack>
+                    )}
+                </>
+            )}
         </CenteredStack>
     )
 

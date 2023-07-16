@@ -12,6 +12,7 @@ import { sendHttpRequest } from "../../utils/requests"
 import { headers } from "next/dist/client/components/headers"
 import { ORDERS_ROUTES, USER_ROUTES } from "../../utils/server-routes"
 import CustomerInterface from "./interfaces/customer"
+import ManagerInterface from "./interfaces/manager"
 
 const OrdersPage = () => {
 
@@ -28,6 +29,11 @@ const OrdersPage = () => {
 
     return (
         <>
+            {contextValue.permissionLevel === 1 && (
+                <ManagerInterface
+                    orders={orders}
+                />
+            )}
             {contextValue.permissionLevel === 5 && (
                 <CustomerInterface
                     orders={orders}

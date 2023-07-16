@@ -62,10 +62,10 @@ const getOrdersInDesign = async () => {
 const getAllOrders = async (permissionLevel, userId) => {
     
     let ordersData = await Order.findAll({
-        // include: {
-        //     model: OrderCustomer,
-        //     attributes: ['customerName']
-        // }, 
+        include: {
+            model: OrderCustomer,
+            attributes: ['customerName']
+        }, 
     });
 
     if (permissionLevel === 5) {
@@ -78,7 +78,7 @@ const getAllOrders = async (permissionLevel, userId) => {
             orderId: order.orderId,
             type: order.type,
             price: order.price,
-            //customerName: order['Order Customer'].customerName,
+            customerName: order['Order Customer'].customerName,
             created: new Date(order.created).toLocaleDateString('he-IL'),
             deadline: new Date(order.deadline).toLocaleDateString('he-IL'),
             status: order.status

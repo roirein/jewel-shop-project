@@ -804,5 +804,9 @@ export const ordersPageMessages = defineMessages({
     waitToCustomerApproval: {
         id: 'waitToCustomerApproval',
         defaultMessage: 'waiting for customer approval'
+    },
+    rejectOrder: {
+        id: 'rejectOrder',
+        defaultMessage: 'rejectOrder'
     }
 })
