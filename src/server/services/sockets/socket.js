@@ -59,57 +59,20 @@ const initSocket = (io) => {
             await onNewDesignRequest(data)
         })
 
-        socket.on('customer-approval', async (data) => {
-            await Order.update({
-                price: data.price,
-                status: 3
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-
-            if (data.casting) {
-                await OrdersInCasting.create({orderId: data.orderId})
-            }
+        socket.on('customer-design-complete', async (data) => {
+            await onDesignComplete(data)
         })
 
-        socket.on('update-casting-status', async (data) => {
-            await OrdersInCasting.update({
-                castingStatus: data.castingStatus
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-            let status
-            if (data.castingStatus === 2) {
-                status = 4
-                await OrderTimeline.update({
-                    castingStart: Date.now()
-                }, {
-                    where: {
-                        orderId: data.orderId
-                    }
-                })
-            }
-            if (data.castingStatus === 3) {
-                status = 5
-                await OrderTimeline.update({
-                    castingEnd: Date.now()
-                }, {
-                    where: {
-                        orderId: data.orderId
-                    }
-                })
-            }
-            await Order.update({
-                status: status
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
+        socket.on('customer-order-approval', async (data) => {
+            await setOrderPrice(data)
+        })
+
+        socket.on('casting-start', async (data) => {
+            await startCasting(data)
+        })
+
+        socket.on('casting-end', async (data) => {
+            await endCasting(data)
         })
 
         socket.on('send-order-to-production', async (data) => {
@@ -290,12 +253,12 @@ const onCreateNewModel = async (modelNumber, modelTitle) => {
 
 
 const onModelApprove = async (modelData) => {
-    // await ModelPrice.create({
-    //     modelNumber: modelData.modelNumber,
-    //     materials: modelData.materials,
-    //     priceWithMaterials: modelData.priceWithMaterials,
-    //     priceWithoutMaterials: modelData.priceWithoutMaterials
-    // })
+    await ModelPrice.create({
+        modelNumber: modelData.modelNumber,
+        materials: modelData.materials,
+        priceWithMaterials: modelData.priceWithMaterials,
+        priceWithoutMaterials: modelData.priceWithoutMaterials
+    })
 
     const jewelModel = await JewelModel.findOne({
         where: {
@@ -309,6 +272,14 @@ const onModelApprove = async (modelData) => {
     if (jewelModel.dataValues['Model Metadatum'].dataValues.orderId) {
         await Order.update({
             status: 3
+        }, {
+            where: {
+                orderId: jewelModel.dataValues['Model Metadatum'].dataValues.orderId
+            }
+        })
+
+        await OrderTimeline.update({
+            designEnd: dayjs()
         }, {
             where: {
                 orderId: jewelModel.dataValues['Model Metadatum'].dataValues.orderId
@@ -460,6 +431,117 @@ const onNewDesignRequest = async (data) => {
     if (socketId) {
         ioInstance.to(socketId).emit('new-design', notification)
     }
+}
+
+const onDesignComplete = async (data) => {
+    const order = await Order.findOne({
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    order.status = 4
+    await order.save();
+
+    const socketId = users[order.dataValues.customerId]
+    const notificationData = {
+        resource: 'order',
+        type: 'customer-design-complete',
+        resourceId: data.orderId,
+        recipient: order.dataValues.customerId,
+        data: {
+            orderId: data.orderId,
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('customer-design-complete', notification)
+    }
+
+}
+
+const setOrderPrice = async (data) => {
+    await Order.update({
+        status: 5,
+        price: data.price
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    const manager = await User.findOne({
+        where: {
+            permissionLevel: 1
+        }
+    })
+    const socketId = users[manager.dataValues.userId]
+    const notificationData = {
+        resource: 'order',
+        type: 'customer-order-approval',
+        resourceId: data.orderId,
+        recipient: manager.dataValues.userId,
+        data: {
+            orderId: data.orderId,
+            customerName: data.customerName,
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('customer-order-approval', notification)
+    }
+}
+
+
+const startCasting = async (data) => {
+    await OrdersInCasting.create({
+        orderId: data.orderId,
+        castingStatus: 2
+    })
+
+    await Order.update({
+        status: 6
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    await OrderTimeline.update({
+        castingStart: dayjs()
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+}
+
+const endCasting = async (data) => {
+    await OrdersInCasting.update({
+        castingStatus: 3
+    }, {
+        where: {
+            orderId: data.orderId,
+        }
+    })
+
+    await Order.update({
+        status: 7
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    await OrderTimeline.update({
+        castingEnd: dayjs()
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
 }
 
 const sendNewModelNotification = async (modelId) => {

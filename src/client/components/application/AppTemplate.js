@@ -75,6 +75,14 @@ const AppTemplate = (props) => {
                         notifications: contextValue.notifications.models
                     }
                 ]
+            case 5: 
+                return [
+                    {
+                        type: 2,
+                        icon: <ShoppingCart/>,
+                        notifications: contextValue.notifications.orders
+                    }
+                ]
             default: 
                 return []
         }

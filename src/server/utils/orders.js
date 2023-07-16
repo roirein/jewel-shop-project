@@ -122,7 +122,7 @@ const getOrdersInCasting = async () => {
     const orderData = await Order.findAll({
         where: {
             status: {
-                [Op.or]: [3, 4, 5]
+                [Op.or]: [6, 7]
             },
             type: {
                 [Op.or]: [1, 2]
@@ -247,7 +247,7 @@ const getModelDataDForOrder = async (modelMetadataId, orderId, orderType, orderS
         if (orderStatus >= 2) {
             const orderModelData = await JewelModel.findOne({
                 where: {
-                    status: 4,
+                    status: 2,
                     metadataId: modelData.dataValues.metadataId
                 }
             })
@@ -259,23 +259,25 @@ const getModelDataDForOrder = async (modelMetadataId, orderId, orderType, orderS
                     description: orderModelData.dataValues.description,
                     image: orderModelData.dataValues.image
                 }
-            }
-            
-            if (permissionLevel === 5 && orderStatus === 2) {
+
                 const priceData = await ModelPrice.findOne({
                     where: {
                         modelNumber: orderModelData.dataValues.modelNumber
                     }
                 })
 
-                model = {
-                    ...model,
-                    materials: priceData.dataValues.materials,
-                    priceWithMaterials: priceData.dataValues.priceWithMaterials,
-                    priceWithoutMaterials: priceData.dataValues.priceWithoutMaterials
+                if (priceData) {
+                    model = {
+                        ...model,
+                        materials: priceData.dataValues.materials,
+                        priceWithMaterials: priceData.dataValues.priceWithMaterials,
+                        priceWithoutMaterials: priceData.dataValues.priceWithoutMaterials
+            
+                    }
                 }
             }
         }
+            
     }
     if (orderType === 2) {
         const orderModelData = await JewelModel.findOne({
@@ -308,8 +310,6 @@ const getJewelOrderData = async (orderId, orderType, orderStatus, permissionLeve
         comments: jewelOrderData.dataValues.comments,
         casting: jewelOrderData.dataValues.casting
     }
-
-    console.log(jewelOrderData.dataValues.metadataId)
 
     const modelData = await getModelDataDForOrder(jewelOrderData.dataValues.metadataId, orderId, orderType, orderStatus, permissionLevel)
 

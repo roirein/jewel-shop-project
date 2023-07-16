@@ -292,6 +292,14 @@ export const notificationMessages = defineMessages({
     newDesign: {
         id: 'newDesign',
         defaultMessage: 'new design request from order number {number}'
+    },
+    designCompletedForOrder: {
+        id: 'designCompletedForOrder',
+        defaultMessage: 'design completed for order number {number}'
+    },
+    orderApprovedByCustomer: {
+        id: 'orderApprovedByCustomer',
+        defaultMessage: 'order number {number} approved by customer'
     }
 })
 
@@ -747,7 +755,7 @@ export const ordersPageMessages = defineMessages({
     },
     price: {
         id: 'price',
-        defaultMessage: 'price {price}'
+        defaultMessage: 'price'
     },
     position: {
         id: 'position',
@@ -816,5 +824,9 @@ export const ordersPageMessages = defineMessages({
     rejectOrder: {
         id: 'rejectOrder',
         defaultMessage: 'rejectOrder'
-    }
+    },
+    sendToCustomerApproval: {
+        id: 'sendToCustomerApproval',
+        defaultMessage: 'send to customer approval'
+    },
 })

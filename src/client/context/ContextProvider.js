@@ -166,6 +166,28 @@ const ContextProvider = (props) => {
                 })
             })
 
+            socket.on('customer-design-complete', (data) => {
+                const notification = createNotification(data);
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const ordersNotifications = notifications.orders
+                setNotifications({
+                    ...notifications,
+                    orders: [...ordersNotifications, notification]
+                })
+            })
+
+            socket.on('customer-order-approval', (data) => {
+                const notification = createNotification(data);
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const ordersNotifications = notifications.orders
+                setNotifications({
+                    ...notifications,
+                    orders: [...ordersNotifications, notification]
+                })
+            })
+
             return () => {
                 socket.off('new-customer')
                 socket.off('new-model')
@@ -174,6 +196,8 @@ const ContextProvider = (props) => {
                 socket.off('model-update')
                 socket.off('new-order')
                 socket.off('new-design')
+                socket.off('customer-design-complete')
+                socket.off('customer-order-approval')
             }
         }
     }, [socket, notifications])

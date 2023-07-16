@@ -41,6 +41,21 @@ const CustomerInterface = (props) => {
         setTableData(data)
     }, [displayedOrders])
 
+    useEffect(() => {
+        switch(selectedTab) {
+            case 0:
+                setDisplayedOrders(props.orders)
+                break
+            case 2: 
+                const newOrders = props.orders.filter((ord) => ord.status === 4 || ord.status === 5)
+                setDisplayedOrders(newOrders);
+                break;
+            default:
+                setDisplayedOrders(props.orders)
+
+        }
+    }, [selectedTab])
+
     return (
         <Stack
             width="100%"
@@ -56,6 +71,7 @@ const CustomerInterface = (props) => {
                     direction: theme.direction,
                     pr: theme.spacing(4)
                 }}
+                onChange={(event, value) => setSelectedTab(value)}
             >
                 {CUSTOMER_ORDERS_TABS.map((tab, index) => (
                     <Tab

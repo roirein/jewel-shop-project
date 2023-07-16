@@ -15,17 +15,18 @@ const { getOrderByPermissionLevel, getOrdersInCasting, createTaskForOrder, getOr
 const path = require('path')
 
 const createNewOrder = async (req, res, next) => {
+    const user = await User.getUserByEmail(req.body.email)
     try {
         const newOrder = await Order.create({
             type: req.body.orderType, 
-            customerId: req.userId, 
+            customerId: user.userId, 
             status: 0, 
             deadline: dayjs(req.body.deadline),
             created: dayjs()
         })
         const customerData = await OrderCustomer.create({
             orderId: newOrder.orderId,
-            customerId: req.userId,
+            customerId: user.userId,
             customerName: req.body.customerName,
             email: req.body.email,
             phoneNumber: req.body.phoneNumber

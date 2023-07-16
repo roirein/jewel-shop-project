@@ -64,6 +64,10 @@ const generateOrderNotificationMessage = (notificationData, type) => {
             return intl.formatMessage(notificationMessages.newOrder, {name: notificationData.customerName})
         case 'new-design':
             return intl.formatMessage(notificationMessages.newDesign, {number: notificationData.orderId})
+        case 'customer-design-complete': 
+            return intl.formatMessage(notificationMessages.designCompletedForOrder, {number: notificationData.orderId})
+        case 'customer-order-approval':
+            return intl.formatMessage(notificationMessages.orderApprovedByCustomer, {number: notificationData.orderId})
     }
 }
 

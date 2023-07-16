@@ -17,8 +17,9 @@ import { useRouter } from "next/router"
 import CenteredStack from "../../../components/UI/CenteredStack"
 import ModelComponent from "../components/order-steps/existing-model-odrer/ModelComponent"
 import PriceOfferModal from "./OfferPriceModal"
-import { ORDERS_ROUTES } from "../../../utils/server-routes"
+import { MODELS_ROUTES, ORDERS_ROUTES } from "../../../utils/server-routes"
 import { sendHttpRequest } from "../../../utils/requests"
+import ModelCardComponent from "../../models/components/ModelCard"
 
 const OrderPage = () => {
 
@@ -29,6 +30,7 @@ const OrderPage = () => {
 
     const [order, setOrder] = useState()
     const [imageUrl, setImageUrl] = useState()
+    const [modelImageUrl, setModelImageUrl] = useState()
     const [orderSummary, setOrderSummary] = useState()
 
     const fetchOrder = async () => {
@@ -55,6 +57,17 @@ const OrderPage = () => {
     }, [order])
 
     useEffect(() => {
+        if (order?.status > 2) {
+            sendHttpRequest(MODELS_ROUTES.IMAGE(order.image), 'GET', {}, {
+                Authorization: `Bearer ${contextValue.token}`
+            }, 'blob').then((res) => {
+                const image = URL.createObjectURL(res.data)
+                setModelImageUrl(image)
+            }) 
+        }
+    }, [order])
+
+    useEffect(() => {
         const detailsProps = {}
         if (order?.type === 3) {
             detailsProps['description'] = order?.description
@@ -76,6 +89,39 @@ const OrderPage = () => {
     const sendOrderToDesign = () => {
         contextValue.socket.emit('new-design', {
             orderId: order?.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const sendOrderToCustomerApproval = () => {
+        contextValue.socket.emit('customer-design-complete', {
+            orderId: order?.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const approveOrderByCustomer = (price) => {
+        contextValue.socket.emit('customer-order-approval', {
+            price,
+            orderId: order.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const sendOrderToCasting = () => {
+        contextValue.socket.emit('casting-start', {
+            orderId: order.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const completeCasting = () => {
+        contextValue.socket.emit('casting-end', {
+            orderId: order.orderId
         })
 
         fetchOrder().then((order) => setOrder(order))
@@ -126,12 +172,39 @@ const OrderPage = () => {
                         {...orderSummary}
                     />
                 </Stack>
+                {order?.status > 2 && order?.type !== 3 && (
+                    <Stack
+                        rowGap={theme.spacing(3)}
+                    >
+                        <ModelCardComponent
+                            image={modelImageUrl}
+                            title={order.title}
+                            description={order.description}
+                        />
+                        <Typography>
+                                {`${intl.formatMessage(modelsPageMessages.materials)}: ${order.materials}`}
+                        </Typography>
+                        {contextValue.permissionLevel !== 5 && (
+                            <Stack
+                                rowGap={theme.spacing(3)}
+                            >
+                                <Typography>
+                                        {`${intl.formatMessage(modelsPageMessages.priceWithMaterials)}: ${order.priceWithMaterials}`}
+                                </Typography>
+                                <Typography>
+                                        {`${intl.formatMessage(modelsPageMessages.priceWithoutMaterials)}: ${order.priceWithoutMaterials}`}
+                                </Typography>
+                            </Stack>
+                        )}
+                    </Stack>
+                )}
             </Stack>
             <Stack
                 direction="row"
                 sx={{
                     mt: theme.spacing(3)
                 }}
+                columnGap={theme.spacing(4)}
             >
                 <Stack
                     direction="row"
@@ -151,6 +224,26 @@ const OrderPage = () => {
                         {ORDER_STATUS[order?.status]}
                     </Typography>
                 </Stack>
+                {order?.price && (
+                    <Stack
+                        direction="row"
+                        columnGap={theme.spacing(2)}
+                    >
+                        <Typography
+                            variant="body1"
+                            fontSize="22px"
+                        >
+                            {`${intl.formatMessage(ordersPageMessages.price)}:`}
+                        </Typography>
+                        <Typography
+                            varinat="body1"
+                            fontWeight="bold"
+                            fontSize="22px"
+                        >
+                            {order?.price}
+                        </Typography>
+                    </Stack>
+                )}
             </Stack>
             {contextValue.permissionLevel === 1 && (
                 <>
@@ -161,7 +254,7 @@ const OrderPage = () => {
                             sx={{
                                 mt: theme.spacing(4)
                             }}
-                            width="20%"
+                            width="35%"
                         >
                             {order?.type === 1 && (
                                 <ButtonComponent
@@ -175,18 +268,78 @@ const OrderPage = () => {
                             />
                         </Stack>
                     )}
-                    {order?.status === 1 && (
+                    {order?.status === 3 && (
                         <Stack
                             direction="row"
                             columnGap={theme.spacing(2)}
                         >
-                            <Typography
-                                variant="body1"
-                                fontSize="22px"
-                                fontWeight="bold"
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.sendToCustomerApproval)}
+                                onClick={() => sendOrderToCustomerApproval()}
+                            />
+                        </Stack>
+                    )}
+                    {order?.status === 5 && (
+                        <Stack
+                            width="20%"
+                        >
+                            {order?.casting && (
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
+                                    onClick={() => sendOrderToCasting()}
+                                />
+                            )}
+                        </Stack>
+                    )}
+                    {order?.status === 6 && (
+                        <Stack
+                            width="20%"
+                        >
+                            {order?.casting && (
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.completeCasting)}
+                                    onClick={() => completeCasting()}
+                                />
+                            )}
+                        </Stack>
+                    )}
+                        {order?.status === 7 && (
+                            <Stack
+                                width="20%"
                             >
-                                {intl.formatMessage(ordersPageMessages.orderInDesign)}
-                            </Typography>
+                                {order?.casting && (
+                                    <ButtonComponent
+                                        label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
+                                        onClick={() => {}}
+                                    />
+                                )}
+                            </Stack>
+                    )}
+                </>
+            )}
+            {contextValue.permissionLevel === 5 && (
+                <>
+                    {order?.status === 4 && (
+                        <Stack
+                            direction="row"
+                            columnGap={theme.spacing(4)}
+                            sx={{
+                                mt: theme.spacing(4)
+                            }}
+                            width="20%"
+                        >
+                            <ButtonComponent
+                                label={`${intl.formatMessage(modelsPageMessages.priceWithMaterials)}: ${order.priceWithMaterials}`}
+                                onClick={() => approveOrderByCustomer(order.priceWithMaterials)}
+                            />
+                            <ButtonComponent
+                                label={`${intl.formatMessage(modelsPageMessages.priceWithoutMaterials)}: ${order.priceWithoutMaterials}`}
+                                onClick={() => approveOrderByCustomer(order.priceWithoutMaterials)}
+                            />
+                            <ButtonComponent
+                                label={intl.formatMessage(ordersPageMessages.rejectOrder)}
+                                onClick={() => {}}
+                            />
                         </Stack>
                     )}
                 </>
