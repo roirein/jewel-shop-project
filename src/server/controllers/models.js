@@ -187,7 +187,7 @@ const getModelsForOrders = async (req, res, next) => {
     try {
         const modelsData = await JewelModel.findAll({
             where: {
-                status: 4,
+                status: 2,
             },
             include: {
                 model: ModelMetadata

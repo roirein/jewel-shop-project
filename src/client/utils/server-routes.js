@@ -31,7 +31,8 @@ export const MODELS_ROUTES = {
     COMMENTS: (id) => `${serverUrl}/model/model/comments/${id}`,
     PRICE: (id) => `${serverUrl}/model/price/${id}`,
     IMAGE: (imagePath) => `${serverUrl}/model/image/${imagePath}`,
-    UPDATE: (id) => `${serverUrl}/model/model/${id}`
+    UPDATE: (id) => `${serverUrl}/model/model/${id}`,
+    GET_MODELS: `${serverUrl}/model/models`
 }
 
 export const ORDERS_ROUTES = {

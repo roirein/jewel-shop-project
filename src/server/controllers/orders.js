@@ -46,7 +46,6 @@ const createNewOrder = async (req, res, next) => {
             }
             if (req.body.orderType === '2' || req.body.orderType === 2) {
                 newOrder.price = req.body.price
-                newOrder.status = 3
                 await newOrder.save()
                 console.log(req.body.modelNumber)
                 const meta = await ModelMetadata.findOne({

@@ -60,7 +60,7 @@ const OrderPage = () => {
     }, [order])
 
     useEffect(() => {
-        if (order?.status > 2 && order?.type !== 3) {
+        if ((order?.status > 2 && order?.type === 1) || (order?.type === 2)) {
             sendHttpRequest(MODELS_ROUTES.IMAGE(order.image), 'GET', {}, {
                 Authorization: `Bearer ${contextValue.token}`
             }, 'blob').then((res) => {
@@ -82,9 +82,6 @@ const OrderPage = () => {
                 detailsProps['sideStoneSize'] = order?.sideStoneSize
                 detailsProps['mainStoneSize'] = order?.mainStoneSize
             }
-            // if (props.order['type'] === 2) {
-            //     detailsProps['price'] = props.order['price']
-            // }
         }
        setOrderSummary(detailsProps)
     }, [order])
@@ -273,7 +270,16 @@ const OrderPage = () => {
                         {...orderSummary}
                     />
                 </Stack>
-                {order?.status > 2 && order?.type !== 3 && (
+                {order?.type === 2 && (
+                    <Stack>
+                        <ModelCardComponent
+                            image={modelImageUrl}
+                            title={order.title}
+                            description={order.description}
+                        />
+                    </Stack>
+                )}
+                {order?.status > 2 && order?.type === 1 && (
                     <Stack
                         rowGap={theme.spacing(3)}
                     >
@@ -363,6 +369,22 @@ const OrderPage = () => {
                                     onClick={() => sendOrderToDesign()}
                                 />
                             )}
+                            {order?.type === 2 && (
+                                <>
+                                    {order?.casting && (
+                                        <ButtonComponent
+                                            label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
+                                            onClick={() => sendOrderToCasting()}
+                                        />
+                                    )}
+                                    {!order?.casting && (
+                                        <ButtonComponent
+                                            label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
+                                            onClick={() => sendOrderToProduction()}
+                                        />
+                                    )}
+                                </>
+                            )}
                             {order?.type === 3 && (
                                 <ButtonComponent
                                     label={intl.formatMessage(ordersPageMessages.priceOffer)}
@@ -396,6 +418,12 @@ const OrderPage = () => {
                                         <ButtonComponent
                                             label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
                                             onClick={() => sendOrderToCasting()}
+                                        />
+                                    )}
+                                    {!order?.casting && (
+                                        <ButtonComponent
+                                            label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
+                                            onClick={() => sendOrderToProduction()}
                                         />
                                     )}
                                 </>

@@ -285,7 +285,7 @@ const getModelDataDForOrder = async (modelMetadataId, orderId, orderType, orderS
     if (orderType === 2) {
         const orderModelData = await JewelModel.findOne({
             where: {
-                status: 4,
+                status: 2,
                 metadataId: modelData.dataValues.metadataId
             }
         })

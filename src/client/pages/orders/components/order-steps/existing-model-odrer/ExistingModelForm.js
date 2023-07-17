@@ -4,12 +4,12 @@ import FormTextAreaComponent from '../../../../../components/UI/Form/Inputs/Form
 import { Typography, Stack, useTheme } from "@mui/material"
 import { useIntl } from "react-intl"
 import { modelsPageMessages, ordersPageMessages, formMessages } from "../../../../../translations/i18n"
-import { ITEM_ENUMS, METAL_ENUM, SIZE_ENUM } from "../../../../../const/Enums"
+import { BRACELET_SIZES, ITEM_ENUMS, METAL_ENUM, PENDANT_SIZES, RING_SIZES, SIZE_ENUM } from "../../../../../const/Enums"
 import FormSwitchComponent from "../../../../../components/UI/Form/Inputs/FormSwitchComponent"
 import { useForm, FormProvider } from "react-hook-form"
 import * as yup from 'yup'
 import { yupResolver } from "@hookform/resolvers/yup"
-import { forwardRef, useImperativeHandle } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react"
 import ModelsList from "./ModelsList"
 
 
@@ -21,7 +21,10 @@ const ExistingModelForm = forwardRef((props, ref) => {
 
     const existingModelValidationSchema = yup.object().shape({
         item: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
-        size: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
+        size: yup.string().when('item', {
+            is: (value) => ["1", "3", "4"].includes(value),
+            then: () => yup.string().required(intl.formatMessage(formMessages.emptyFieldError))
+        }),
         metal: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
         modelNumber: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
         price: yup.number().min(0).required(intl.formatMessage(formMessages.emptyFieldError)),
@@ -30,6 +33,9 @@ const ExistingModelForm = forwardRef((props, ref) => {
     const methods = useForm({
         resolver: yupResolver(existingModelValidationSchema)
     })
+
+    const [sizeSelectDisabled, setSizeSelectDisabled] = useState(true)
+    const [sizeOption, setSizeOption] = useState([])
 
     const getSelectOptions = (items) => {
         console.log(items)
@@ -52,6 +58,39 @@ const ExistingModelForm = forwardRef((props, ref) => {
     }))
 
     const itemWatcher = methods.watch('item')
+
+    useEffect(() => {
+        let options;
+        switch(itemWatcher) {
+            case "1": 
+                options = RING_SIZES
+                setSizeSelectDisabled(false)
+                break;
+            case "2": 
+                options = []
+                setSizeSelectDisabled(true)
+                break;
+            case "3": 
+                options = BRACELET_SIZES
+                setSizeSelectDisabled(false)
+                break;
+            case "4": 
+                options = PENDANT_SIZES
+                setSizeSelectDisabled(false)
+                break
+            default: 
+                options = []
+                break
+        }
+        options = options.map(opt => {
+            return {
+                value: opt,
+                label: opt
+            }
+        })
+        methods.setValue('size', '')
+        setSizeOption(options)
+    }, [itemWatcher])
 
     return (
         <FormProvider {...methods}>
@@ -77,16 +116,20 @@ const ExistingModelForm = forwardRef((props, ref) => {
                             name="item"
                             fieldLabel={intl.formatMessage(modelsPageMessages.item)}
                             items={getSelectOptions(ITEM_ENUMS)}
+                            onChange={(value) => methods.setValue('item', value)}
                         />
                         <FormSelectComponent
                             name="size"
                             fieldLabel={intl.formatMessage(ordersPageMessages.size)}
-                            items={getSelectOptions(SIZE_ENUM)}
+                            items={sizeOption}
+                            disabled={sizeSelectDisabled}
+                            onChange={(value) => methods.setValue('size', value)}
                         />
                         <FormSelectComponent
                             name="metal"
                             fieldLabel={intl.formatMessage(ordersPageMessages.metal)}
                             items={getSelectOptions(METAL_ENUM)}
+                            onChange={(value) => methods.setValue('metal', value)}
                         />
                     </Stack>
                     <ModelsList
