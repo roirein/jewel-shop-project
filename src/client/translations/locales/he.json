@@ -163,7 +163,7 @@
     "updateCustomer": "עדכן לקוח",
     "customerUpdated": "לקוח עודכן",
     "orderComplete": "הזמנה הושלמה",
-    "desginStart": "תחילת עיצוב",
+    "designStart": "תחילת עיצוב",
     "designEnd": "סיום עיצוב",
     "castingStart": "תחילת יציקה",
     "castingEnd": "סיום יציקה",
@@ -205,5 +205,6 @@
     "newOrderToProduction": "הזמנה מספר {number} מוכנה לתחילת ייצור",
     "taskCompletedByEmployee": "{name} השלים את המשימה שלו עבור הזמנה מספר {number}",
     "productionFinished": "ייצור הסתיים עבור הזמנה מספר {number}",
-    "orderReady": "הזמנה מספר {number} מוכנה וממתינה לך בחנות"
+    "orderReady": "הזמנה מספר {number} מוכנה וממתינה לך בחנות",
+    "deliveryTime": "זמן מסירה"
 }

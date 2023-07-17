@@ -845,4 +845,32 @@ export const ordersPageMessages = defineMessages({
         id: 'sendToCustomerApproval',
         defaultMessage: 'send to customer approval'
     },
+    deliveryTime: {
+        id: 'deliveryTime',
+        defaultMessage: 'delivery time'
+    },
+    designStart: {
+        id: 'designStart',
+        defaultMessage: 'design starting time'
+    },
+    designEnd: {
+        id: 'designEnd',
+        defaultMessage: 'design end time'
+    },
+    castingStart: {
+        id: 'castingStart',
+        defaultMessage: 'casting starting time'
+    },
+    castingEnd: {
+        id: 'castingEnd',
+        defaultMessage: 'casting end time'
+    },
+    productionStart: {
+        id: 'productionStart',
+        defaultMessage: 'production starting time'
+    },
+    productionEnd: {
+        id: 'productionEnd',
+        defaultMessage: 'production end time'
+    }
 })

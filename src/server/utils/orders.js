@@ -9,6 +9,7 @@ const OrdersInCasting = require('../models/orders/ordersInCasing')
 const OrdersInProduction = require('../models/orders/ordersInProduction')
 const Task = require("../models/tasks/task")
 const FixOrder = require("../models/orders/fixOrder")
+const OrderTimeline = require("../models/orders/orderTimeline")
  
 const getOrdersInDesign = async () => {
     const ordersData = await Order.findAll({
@@ -337,6 +338,46 @@ const getFixOrderData = async (orderId) => {
 }
 
 
+const getCompletedOrders = async () => {
+
+    const ordersData = await Order.findAll({
+        include: [
+            {
+                model: OrderTimeline
+            },
+            {
+                model: OrderCustomer,
+                attributes: ['customerName']
+            }
+        ],
+        where: {
+            status: 11
+        }
+    })
+
+    const orders = ordersData.map((ord) => {
+        return {
+            orderId: ord.orderId,
+            type: ord.type,
+            customerName: ord['Order Customer'].customerName,
+            deadline: ord.deadline,
+            price: ord.price,
+            createdAt: ord['Order Timeline'].createdAt,
+            designStart: ord['Order Timeline'].designStart,
+            designEnd: ord['Order Timeline'].designEnd,
+            castingStart: ord['Order Timeline'].castingStart,
+            castingEnd: ord['Order Timeline'].castingEnd,
+            productionStart: ord['Order Timeline'].productionStart,
+            productionEnd: ord['Order Timeline'].productionEnd,
+            delivered: ord['Order Timeline'].delivered,
+        }
+    })
+
+    return orders
+
+}
+
+
 module.exports = {
     getOrderByPermissionLevel,
     getOrdersInCasting,
@@ -344,5 +385,6 @@ module.exports = {
     getOrdersInProduction,
     getOrdersInDesignForManager,
     getJewelOrderData,
-    getFixOrderData
+    getFixOrderData,
+    getCompletedOrders
 }

@@ -3,7 +3,7 @@ import { CUSTOMER_INTERFACE_TABS, CUSTOMER_ORDERS_TABS, MANAGER_ORDERS_TABS } fr
 import { useContext, useEffect, useState } from "react"
 import { Add } from "@mui/icons-material"
 import TableComponent from "../../../components/UI/TableComponent"
-import { CUSTOMER_TABLE_COLUMNS, ORDERS_IN_CASTING_TABLE_COLUMNS, ORDERS_IN_DESIGN_MANAGER_TABLE_COLUMNS, ORDERS_IN_PRODUCTION_TABLE_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS, ORDER_CUSTOMER_TABEL_COLUMNS } from "../../../const/TablesColumns"
+import { CUSTOMER_TABLE_COLUMNS, MANAGER_COMPLETED_ORDERS_COLUMNS, ORDERS_IN_CASTING_TABLE_COLUMNS, ORDERS_IN_DESIGN_MANAGER_TABLE_COLUMNS, ORDERS_IN_PRODUCTION_TABLE_COLUMNS, ORDERS_MANAGER_TABLE_COLUMNS, ORDER_CUSTOMER_TABEL_COLUMNS } from "../../../const/TablesColumns"
 import { CASTING_STATUS, MODEL_STATUS_ENUM, ORDER_STATUS, ORDER_TYPES, PRODUCTION_STATUS } from "../../../const/Enums"
 import { useRouter } from "next/router"
 import { useIntl } from "react-intl"
@@ -114,6 +114,26 @@ const ManagerInterface = (props) => {
                             rowContent: [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.deadline, PRODUCTION_STATUS[dataElement.productionStatus]]
                         });
                 })
+            case 7:
+                displayedOrders?.forEach((dataElement) => {
+                    data.push(
+                        {
+                            rowId: dataElement.orderId,
+                            rowContent: [
+                                            dataElement.orderId,
+                                            dataElement.customerName,
+                                            ORDER_TYPES[dataElement.type],
+                                            dayjs(dataElement.deadline).format('DD/MM/YYYY, HH:mm'),
+                                            dayjs(dataElement.designStart).format('DD/MM/YYYY, HH:mm'),
+                                            dayjs(dataElement.designEnd).format('DD/MM/YYYY, HH:mm'),
+                                            dayjs(dataElement.castingStart).format('DD/MM/YYYY, HH:mm'),
+                                            dayjs(dataElement.castingEnd).format('DD/MM/YYYY, HH:mm'),
+                                            dayjs(dataElement.productionStart).format('DD/MM/YYYY, HH:mm'),
+                                            dayjs(dataElement.productionEnd).format('DD/MM/YYYY, HH:mm'),
+                                            dayjs(dataElement.delivered).format('DD/MM/YYYY, HH:mm')
+                                        ]
+                        });
+                })
             default:
                 break;
         }
@@ -157,6 +177,12 @@ const ManagerInterface = (props) => {
         if (selectedTab === 6) {
             setTableColumns(ORDERS_IN_PRODUCTION_TABLE_COLUMNS)
             sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('production'), "GET", {}, {
+                Authorization: `Bearer ${contextValue.token}`
+            }).then((res) => setDisplayedOrders(res.data.orders))
+        }
+        if (selectedTab === 7) {
+            setTableColumns(MANAGER_COMPLETED_ORDERS_COLUMNS)
+            sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('completed'), "GET", {}, {
                 Authorization: `Bearer ${contextValue.token}`
             }).then((res) => setDisplayedOrders(res.data.orders))
         }

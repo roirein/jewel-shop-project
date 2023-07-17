@@ -11,7 +11,7 @@ const Task = require("../models/tasks/task")
 const Employee = require("../models/users/employee")
 const User = require("../models/users/user")
 const { createModelMetadata } = require("../utils/models")
-const { getOrderByPermissionLevel, getOrdersInCasting, createTaskForOrder, getOrdersInProduction, getOrdersInDesignForManager, getJewelOrderData, getFixOrderData } = require("../utils/orders")
+const { getOrderByPermissionLevel, getOrdersInCasting, createTaskForOrder, getOrdersInProduction, getOrdersInDesignForManager, getJewelOrderData, getFixOrderData, getCompletedOrders } = require("../utils/orders")
 const path = require('path')
 
 const createNewOrder = async (req, res, next) => {
@@ -159,6 +159,9 @@ const getOrderByStatus = async (req, res, next) => {
         }
         if (req.params.type === 'production') {
             orders = await getOrdersInProduction();
+        }
+        if (req.params.type === 'completed') {
+            orders = await getCompletedOrders()
         }
         res.status(200).send({orders})
     }

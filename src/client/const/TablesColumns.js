@@ -103,3 +103,17 @@ export const ORDER_CUSTOMER_TABEL_COLUMNS = [
     intl.formatMessage(modelsPageMessages.status),
     intl.formatMessage(ordersPageMessages.deadline)
 ]
+
+export const MANAGER_COMPLETED_ORDERS_COLUMNS = [
+    intl.formatMessage(ordersPageMessages.orderNumber),
+    intl.formatMessage(customerPageMessages.customerName),
+    intl.formatMessage(ordersPageMessages.orderType),
+    intl.formatMessage(ordersPageMessages.deadline),
+    intl.formatMessage(ordersPageMessages.designStart),
+    intl.formatMessage(ordersPageMessages.designEnd),
+    intl.formatMessage(ordersPageMessages.castingStart),
+    intl.formatMessage(ordersPageMessages.castingEnd),
+    intl.formatMessage(ordersPageMessages.productionStart),
+    intl.formatMessage(ordersPageMessages.productionEnd),
+    intl.formatMessage(ordersPageMessages.deliveryTime)
+]
