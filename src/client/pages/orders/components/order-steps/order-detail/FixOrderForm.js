@@ -64,6 +64,7 @@ const FixOrderForm= forwardRef((props, ref) => {
                         name="item"
                         fieldLabel={intl.formatMessage(modelsPageMessages.item)}
                         items={getSelectOptions(ITEM_ENUMS)}
+                        onChange={(value) => methods.setValue('item', value)}
                     />
                     <FormTextAreaComponent
                         name="description"

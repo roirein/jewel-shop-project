@@ -233,6 +233,17 @@ const ContextProvider = (props) => {
                 })
             })
 
+            socket.on('price-offer', (data) => {
+                const notification = createNotification(data);
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const ordersNotifications = notifications.orders
+                setNotifications({
+                    ...notifications,
+                    orders: [...ordersNotifications, notification]
+                })
+            })
+
 
             return () => {
                 socket.off('new-customer')
@@ -248,6 +259,7 @@ const ContextProvider = (props) => {
                 socket.off('task-complete')
                 socket.off('production-end')
                 socket.off('order-ready')
+                socket.off('price-offer')
             }
         }
     }, [socket, notifications])

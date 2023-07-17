@@ -316,6 +316,10 @@ export const notificationMessages = defineMessages({
     orderReady: {
         id: 'orderReady',
         defaultMessage: 'order number {number} is ready and waiting for you in the shop'
+    },
+    newPriceOffer: {
+        id: 'newPriceOffer',
+        defaultMessage: 'new price offer for order number {number}'
     }
 })
 

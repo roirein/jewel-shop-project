@@ -206,5 +206,6 @@
     "taskCompletedByEmployee": "{name} השלים את המשימה שלו עבור הזמנה מספר {number}",
     "productionFinished": "ייצור הסתיים עבור הזמנה מספר {number}",
     "orderReady": "הזמנה מספר {number} מוכנה וממתינה לך בחנות",
-    "deliveryTime": "זמן מסירה"
+    "deliveryTime": "זמן מסירה",
+    "newPriceOffer": "התקבלה הצעת מחיר חדשה להזמנה מספר {number}"
 }

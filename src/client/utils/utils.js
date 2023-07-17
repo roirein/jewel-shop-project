@@ -77,6 +77,8 @@ const generateOrderNotificationMessage = (notificationData, type) => {
             return intl.formatMessage(notificationMessages.productionFinished, {number: notificationData.orderId})
         case 'order-ready': 
             return intl.formatMessage(notificationMessages.orderReady, {number: notificationData.orderId})
+        case 'price-offer':
+            return intl.formatMessage(notificationMessages.newPriceOffer, {number: notificationData.orderId})
     }
 }
 

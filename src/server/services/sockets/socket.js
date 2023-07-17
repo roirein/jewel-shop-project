@@ -95,6 +95,10 @@ const initSocket = (io) => {
             await completeOrder(data)
         })
 
+        socket.on('price-offer', async (data) => {
+            await sendPriceOffer(data)
+        })
+
 
         socket.on('read-notification', async (data) => {
             await Notifications.update({
@@ -102,28 +106,6 @@ const initSocket = (io) => {
             }, {
                 where: {
                     resourceId: data.resourceId
-                }
-            })
-        })
-
-        socket.on('send-price-offer', async (data) => {
-            console.log(data)
-            await FixOrder.update({
-                priceffer: data.price
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-        })
-
-        socket.on('accept-price-offer', async (data) => {
-            await Order.update({
-                status: 3,
-                price: data.price
-            }, {
-                where: {
-                    orderId: data.orderId
                 }
             })
         })
@@ -383,7 +365,6 @@ const onDesignComplete = async (data) => {
     if (socketId) {
         ioInstance.to(socketId).emit('customer-design-complete', notification)
     }
-
 }
 
 const setOrderPrice = async (data) => {
@@ -697,6 +678,42 @@ const updateRequestStatus = async (response, customerId) => {
             customerId
         }
     })
+}
+
+const sendPriceOffer = async (data) => {
+    await FixOrder.update({
+        priceffer: data.price 
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    const order = await Order.findOne({
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    order.status = 4
+    await order.save();
+
+    const socketId = users[order.dataValues.customerId]
+    const notificationData = {
+        resource: 'order',
+        type: 'price-offer',
+        resourceId: data.orderId,
+        recipient: order.dataValues.customerId,
+        data: {
+            orderId: data.orderId,
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('price-offer', notification)
+    }
+
 }
 
 module.exports = {
