@@ -199,6 +199,41 @@ const ContextProvider = (props) => {
                 })
             })
 
+            
+            socket.on('task-complete', (data) => {
+                const notification = createNotification(data);
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const ordersNotifications = notifications.orders
+                setNotifications({
+                    ...notifications,
+                    orders: [...ordersNotifications, notification]
+                })
+            })
+
+            socket.on('production-end', (data) => {
+                const notification = createNotification(data);
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const ordersNotifications = notifications.orders
+                setNotifications({
+                    ...notifications,
+                    orders: [...ordersNotifications, notification]
+                })
+            })
+
+            socket.on('order-ready', (data) => {
+                const notification = createNotification(data);
+                setNotificationMessage(notification.message)
+                setShowNotification(true)
+                const ordersNotifications = notifications.orders
+                setNotifications({
+                    ...notifications,
+                    orders: [...ordersNotifications, notification]
+                })
+            })
+
+
             return () => {
                 socket.off('new-customer')
                 socket.off('new-model')
@@ -210,6 +245,9 @@ const ContextProvider = (props) => {
                 socket.off('customer-design-complete')
                 socket.off('customer-order-approval')
                 socket.off('production-start')
+                socket.off('task-complete')
+                socket.off('production-end')
+                socket.off('order-ready')
             }
         }
     }, [socket, notifications])

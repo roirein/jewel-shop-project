@@ -58,6 +58,7 @@ const TaskFormComponent = forwardRef((props, ref) => {
                             name="employee"
                             fieldLabel={intl.formatMessage(employeesPageMessages.employeeName)}
                             items={props.employees}
+                            onChange={(value) => methods.setValue('employee', value)}
                         />
                         <FormTextAreaComponent
                             name="description"

@@ -79,6 +79,22 @@ const initSocket = (io) => {
             await startProduction(data)
         })
 
+        socket.on('task-complete', async (data) => {
+            await completeTask(data)
+        })
+
+        socket.on('production-end', async (data) => {
+            await endProduction(data)
+        })
+
+        socket.on('order-ready', async (data) => {
+            await updateCustomer(data)
+        })
+
+        socket.on('order-complete', async (data) => {
+            await completeOrder(data)
+        })
+
 
         socket.on('read-notification', async (data) => {
             await Notifications.update({
@@ -105,82 +121,6 @@ const initSocket = (io) => {
             await Order.update({
                 status: 3,
                 price: data.price
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-        })
-        
-        socket.on('on-task-completion', async (data) => {
-            console.log(data)
-            const currentTask = await Task.findOne({
-                where: {
-                    taskId: data.taskId
-                }
-            })
-            currentTask.isCompleted = true,
-            await currentTask.save()
-            if (currentTask.dataValues.nextTask) {
-                const nextTask = await Task.findOne({
-                    where: {
-                        taskId: currentTask.dataValues.nextTask
-                    }
-                })
-                nextTask.isBlocked = false
-                await nextTask.save()
-            } else {
-                const order = await OrdersInProduction.findOne({
-                    where: {
-                        orderId: data.orderId
-                    }
-                })
-                order.productionStatus = 6
-                await order.save();
-            }
-        })
-
-        socket.on('on-production-complete', async (data) => {
-            console.log(data, 1)
-            await Order.update({
-                status: 7
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-            await OrderTimeline.update({
-                productionEnd: Date.now()
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-        }),
-
-        socket.on('update-customer', async (data) => {
-            const order = await Order.findOne({
-                where: {
-                    orderId: data.orderId
-                },
-                include: OrderCustomer
-            })
-            order.status = 8
-            await order.save();
-
-            sendOrderReadyMail(order.dataValues['Order Customer'].dataValues.customerName, order.dataValues['Order Customer'].dataValues.email, order.orderId)
-        })
-        
-        socket.on('complete-order', async (data) => {
-            await Order.update({
-                status: 9
-            }, {
-                where: {
-                    orderId: data.orderId
-                }
-            })
-            await OrderTimeline.update({
-                delivered: Date.now()
             }, {
                 where: {
                     orderId: data.orderId
@@ -572,6 +512,152 @@ const startProduction = async (data) => {
     }
 }
 
+
+const completeTask = async (data) => {
+    const task = await Task.findOne({
+        where: {
+            taskId: data.taskId
+        }
+    })
+
+    const nextTask = await Task.findOne({
+        where: {
+            taskId: task.dataValues.nextTask
+        }
+    })
+
+    await OrdersInProduction.update({
+        productionStatus: nextTask ? nextTask.dataValues.position + 1 : 6
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    task.isCompleted = true
+    await task.save()
+    if (nextTask) {
+        nextTask.isBlocked = false;
+        await nextTask.save()
+    }
+
+    const productionManager = await User.findOne({
+        where: {
+            permissionLevel: 3
+        }
+    })
+
+    const socketId = users[productionManager.dataValues.userId]
+    const notificationData = {
+        resource: 'order',
+        type: 'task-complete',
+        resourceId: data.orderId,
+        recipient: productionManager.dataValues.userId,
+        data: {
+            orderId: data.orderId,
+            employeeName: data.username
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('task-complete', notification)
+    }
+
+}
+
+const endProduction = async (data) => {
+    await Order.update({
+        status: 9
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    await OrderTimeline.update({
+        productionEnd: dayjs()
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    const manager = await User.findOne({
+        where: {
+            permissionLevel: 1
+        }
+    })
+    const socketId = users[manager.dataValues.userId]
+    const notificationData = {
+        resource: 'order',
+        type: 'production-end',
+        resourceId: data.orderId,
+        recipient: manager.dataValues.userId,
+        data: {
+            orderId: data.orderId,
+        }
+    }
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('production-end', notification)
+    }
+}
+
+const updateCustomer = async (data) => {
+    const order = await Order.findOne({
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    order.status = 10
+    await order.save();
+
+    const socketId = users[order.dataValues.customerId]
+    const notificationData = {
+        resource: 'order',
+        type: 'order-ready',
+        resourceId: data.orderId,
+        recipient: order.dataValues.customerId,
+        data: {
+            orderId: data.orderId,
+        }
+    }
+
+    const customerDetails = await OrderCustomer.findOne({
+        where: {
+            customerId: order.dataValues.customerId
+        }
+    })
+
+    sendOrderReadyMail(customerDetails.dataValues.customerName, customerDetails.dataValues.email, data.orderId)
+
+    const notification = await Notifications.create(notificationData)
+    if (socketId) {
+        ioInstance.to(socketId).emit('order-ready', notification)
+    }
+}
+
+const completeOrder = async (data) => {
+    await Order.update({
+        status: 11
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+
+    await OrderTimeline.update({
+        delivered: dayjs()
+    }, {
+        where: {
+            orderId: data.orderId
+        }
+    })
+}
+
 const sendNewModelNotification = async (modelId) => {
     const manager = await User.findOne({
         where: {
@@ -611,24 +697,6 @@ const updateRequestStatus = async (response, customerId) => {
             customerId
         }
     })
-}
-
-const sendOrderToDesign = async (orderId) => {
-    const designManager = Employee.findOne({
-        where: {
-            role: 2
-        }
-    })
-
-    await Order.update({
-        status: 1,
-    }, {
-        where: {
-            orderId
-        }
-    })
-
-    //const socketId = users[designManager.dataValues.userId];
 }
 
 module.exports = {

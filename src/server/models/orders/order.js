@@ -29,7 +29,7 @@ Order.init({
         allowNull: false,
         validate: {
             min: -1,
-            max: 9
+            max: 12
         }
     },
     deadline: {

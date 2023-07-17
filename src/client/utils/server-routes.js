@@ -21,7 +21,7 @@ export const EMPLOYEES_ROUTES = {
     EMPLOYEES: `${serverUrl}/employee/employees`,
     ADD_EMPLOYEE: `${serverUrl}/employee/employee`,
     DELETE_EMPLOYEE: (id) => `${serverUrl}/employee/employee/${id}`,
-    EMPLOYEES_ROLE: `${serverUrl}/employee/employee/employee-role`
+    EMPLOYEES_ROLE: `${serverUrl}/employee/employees-role`
 }
 
 export const MODELS_ROUTES = {
@@ -39,5 +39,7 @@ export const ORDERS_ROUTES = {
     GET_ORDERS: `${serverUrl}/order/orders`,
     GET_ORDER: (id) => `${serverUrl}/order/order/${id}`,
     IMAGE: (imagePath) => `${serverUrl}/order/image/${imagePath}`,
-    ORDETS_BY_STATUS: (orderStatus) => `${serverUrl}/order/status/${orderStatus}`
+    ORDETS_BY_STATUS: (orderStatus) => `${serverUrl}/order/status/${orderStatus}`,
+    TASKS: (id) => `${serverUrl}/order/tasks/${id}`,
+    TASK_BY_EMPLOYEE: (orderId, employeeId) => `${serverUrl}/order/task/${employeeId}/${orderId}`
 }

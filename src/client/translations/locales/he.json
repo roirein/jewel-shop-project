@@ -202,5 +202,8 @@
     "sendToCustomerApproval": "שלח לאישור לקוח",
     "designCompletedForOrder": "עיצוב הושלם עבור הזמנה מספר {number}",
     "orderApprovedByCustomer": "הזמנה מספר {number} אושרה על ידי הלקוח",
-    "newOrderToProduction": "הזמנה מספר {number} מוכנה לתחילת ייצור"
+    "newOrderToProduction": "הזמנה מספר {number} מוכנה לתחילת ייצור",
+    "taskCompletedByEmployee": "{name} השלים את המשימה שלו עבור הזמנה מספר {number}",
+    "productionFinished": "ייצור הסתיים עבור הזמנה מספר {number}",
+    "orderReady": "הזמנה מספר {number} מוכנה וממתינה לך בחנות"
 }

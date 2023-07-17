@@ -11,6 +11,8 @@ import { getAuthorizationHeader } from '../../../../utils/utils'
 import TaskSummaryComponent from './TasksSummary'
 import { useRouter } from 'next/router'
 import { POSITIONS } from '../../../../const/Enums'
+import { sendHttpRequest } from '../../../../utils/requests'
+import { EMPLOYEES_ROUTES, ORDERS_ROUTES } from '../../../../utils/server-routes'
 
 const CreateTasksModal = (props) => {
 
@@ -25,10 +27,8 @@ const CreateTasksModal = (props) => {
     const router = useRouter()
 
     useEffect(() => {
-        axios.get(`http://localhost:3002/employee/employees`, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            }
+        sendHttpRequest(EMPLOYEES_ROUTES.EMPLOYEES_ROLE, 'GET', null, {
+            Authorization: `Bearer ${contextValue.token}`
         }).then((response) => {
             const employeesData = response.data.employees.map((employee) => {
                 return {
@@ -108,9 +108,10 @@ const CreateTasksModal = (props) => {
         setActiveStep(activeStep + 1)
     }
 
-    const handleClose = () => {
+    const handleClose = (toFetchOrder) => {
         setActiveStep(0)
         setTasks([])
+        props.onClose(toFetchOrder)
     }
 
     const getEmployeesForStep = (role) => {
@@ -130,16 +131,11 @@ const CreateTasksModal = (props) => {
                 position: task.position
             }
         })
-
-        const response = await axios.post(`http://localhost:3002/order/tasks/${router.query.orderId}`, {tasks: tasksData}, {
-            headers: {
-                Authorization: getAuthorizationHeader(contextValue.token)
-            }
+        const response = await sendHttpRequest(ORDERS_ROUTES.TASKS(router.query.orderId), 'POST', {tasks: tasksData}, {
+            Authorization: `Bearer ${contextValue.token}`
         })
         if (response.status === 201) {
-            handleClose();
-            router.push('/orders')
-            contextValue.socket.emit('send-task-to-employee')
+            handleClose(true);
         }
     }
 
@@ -194,7 +190,7 @@ const CreateTasksModal = (props) => {
     return (
         <ModalComponent
             title={intl.formatMessage(ordersPageMessages.tasksToOrder)}
-            onClose={() => handleClose}
+            onClose={() =>  handleClose(false)}
             open={props.open}
             width="sm"
             actions={getModalActions()}

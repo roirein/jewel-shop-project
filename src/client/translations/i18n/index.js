@@ -304,6 +304,18 @@ export const notificationMessages = defineMessages({
     newOrderToProduction: {
         id: 'newOrderToProduction',
         defaultMessage: 'order number {number} is ready for production'
+    },
+    taskCompletedByEmployee: {
+        id: 'taskCompletedByEmployee',
+        defaultMessage: '{name} completed his task for order number {number}'
+    },
+    productionFinished: {
+        id: 'productionFinished',
+        defaultMessage: 'production finished for order number {number}'
+    },
+    orderReady: {
+        id: 'orderReady',
+        defaultMessage: 'order number {number} is ready and waiting for you in the shop'
     }
 })
 

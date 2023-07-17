@@ -28,10 +28,12 @@ const OrderPage = () => {
     const router = useRouter();
     const contextValue = useContext(AppContext);
 
-    const [order, setOrder] = useState()
-    const [imageUrl, setImageUrl] = useState()
-    const [modelImageUrl, setModelImageUrl] = useState()
-    const [orderSummary, setOrderSummary] = useState()
+    const [order, setOrder] = useState();
+    const [imageUrl, setImageUrl] = useState();
+    const [modelImageUrl, setModelImageUrl] = useState();
+    const [orderSummary, setOrderSummary] = useState();
+    const [showTaskModal, setShowTaskModal] = useState();
+    const [tasks, setTasks] = useState([]);
 
     const fetchOrder = async () => {
         const orderId = router.query.orderId
@@ -86,6 +88,53 @@ const OrderPage = () => {
        setOrderSummary(detailsProps)
     }, [order])
 
+    useEffect(() => {
+        if (order?.status === 8 && contextValue.permissionLevel === 3) {
+            sendHttpRequest(ORDERS_ROUTES.TASKS(order?.orderId), 'GET', null, {
+                Authorization: `Bearer ${contextValue.token}`
+            }).then((response) => {
+                const tasksData = response.data.tasks.map((task, index) => {
+                    return {
+                        index: index + 1,
+                        employee: task.employeeName,
+                        description: task.description,
+                        position: POSITIONS[task.position],
+                        isCompleted: task.isCompleted
+                    }
+                })
+                setTasks(tasksData)
+            })
+        }
+    }, [order])
+
+
+    useEffect(() => {
+        if (order?.status === 8 && contextValue.permissionLevel === 4) {
+            sendHttpRequest(ORDERS_ROUTES.TASK_BY_EMPLOYEE(order?.orderId, contextValue.userId), 'GET', null, {
+                Authorization: `Bearer ${contextValue.token}`
+            }).then((response) => {
+                const taskData = response.data.task
+                const result =  {
+                        index: 1,
+                        taskId: taskData.taskId,
+                        employee: taskData.employeeName,
+                        description: taskData.description,
+                        position: POSITIONS[taskData.position],
+                        isCompleted: taskData.isCompleted,
+                        isBlocked: taskData.isBlocked
+                    }
+                setTasks([result])
+            })
+        }
+    }, [order])
+
+    const handleCloseTasksModal = (toFetchOrder) => {
+        setShowTaskModal(false);
+        if (toFetchOrder) {
+            fetchOrder().then((order) => setOrder(order))
+        }
+    }
+
     const sendOrderToDesign = () => {
         contextValue.socket.emit('new-design', {
             orderId: order?.orderId
@@ -129,6 +178,40 @@ const OrderPage = () => {
 
     const sendOrderToProduction = () => {
         contextValue.socket.emit('production-start', {
+            orderId: order.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const completeTask = () => {
+        contextValue.socket.emit('task-complete', {
+            orderId: order.orderId,
+            username: contextValue.name,
+            taskId: tasks[0].taskId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const completeProduction = () => {
+        contextValue.socket.emit('production-end', {
+            orderId: order.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const updateCustomer = () => {
+        contextValue.socket.emit('order-ready', {
+            orderId: order.orderId
+        })
+
+        fetchOrder().then((order) => setOrder(order))
+    }
+
+    const completeOrder = () => {
+        contextValue.socket.emit('order-complete', {
             orderId: order.orderId
         })
 
@@ -311,17 +394,108 @@ const OrderPage = () => {
                             )}
                         </Stack>
                     )}
-                        {order?.status === 7 && (
+                    {order?.status === 7 && (
+                        <Stack
+                            width="20%"
+                        >
+                            {order?.casting && (
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
+                                    onClick={() => sendOrderToProduction()}
+                                />
+                            )}
+                        </Stack>
+                    )}
+                    {order?.status === 9 && (
+                        <Stack
+                            width="20%"
+                        >
+                            {order?.casting && (
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.updateCustomer)}
+                                    onClick={() => updateCustomer()}
+                                />
+                            )}
+                        </Stack>
+                    )}
+                    {order?.status === 10 && (
+                        <Stack
+                            width="20%"
+                        >
+                            {order?.casting && (
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.completeOrder)}
+                                    onClick={() => completeOrder()}
+                                />
+                            )}
+                        </Stack>
+                    )}
+                    
+                </>
+            )}
+            {contextValue.permissionLevel === 3 && (
+                <>
+                    {tasks.length === 0 && order?.status === 8 && (
+                        <Stack
+                            width="20%"
+                        >
+                            {order?.casting && (
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.defineTasks)}
+                                    onClick={() => setShowTaskModal(true)}
+                                />
+                            )}
+                        </Stack>
+                    )}
+                    {tasks.length > 0 && order?.status === 8 (
+                        <Stack
+                            width="50%"
+                            columnGap={theme.spacing(3)}
+                        >
+                            <TaskSummaryComponent
+                                showStatus
+                                tasks={tasks}
+                            />
                             <Stack
                                 width="20%"
+                                sx={{
+                                    margin: '0 auto'
+                                }}
                             >
-                                {order?.casting && (
-                                    <ButtonComponent
-                                        label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
-                                        onClick={() => sendOrderToProduction()}
-                                    />
-                                )}
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.completeProduction)}
+                                    onClick={() => completeProduction()}
+                                    disabled={!(tasks.every((task) => task.isCompleted))}
+                                />
                             </Stack>
+                        </Stack>
+                    )}
+                </>
+            )}
+            {contextValue.permissionLevel === 4 && (
+                <>
+                    {tasks.length > 0 && (
+                        <Stack
+                            width="50%"
+                            columnGap={theme.spacing(3)}
+                        >
+                            <TaskSummaryComponent
+                                showStatus
+                                tasks={tasks}
+                            />
+                            <CenteredStack
+                                width="20%"
+                                sx={{
+                                    margin: '0 auto'
+                                }}
+                            >
+                                <ButtonComponent
+                                    label={intl.formatMessage(ordersPageMessages.completeTask)}
+                                    onClick={() => completeTask()}
+                                    disabled={tasks[0].isBlocked || tasks[0].isCompleted}
+                                />
+                            </CenteredStack>
+                        </Stack>
                     )}
                 </>
             )}
@@ -351,6 +525,12 @@ const OrderPage = () => {
                         </Stack>
                     )}
                 </>
+            )}
+            {contextValue.permissionLevel === 3 && tasks.length === 0 && (
+                <CreateTasksModal
+                    open={showTaskModal}
+                    onClose={(fetchOrder) => handleCloseTasksModal(fetchOrder)}
+                />
             )}
         </CenteredStack>
     )

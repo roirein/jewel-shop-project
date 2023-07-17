@@ -71,6 +71,12 @@ const generateOrderNotificationMessage = (notificationData, type) => {
             return intl.formatMessage(notificationMessages.orderApprovedByCustomer, {number: notificationData.orderId})
         case 'production-start':
             return intl.formatMessage(notificationMessages.newOrderToProduction, {number: notificationData.orderId})
+        case 'task-complete':
+            return intl.formatMessage(notificationMessages.taskCompletedByEmployee, {name: notificationData.employeeName, number: notificationData.orderId})
+        case 'production-end':
+            return intl.formatMessage(notificationMessages.productionFinished, {number: notificationData.orderId})
+        case 'order-ready': 
+            return intl.formatMessage(notificationMessages.orderReady, {number: notificationData.orderId})
     }
 }
 

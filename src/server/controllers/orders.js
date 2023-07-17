@@ -186,6 +186,15 @@ const setTasksForOrder = async (req, res, next) => {
         tasks[0].isBlocked = false
         await tasks[0].save();
 
+        await OrdersInProduction.update({
+            productionStatus: tasks[0].position + 1
+        }, {
+            where: {
+                orderId: req.params.orderId
+            }
+        })
+
+
         res.status(201).send({tasks})
     } catch (e) {
         console.log(e)
