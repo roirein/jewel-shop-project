@@ -132,15 +132,17 @@ const OrderSummary = (props) => {
                         {...summaryProps}
                     />
                 </Stack>
-                <Stack
-                    width="33%"
-                >
-                    <ModelCardComponent
-                        title={modelData.title}
-                        description={modelData.description}
-                        image={modelImage}
-                    />
-                </Stack>
+                {props.orderType === 2 && (
+                    <Stack
+                        width="33%"
+                    >
+                        <ModelCardComponent
+                            title={modelData.title}
+                            description={modelData.description}
+                            image={modelImage}
+                        />
+                    </Stack>
+                )}
             </Stack>
             {props.orderType === 2 && (
                 <Stack

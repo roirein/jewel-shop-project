@@ -2,7 +2,7 @@ import { notificationMessages } from '../translations/i18n'
 import { CLIENT_ROUTES } from './client-routes'
 import { createIntl } from 'react-intl'
 import messages from '../translations/locales/he.json'
-import { not } from '@vuelidate/validators'
+
 
 const intl = createIntl({
     locale: 'he',

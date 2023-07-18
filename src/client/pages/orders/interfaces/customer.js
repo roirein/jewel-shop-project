@@ -46,8 +46,19 @@ const CustomerInterface = (props) => {
             case 0:
                 setDisplayedOrders(props.orders)
                 break
+            case 1: 
+                setDisplayedOrders([]);
+                break;
             case 2: 
                 const newOrders = props.orders.filter((ord) => ord.status === 4 || ord.status === 5)
+                setDisplayedOrders(newOrders);
+                break;
+            case 3: 
+                const newOrders = props.orders.filter((ord) => ord.status === 11)
+                setDisplayedOrders(newOrders);
+                break
+            case 4: 
+                const newOrders = props.orders.filter((ord) => ord.status === 11 || ord.status === -1)
                 setDisplayedOrders(newOrders);
                 break;
             default:

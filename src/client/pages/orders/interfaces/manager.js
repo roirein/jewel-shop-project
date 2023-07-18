@@ -82,12 +82,12 @@ const ManagerInterface = (props) => {
                                             dataElement.orderId,
                                             dataElement.customerName,
                                             dayjs(dataElement.deadline).format('DD/MM/YYYY'),
-                                            <Link
+                                            dataElement?. modelNumber ? <Link
                                                 onClick={() => handleOpenModelModal(dataElement.modelNumber)}
                                             >
                                                 {dataElement.modelNumber}
-                                            </Link>,
-                                            MODEL_STATUS_ENUM[dataElement.modelStatus]
+                                            </Link> : null,
+                                            dataElement?.modelStatus ? MODEL_STATUS_ENUM[dataElement.modelStatus] : null
                                         ]
                         });
                 })
@@ -106,6 +106,7 @@ const ManagerInterface = (props) => {
                                         ]
                         });
                 })
+                break;
             case 6:
                 displayedOrders?.forEach((dataElement) => {
                     data.push(
@@ -114,6 +115,7 @@ const ManagerInterface = (props) => {
                             rowContent: [dataElement.orderId, ORDER_TYPES[dataElement.type], dataElement.deadline, PRODUCTION_STATUS[dataElement.productionStatus]]
                         });
                 })
+                break;
             case 7:
                 displayedOrders?.forEach((dataElement) => {
                     data.push(
@@ -124,10 +126,10 @@ const ManagerInterface = (props) => {
                                             dataElement.customerName,
                                             ORDER_TYPES[dataElement.type],
                                             dayjs(dataElement.deadline).format('DD/MM/YYYY, HH:mm'),
-                                            dayjs(dataElement.designStart).format('DD/MM/YYYY, HH:mm'),
-                                            dayjs(dataElement.designEnd).format('DD/MM/YYYY, HH:mm'),
-                                            dayjs(dataElement.castingStart).format('DD/MM/YYYY, HH:mm'),
-                                            dayjs(dataElement.castingEnd).format('DD/MM/YYYY, HH:mm'),
+                                            dataElement.designStart ? dayjs(dataElement.designStart).format('DD/MM/YYYY, HH:mm') : null,
+                                            dataElement.designEnd ? dayjs(dataElement.designEnd).format('DD/MM/YYYY, HH:mm') : null,
+                                            dataElement.castingStart ? dayjs(dataElement.castingStart).format('DD/MM/YYYY, HH:mm') : null,
+                                            dataElement.castingEnd ? dayjs(dataElement.castingEnd).format('DD/MM/YYYY, HH:mm') : null,
                                             dayjs(dataElement.productionStart).format('DD/MM/YYYY, HH:mm'),
                                             dayjs(dataElement.productionEnd).format('DD/MM/YYYY, HH:mm'),
                                             dayjs(dataElement.delivered).format('DD/MM/YYYY, HH:mm')
@@ -156,6 +158,9 @@ const ManagerInterface = (props) => {
             const orders = displayedOrders.filter(order => order.status === 0)
             setDisplayedOrders(orders)
             setTableColumns(ORDERS_MANAGER_TABLE_COLUMNS)
+        }
+        if (selectedTab === 2) {
+            setDisplayedOrders([])
         }
         if (selectedTab === 3) {
             setTableColumns(ORDERS_IN_DESIGN_MANAGER_TABLE_COLUMNS)

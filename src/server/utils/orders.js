@@ -216,15 +216,14 @@ const getOrdersInDesignForManager = async () => {
     const orders = ordersData.map((order) => {
 
         const orderModel = metadata.find((model) => model.orderId === order.orderId)
-        console.log(orderModel?.dataValues['Jewel Model'].dataValues.status)
 
         return {
             orderId: order.orderId,
             customerName: order['Order Customer'].customerName,
             deadline: order.deadline,
-            item: orderModel.dataValues.item,
-            modelNumber: orderModel?.dataValues.modelNumber || null,
-            modelStatus: orderModel?.dataValues['Jewel Model'].dataValues.status
+            item: orderModel.dataValues?.item,
+            modelNumber: orderModel?.dataValues?.modelNumber || null,
+            modelStatus: orderModel?.dataValues['Jewel Model']?.dataValues.status
         }
     })
 
@@ -359,17 +358,17 @@ const getCompletedOrders = async () => {
         return {
             orderId: ord.orderId,
             type: ord.type,
-            customerName: ord['Order Customer'].customerName,
+            customerName: ord['Order Customer']?.customerName,
             deadline: ord.deadline,
             price: ord.price,
-            createdAt: ord['Order Timeline'].createdAt,
-            designStart: ord['Order Timeline'].designStart,
-            designEnd: ord['Order Timeline'].designEnd,
-            castingStart: ord['Order Timeline'].castingStart,
-            castingEnd: ord['Order Timeline'].castingEnd,
-            productionStart: ord['Order Timeline'].productionStart,
-            productionEnd: ord['Order Timeline'].productionEnd,
-            delivered: ord['Order Timeline'].delivered,
+            createdAt: ord.created,
+            designStart: ord['Order Timeline']?.designStart,
+            designEnd: ord['Order Timeline']?.designEnd,
+            castingStart: ord['Order Timeline']?.castingStart,
+            castingEnd: ord['Order Timeline']?.castingEnd,
+            productionStart: ord['Order Timeline']?.productionStart,
+            productionEnd: ord['Order Timeline']?.productionEnd,
+            delivered: ord['Order Timeline']?.delivered,
         }
     })
 
