@@ -50,16 +50,16 @@ const CustomerInterface = (props) => {
                 setDisplayedOrders([]);
                 break;
             case 2: 
-                const newOrders = props.orders.filter((ord) => ord.status === 4 || ord.status === 5)
-                setDisplayedOrders(newOrders);
+                const newOrdersApproval = props.orders.filter((ord) => ord.status === 4 || ord.status === 5)
+                setDisplayedOrders(newOrdersApproval);
                 break;
             case 3: 
-                const newOrders = props.orders.filter((ord) => ord.status === 11)
-                setDisplayedOrders(newOrders);
+                const newOrdersCompleted = props.orders.filter((ord) => ord.status === 11)
+                setDisplayedOrders(newOrdersCompleted);
                 break
             case 4: 
-                const newOrders = props.orders.filter((ord) => ord.status === 11 || ord.status === -1)
-                setDisplayedOrders(newOrders);
+                const newOrdersHistory = props.orders.filter((ord) => ord.status === 11 || ord.status === -1)
+                setDisplayedOrders(newOrdersHistory );
                 break;
             default:
                 setDisplayedOrders(props.orders)
