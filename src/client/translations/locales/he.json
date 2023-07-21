@@ -172,8 +172,10 @@
     "completeOrder": "השלם הזמנה",
     "reports": "דוחות",
     "performance": "ביצועים",
-    "totalIncomes": "סך הכנסות",
-    "totalOrder": "סך הזמנות",
+    "incomes": "הכנסות",
+    "amount": "כמות",
+    "percentagePage": "שינוי באחוזים",
+    "measure": "מדד",
     "showAll": "הצג הכל",
     "filterBy": ":סנן לפי",
     "requestApproved": "בקשה אושרה",
@@ -207,5 +209,10 @@
     "productionFinished": "ייצור הסתיים עבור הזמנה מספר {number}",
     "orderReady": "הזמנה מספר {number} מוכנה וממתינה לך בחנות",
     "deliveryTime": "זמן מסירה",
-    "newPriceOffer": "התקבלה הצעת מחיר חדשה להזמנה מספר {number}"
+    "newPriceOffer": "התקבלה הצעת מחיר חדשה להזמנה מספר {number}",
+    "ordersPerDay": "הזמנות לפי יום - {month}",
+    "incomesPerDay": "הכנסות לפי יום - {month}",
+    "day": "יום",
+    "selectedMonth": "חודש נבחר",
+    "previousMonth": "חודש קודם"
 }

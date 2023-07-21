@@ -57,7 +57,7 @@ function generateRandomDate(start, end) {
   const ordersData = generateOrdersData(months);
  // console.log(ordersData.length)
   
-  sequelize.sync({force: true}).then(() => ordersData.forEach((order) => {
+  sequelize.sync({force: false}).then(() => ordersData.forEach((order) => {
     //console.log(order.createdAt, new Date(order.createdAt), typeof(order.createdAt))
     Order.create({
         type: order.type,

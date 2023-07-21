@@ -9,6 +9,12 @@ import AppContext from "../../context/AppContext";
 import {sendHttpRequest} from '../../utils/requests'
 import { ORDERS_ROUTES } from "../../utils/server-routes";
 import dayjs from "dayjs";
+import CenteredStack from "../../components/UI/CenteredStack";
+import PerformanceTable from "./components/performanceTable";
+import PerformanceByOrders from "./components/PertformanceByOrders";
+import GraphComponent from "./components/graph";
+import { useIntl } from "react-intl";
+import { reportsPageMessages, tabsMessages } from "../../translations/i18n";
 
 const ReportsPage = (props) => {
 
@@ -18,6 +24,8 @@ const ReportsPage = (props) => {
     const [endDate, setEndDate] = useState();
     const [selectedMonthsOrders, setSelectedMonthsOrders] = useState([])
     const [prevMonthsOrders, setPrevMonthOrders] = useState([]);
+    const theme = useTheme();
+    const intl = useIntl()
 
     const onChooseStartDate = (selectedStartDate) => {
         setStartDate(dayjs(selectedStartDate))
@@ -63,6 +71,43 @@ const ReportsPage = (props) => {
                     onChooseEndDate={(selectedEndDate) => onChooseEndDate(selectedEndDate)}
                 />
             </Stack>
+            <CenteredStack
+                width="100%"
+            >
+                {startDate && endDate && (
+                    <>
+                        <PerformanceTable
+                            selectedMonthOrders={selectedMonthsOrders}
+                            prevMonthOrders={prevMonthsOrders}
+                        />
+                        <PerformanceByOrders
+                            selectedOrders={selectedMonthsOrders}
+                            prevOrders={prevMonthsOrders}
+                        />
+                        <Stack
+                            width="60%"
+                            rowGap={theme.spacing(5)}
+                        >
+                            <GraphComponent
+                                selectedOrders={selectedMonthsOrders}
+                                prevOrders={prevMonthsOrders}
+                                field="order"
+                                selectedMonthLabel={intl.formatMessage(reportsPageMessages.ordersPerDay, {month: dayjs(selectedMonthsOrders?.[0]?.createdAt).month() + 1})}
+                                prevMonthLabel={intl.formatMessage(reportsPageMessages.ordersPerDay, {month: dayjs(prevMonthsOrders?.[0]?.createdAt).month() + 1})}
+                                yAxisLabel={intl.formatMessage(tabsMessages.orders)}
+                            />
+                            <GraphComponent
+                                selectedOrders={selectedMonthsOrders}
+                                prevOrders={prevMonthsOrders}
+                                field="price"
+                                selectedMonthLabel={intl.formatMessage(reportsPageMessages.incomesPerDay, {month: dayjs(selectedMonthsOrders?.[0]?.createdAt).month() + 1})}
+                                prevMonthLabel={intl.formatMessage(reportsPageMessages.incomesPerDay, {month: dayjs(prevMonthsOrders?.[0]?.createdAt).month() + 1})}
+                                yAxisLabel={intl.formatMessage(reportsPageMessages.incomes)}
+                            />
+                        </Stack>
+                    </>
+                )}
+            </CenteredStack>
         </Stack>
     )
 }

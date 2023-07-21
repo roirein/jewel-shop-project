@@ -878,3 +878,46 @@ export const ordersPageMessages = defineMessages({
         defaultMessage: 'production end time'
     }
 })
+
+export const reportsPageMessages = defineMessages({
+    performance: {
+        id: 'performance',
+        defaultMessage: 'Performance'
+    },
+    incomes: {
+        id: 'incomes',
+        defaultMessage: 'incomes'
+    },
+    amount: {
+        id: 'amount',
+        defaultMessage: 'amount',
+    },
+    percentagePage: {
+        id: 'percentagePage',
+        defaultMessage: 'percentagePage'
+    },
+    measure: {
+        id: 'measure',
+        defaultMessage: 'measure'
+    },
+    ordersPerDay: {
+        id: 'ordersPerDay',
+        defaultMessage: 'order per day - {month}'
+    },
+    incomesPerDay: {
+        id: 'incomesPerDay',
+        defaultMessage: 'incomes per day - {month}'
+    },
+    day: {
+        id: 'day',
+        defaultMessage: 'day'
+    },
+    selectedMonth: {
+        id: 'selectedMonth',
+        defaultMessage: 'selected month'
+    },
+    previousMonth: {
+        id: 'previousMonth',
+        defaultMessage: 'previous month'
+    }
+})
