@@ -1,4 +1,4 @@
-import { Stack, useTheme } from "@mui/material"
+import { Button, Menu, MenuItem, Stack, useTheme } from "@mui/material"
 import TableComponent from '../../components/UI/TableComponent'
 import axios from "axios"
 import {getAuthorizationHeader, getUserToken} from '../../utils/utils'
@@ -7,34 +7,38 @@ import { FormProvider, useForm } from "react-hook-form";
 import DateRangePicker from "./components/date-range-picker";
 import AppContext from "../../context/AppContext";
 import {sendHttpRequest} from '../../utils/requests'
-import { ORDERS_ROUTES } from "../../utils/server-routes";
+import { CUSTOMER_ROUTES, ORDERS_ROUTES } from "../../utils/server-routes";
 import dayjs from "dayjs";
 import CenteredStack from "../../components/UI/CenteredStack";
 import PerformanceTable from "./components/performanceTable";
 import PerformanceByOrders from "./components/PertformanceByOrders";
 import GraphComponent from "./components/graph";
 import { useIntl } from "react-intl";
-import { reportsPageMessages, tabsMessages } from "../../translations/i18n";
+import { formMessages, ordersPageMessages, reportsPageMessages, tabsMessages } from "../../translations/i18n";
+import { KeyboardArrowDown } from "@mui/icons-material";
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 const ReportsPage = (props) => {
 
     const [orders, setOrders] = useState([])
+    const [customers, setCustomers] = useState([])
+    const [menuAnchor, setMenuAnchor] = useState()
     const contextValue = useContext(AppContext)
     const [startDate, setStartDate] = useState();
     const [endDate, setEndDate] = useState();
     const [selectedMonthsOrders, setSelectedMonthsOrders] = useState([])
     const [prevMonthsOrders, setPrevMonthOrders] = useState([]);
+    const [showMenu, setShowMenu] = useState(false)
     const theme = useTheme();
     const intl = useIntl()
 
     const onChooseStartDate = (selectedStartDate) => {
         setStartDate(dayjs(selectedStartDate))
-        //setMonthBeforeStartDate(selectedStartDate.substract(1, 'month'))
     }
 
     const onChooseEndDate= (selectedEndDate) => {
         setEndDate(dayjs(selectedEndDate))
-        //setMonthBeforeEndDate(selectedEndDate.substract(1, 'month'))
     }
 
     useEffect(() => {
@@ -42,6 +46,29 @@ const ReportsPage = (props) => {
             Authorization: `Bearer ${contextValue.token}`
         }).then(response => setOrders(response.data.orders))
     }, [])
+
+    useEffect(() => {
+        sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, "GET", null, {
+            Authorization: `Bearer ${contextValue.token}`
+        }).then((response) => {
+            const customersData = response.data.customers.map((customer) => {
+                const customerOrders = orders.filter((ord) => {
+                    return ord.customerName === customer.name
+                })
+                const totalPrice = customerOrders.reduce((sum, obj) => sum + obj.price, 0)
+                return {
+                    userId: customer.userId,
+                    firstName: customer.name.split(' ')[0],
+                    lastName: customer.name.split(' ')[1],
+                    businessName: customer.businessName,
+                    phoneNumber: customer.phoneNumber,
+                    ordersAmount: customerOrders.length,
+                    totalPrice
+                }
+            })
+            setCustomers(customersData)
+        })
+    }, [orders])
 
     useEffect(() => {
         if (startDate && endDate) {
@@ -58,18 +85,106 @@ const ReportsPage = (props) => {
         }
     }, [startDate, endDate])
 
+    const generatePdf = async () => {
+        const doc = new jsPDF('p', 'pt', 'a4', true); 
+
+        const fontUrl = "https://fonts.googleapis.com/css2?family=Assistant:wght@400;800&family=Lato:wght@300&family=Roboto+Condensed:wght@300&display=swap"
+
+        const response = await axios.get(fontUrl);
+        const fontCss = response.data;
+    
+        // Extract the font URL from the CSS response
+        const fontUrlMatch = fontCss.match(/url\('(.+?)'\)/);
+        if (fontUrlMatch && fontUrlMatch[1]) {
+          const fontFileUrl = fontUrlMatch[1];
+    
+          // Fetch the font file
+          const fontResponse = await axios.get(fontFileUrl, { responseType: 'blob' });
+          const fontBlob = fontResponse.data;
+    
+          // Convert the font blob to data URL
+          const fontDataUrl = URL.createObjectURL(fontBlob);
+    
+          // Add the Hebrew font to the PDF
+          doc.addFileToVFS('Assistant.ttf', fontDataUrl);
+          doc.addFont('Assistant.ttf', 'HebrewFont', 'normal');
+    
+          doc.setFont('Assistant'); // Set
+          
+        }
+
+        doc.autoTable({
+          head: [[
+            formMessages.firstName.defaultMessage,
+            formMessages.lastName.defaultMessage,
+            formMessages.businessName.defaultMessage,
+            formMessages.phoneNumber.defaultMessage,
+            tabsMessages.orders.defaultMessage,
+            ordersPageMessages.price.defaultMessage
+        ]],
+          body: customers.map((item) => [item.firstName, item.lastName, item.businessName, item.phoneNumber, item.ordersAmount, item.totalPrice]),
+          styles: {
+            direction: 'rtl', // Set the text direction to RTL
+          }
+        });
+        doc.save('customers.pdf');
+        setShowMenu(false)
+    }
+
     return (
         <Stack
             width="100%"
         >
             <Stack
+                direction="row"
                 width="100%"
                 alignItems="flex-end"
             >
-                <DateRangePicker
-                    onChooseStartDate={(selectedStartDate) => onChooseStartDate(selectedStartDate)}
-                    onChooseEndDate={(selectedEndDate) => onChooseEndDate(selectedEndDate)}
-                />
+                <Stack
+                    sx={{
+                        marginRight: 'auto'
+                    }}
+                >
+                    <Button
+                        varinat="outlined"
+                        color="primary"
+                        onClick={(e) => {
+                            setShowMenu(true)
+                            setMenuAnchor(e.currentTarget)
+
+                        }}
+                    >
+                        {intl.formatMessage(reportsPageMessages.createReport)}
+                        <KeyboardArrowDown/>
+                    </Button>
+                    <Menu
+                        open={showMenu}
+                        anchorOrigin={{
+                            horizontal: 'left',
+                            vertical: 'bottom'
+                        }}
+                        anchorEl={menuAnchor}
+                    >
+                        <MenuItem
+                            onClick={generatePdf}
+                        >
+                            {intl.formatMessage(tabsMessages.customers)}
+                        </MenuItem>
+                        <MenuItem>
+                            {intl.formatMessage(tabsMessages.orders)}
+                        </MenuItem>
+                    </Menu>
+                </Stack>
+                <Stack
+                    sx={{
+                        mr: theme.spacing(4)
+                    }}
+                >
+                    <DateRangePicker
+                        onChooseStartDate={(selectedStartDate) => onChooseStartDate(selectedStartDate)}
+                        onChooseEndDate={(selectedEndDate) => onChooseEndDate(selectedEndDate)}
+                    />
+                </Stack>
             </Stack>
             <CenteredStack
                 width="100%"

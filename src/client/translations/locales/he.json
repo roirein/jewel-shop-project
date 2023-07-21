@@ -214,5 +214,6 @@
     "incomesPerDay": "הכנסות לפי יום - {month}",
     "day": "יום",
     "selectedMonth": "חודש נבחר",
-    "previousMonth": "חודש קודם"
+    "previousMonth": "חודש קודם",
+    "createReport": "הפק דוח"
 }

@@ -919,5 +919,9 @@ export const reportsPageMessages = defineMessages({
     previousMonth: {
         id: 'previousMonth',
         defaultMessage: 'previous month'
+    },
+    createReport: {
+        id: 'createReport',
+        defaultMessage: 'create report'
     }
 })
