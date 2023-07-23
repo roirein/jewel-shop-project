@@ -16,6 +16,7 @@ const OrderTimeline = require("../../models/orders/orderTimeline");
 const ModelPrice = require("../../models/models/modelPrice");
 const dayjs = require("dayjs");
 const ModelMetadata = require("../../models/models/modelMetadata");
+const createNotification = require("./utils");
 
 let ioInstance = null;
 
@@ -27,7 +28,6 @@ const initSocket = (io) => {
 
     ioInstance.on('connection', (socket) => {
         socket.on('login', (data) => {
-            console.log(data)
             users[data.userId] = socket.id
         })
 
@@ -101,36 +101,35 @@ const initSocket = (io) => {
 
 
         socket.on('read-notification', async (data) => {
-            await Notifications.update({
-                read: true
-            }, {
-                where: {
-                    resourceId: data.resourceId
-                }
-            })
+            await readNotification(data)
         })
     })
 }
 
-const sendNewCustomerNotification = async (customerName, customerId) => {
-    const manager = await User.findOne({
+const findUserSocket = (userId) => {
+    console.log(users[userId])
+    return users[userId]
+}
+
+const readNotification = async (data) => {
+    await Notifications.update({
+        isRead: true
+    }, {
         where: {
-            permissionLevel: 1
+            id: data.id
         }
     })
-    const socketId = users[manager.dataValues.userId]
-    const notificationData = {
-        resource: 'customer',
-        type: 'new_customer',
-        resourceId:  customerId,
-        recipient: manager.dataValues.userId,
-        data: {
-            name: customerName
-        }
-    }
-    const notification = await Notifications.create(notificationData)
+}
+
+const sendNewCustomerNotification = async (customerName, customerId, managerId) => {
+    const socketId = findUserSocket(managerId);
+    const notification = await createNotification(managerId, 'customer', 'new_customer', customerId, {
+        name: customerName
+    })
+    console.log(notification)
     if (socketId) {
-        ioInstance.to(socketId).emit('new-customer', notification)
+        console.log('sending')
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 

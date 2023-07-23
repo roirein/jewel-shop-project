@@ -27,37 +27,37 @@ const nextApp = next({dev, dir: path.join(__dirname, 'client')});
 const handle = nextApp.getRequestHandler();
 const port = process.env.PORT
 
-// sequelize.sync({force: false}).then(() => {
-//     createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
-//         createNewEmployee(user.userId, false, 1)
-//     })
-//     // createNewUser('Itay', 'Rein', 'roirein28@gmail.com', 'Rein@6431368', '0549949976', 2).then((user) => {
-//     //     createNewEmployee(user.userId, false, 2)
-//     // })
-//     // createNewUser('Eilon', 'Rein', 'roirein3@gmail.com', 'Rein@1234', '0505050501', 3).then((user) => {
-//     //     createNewEmployee(user.userId, false, 3)
-//     // })
-//     // createNewUser('Gilad', 'Rein', 'roirein4@gmail.com', 'Rein@5678', '0505050502', 4).then((user) => {
-//     //     createNewEmployee(user.userId, false, 4)
-//     // })
-//     // createNewUser('Guy', 'Doytch', 'roirein5@gmail.com', 'Rein@9012', '0505050503', 4).then((user) => {
-//     //     createNewEmployee(user.userId, false, 4)
-//     // })
-//     // createNewUser('Robert', 'Varnavsky', 'roirein6@gmail.com', 'Rein@3456', '0505050504', 4).then((user) => {
-//     //     createNewEmployee(user.userId, false, 5)
-//     // })
-//     // createNewUser('Dor', 'Maor', 'roirein7@gmail.com', 'Rein@7890', '0505050505', 4).then((user) => {
-//     //     createNewEmployee(user.userId, false, 5)
-//     // })
-//     // createNewUser('רועי', 'ריינשטיין', 'roirein@post.bgu.ac.il', 'Rein@270897', '0545454545', 5).then((user) => {
-//     //     createNewCustomer(user.userId, 'העסק שלי', 1).then((customer) => {
-//     //         Request.create({
-//     //             customerId: customer.userId,
-//     //             status: 1
-//     //         })
-//     //     })
-//     // })
-// })
+sequelize.sync({force: true}).then(() => {
+    createNewUser('Roi', 'Rein', 'roirein@gmail.com', 'Roi@6431368', '0547224004', 1).then((user) => {
+        createNewEmployee(user.userId, false, 1)
+    })
+    createNewUser('Itay', 'Rein', 'roirein28@gmail.com', 'Rein@6431368', '0549949976', 2).then((user) => {
+        createNewEmployee(user.userId, false, 2)
+    })
+    createNewUser('Eilon', 'Rein', 'roirein3@gmail.com', 'Rein@1234', '0505050501', 3).then((user) => {
+        createNewEmployee(user.userId, false, 3)
+    })
+    createNewUser('Gilad', 'Rein', 'roirein4@gmail.com', 'Rein@5678', '0505050502', 4).then((user) => {
+        createNewEmployee(user.userId, false, 4)
+    })
+    createNewUser('Guy', 'Doytch', 'roirein5@gmail.com', 'Rein@9012', '0505050503', 4).then((user) => {
+        createNewEmployee(user.userId, false, 4)
+    })
+    createNewUser('Robert', 'Varnavsky', 'roirein6@gmail.com', 'Rein@3456', '0505050504', 4).then((user) => {
+        createNewEmployee(user.userId, false, 5)
+    })
+    createNewUser('Dor', 'Maor', 'roirein7@gmail.com', 'Rein@7890', '0505050505', 4).then((user) => {
+        createNewEmployee(user.userId, false, 5)
+    })
+    createNewUser('רועי', 'ריינשטיין', 'roirein@post.bgu.ac.il', 'Rein@270897', '0545454545', 5).then((user) => {
+        createNewCustomer(user.userId, 'העסק שלי', 1).then((customer) => {
+            Request.create({
+                customerId: customer.userId,
+                status: 1
+            })
+        })
+    })
+})
 
 nextApp.prepare().then(() => {
 

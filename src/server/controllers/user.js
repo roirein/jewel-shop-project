@@ -26,8 +26,8 @@ const registerNewUser = async (req, res, next) => {
         const newUser = await createNewUser(req.body.firstName, req.body.lastName, req.body.email, req.body.password, req.body.phoneNumber, 5);
         await createNewCustomer(newUser.userId, req.body.businessName, req.body.businessId, req.body.businessPhoneNumber);
         await Request.create({customerId: newUser.userId});
-        console.log(newUser.userId, 1)
-        await sendNewCustomerNotification(`${req.body.firstName} ${req.body.lastName}`, newUser.userId)
+        const manager = await User.findOne({where: {permissionLevel: 1}})
+        await sendNewCustomerNotification(`${req.body.firstName} ${req.body.lastName}`, newUser.userId, manager.dataValues.userId)
         res.status(201).send()
     } catch (e) {
         next(e)
@@ -190,12 +190,13 @@ const getNotifications = async (req, res, next) => {
         
         const notifications = notificationsData.map((notification) => {
             return {
-                id: notification.notificationId,
+                id: notification.id,
                 resource: notification.resource,
                 type: notification.type,
                 resourceId: notification.resourceId,
-                read: notification.read,
-                data: notification.data
+                isRead: notification.isRead,
+                data: notification.data,
+                createdAt: notification.createdAt
             }
         })
 

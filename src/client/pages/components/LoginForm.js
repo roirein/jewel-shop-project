@@ -9,22 +9,19 @@ import FormTextFieldComponent from "../../components/UI/Form/Inputs/FormTextFiel
 import FormPasswordFieldComponent from "../../components/UI/Form/Inputs/FormPasswordFieldComponent";
 import ButtonComponent from "../../components/UI/ButtonComponent";
 import FormCheckboxComponent from "../../components/UI/Form/Inputs/FormCheckboxComponent";
-import axios from 'axios';
 import { useRouter } from "next/router";
 import { useState, useContext } from "react";
 import ErrorLabelComponent from "../../components/UI/Form/Labels/ErrorLabelComponent";
 import AppContext from "../../context/AppContext";
-import { sendHttpRequest } from "../../utils/requests";
-import { USER_ROUTES } from "../../utils/server-routes";
+import userApi from "../../store/user/user-api";
 import { getRouteAfterLogin } from "../../utils/utils";
 import { getLoginErrorMessage } from "../../utils/error";
-import LoadingSpinner from "../../components/UI/LoadingSpinner";
+import notifcationsApi from "../../store/notifications/notification-api";
 
 const LoginFormComponent = (props) => {
 
     const intl = useIntl();
     const router = useRouter()
-    const contextValue = useContext(AppContext)
 
     const loginValidationSchema = yup.object().shape({
         email: yup.string().email(intl.formatMessage(formMessages.emailError)).required(intl.formatMessage(formMessages.emptyFieldError)),
@@ -39,17 +36,12 @@ const LoginFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await sendHttpRequest(USER_ROUTES.LOGIN, 'POST', {
-                email: data.email,
-                password: data.password
-            })
-            if (response.status === 200) {
-                contextValue.onLogin(response.data.user, data.rememberMe)
-                router.push(getRouteAfterLogin(response.data.user.permissionLevel))
-            }
+            const userData = await userApi.loginUser(data.email, data.password)
+            await notifcationsApi.setUserNotifications(userData.id)
+            data.rememberMe ? localStorage.setItem('token', userData.token) : sessionStorage.setItem('token', userData.token)
+            await router.push(getRouteAfterLogin(userData.permissionLevel))
         } catch(e) {
-            console.log(e)
-            setLoginError(getLoginErrorMessage(e.response.status, e.response.data))
+            setLoginError(getLoginErrorMessage(e.response.status, e.response.message))
         }
     }
 

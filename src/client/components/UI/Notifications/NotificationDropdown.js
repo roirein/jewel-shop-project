@@ -2,15 +2,15 @@ import { Badge, IconButton, Popover, Stack, useTheme } from "@mui/material"
 import { useState, useContext } from "react"
 import Notification from "./Notification"
 import { PersonAdd } from "@mui/icons-material"
-import AppContext from "../../../context/AppContext"
 import { useRouter } from "next/router"
+import TemplateContext from "../../../context/template-context"
 
 const NotificationDropdown = (props) => {
 
     const [showDropdown, setShowdropdown] = useState(false);
     const [popoverAnchor, setPopoverAnchor] = useState(null);
     const theme = useTheme();
-    const contextValue = useContext(AppContext)
+    const contextValue = useContext(TemplateContext)
     const router = useRouter()
 
     const onOpenPopover = (e) => {
@@ -28,10 +28,9 @@ const NotificationDropdown = (props) => {
     }
 
     const onNotificationClick = (resourceId, type, resource) => {
-        console.log(1)
         setShowdropdown(false)
         if (resource === 'customer') {
-            contextValue.onShowRequestModal(resourceId)
+            contextValue.onOpenRequestModal(resourceId)
         }
         if (resource === 'model') {
             console.log(2)

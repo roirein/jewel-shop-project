@@ -4,16 +4,20 @@ import AppTemplate from "../components/application/AppTemplate";
 import { IntlProvider } from "react-intl";
 import messages from '../translations/locales/he.json'
 import ContextProvider from "../context/ContextProvider";
+import { Provider } from "react-redux";
+import store from "../store";
 
 const MyApp = ({Component, pageProps}) => {
     return (
         <ThemeProvider theme={theme}>
             <IntlProvider messages={messages}>
-                <ContextProvider>
-                    <AppTemplate>
-                        <Component {...pageProps}/>
-                    </AppTemplate>
-                </ContextProvider>
+                <Provider store={store}>
+                    <ContextProvider>
+                        <AppTemplate>
+                            <Component {...pageProps}/>
+                        </AppTemplate>
+                    </ContextProvider>
+                </Provider>
             </IntlProvider>
         </ThemeProvider>
     )

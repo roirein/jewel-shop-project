@@ -10,6 +10,7 @@ import { customerPageMessages } from "../../translations/i18n";
 import { sendHttpRequest } from "../../utils/requests";
 import { CUSTOMER_ROUTES } from "../../utils/server-routes";
 import ButtonComponent from "../../components/UI/ButtonComponent";
+import customersApi from "../../store/customers/customer-api";
 
 const CustomerPage = () => {
 
@@ -20,18 +21,9 @@ const CustomerPage = () => {
     const intl = useIntl();
     const contextValue = useContext(AppContext)
 
-    const fecthCustomers = async () => {
-        const response = await sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, 'GET', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        return response.data.customers
-    }
-
     useEffect(() => {
-        if (contextValue.token) {
-            fecthCustomers().then((customers) => setOriginalData(customers))
-        }
-    }, [contextValue.token])
+        customersApi.retrieveCustomer().then((customers) => setOriginalData(customers))
+    }, [])
     
     useEffect(() => {
         const data = [];

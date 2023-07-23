@@ -4,12 +4,10 @@ import { buttonMessages, customerPageMessages, notificationMessages } from "../.
 import { Typography, useTheme, Stack, Button } from "@mui/material";
 import { useState, useEffect, useContext } from "react";
 import AppContext from '../../../context/AppContext'
-import axios from "axios";
-import { getAuthorizationHeader } from "../../../utils/utils";
 import ButtonComponent from "../../../components/UI/ButtonComponent";
 import LoadingSpinner from "../../../components/UI/LoadingSpinner";
-import { sendHttpRequest } from "../../../utils/requests";
-import { CUSTOMER_ROUTES } from "../../../utils/server-routes";
+import customersApi from "../../../store/customers/customer-api";
+import notifcationsApi from "../../../store/notifications/notification-api";
 
 
 const RequestModalComponent = (props) => {
@@ -19,33 +17,34 @@ const RequestModalComponent = (props) => {
 
     const [user, setUser] = useState({})
     const [isLoading, setIsLoading] = useState(false)
-    const contextValue = useContext(AppContext)
+    const [status, setStatus] = useState()
+    //const contextValue = useContext(AppContext)
 
-    const markNotificationAsRead = () => {
-        contextValue.readNotification('customer', props.userId, 'new-customer')
-    }
+    // const markNotificationAsRead = () => {
+    //     contextValue.readNotification('customer', props.userId, 'new-customer')
+    // }
 
     useEffect(() => {
-        setIsLoading(true)
-        if (props.userId && props.open) {
-            sendHttpRequest(CUSTOMER_ROUTES.CUSTOMER(props.userId), "GET", null, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((res) => {
-                setUser(res.data.customer)
-
-                markNotificationAsRead()
-                setIsLoading(false)
+        if (props.open) {
+            setIsLoading(true)
+            customersApi.loadCustomer(props.userId).then((customer) => {
+                setUser(customer)
+                customersApi.getRequestStatus(props.userId).then((requestStatus) => {
+                    notifcationsApi.readNotification(props.userId, 'customer')
+                    setStatus(requestStatus)
+                    setIsLoading(false)
+                })
             })
         }
     }, [props.userId])
 
-    const onResponse = (response) => {
-        contextValue.socket.emit('request-response', {
-            customerId: props.userId,
-            status: response ? 1 : -1
-        })
-        props.onClose(true)
-    }
+    // const onResponse = (response) => {
+    //     contextValue.socket.emit('request-response', {
+    //         customerId: props.userId,
+    //         status: response ? 1 : -1
+    //     })
+    //     props.onClose(true)
+    // }
 
     const getButtonActions = () => {
         return (
@@ -63,7 +62,7 @@ const RequestModalComponent = (props) => {
                     >
                         <ButtonComponent
                             label={intl.formatMessage(buttonMessages.close)}
-                            onClick={() => props.onClose(false)}
+                            onClick={() => props.onClose()}
                         />
                     </Stack>
                 </Stack>
@@ -123,7 +122,7 @@ const RequestModalComponent = (props) => {
                         direction="row"
                         columnGap={theme.spacing(3)}
                     >
-                        {props.status === 0 && (
+                        {status === 0 && (
                             <>     
                                 <Button
                                     variant="text"
@@ -141,7 +140,7 @@ const RequestModalComponent = (props) => {
                                 </Button>
                             </>
                         )}
-                        {props.status === -1 && (
+                        {status === -1 && (
                             <Typography
                                 varinat="body1"
                                 color="error"
@@ -149,7 +148,7 @@ const RequestModalComponent = (props) => {
                                 {intl.formatMessage(customerPageMessages.requestDeclined)}
                             </Typography>
                         )}
-                        {props.status === 1 && (
+                        {status === 1 && (
                             <Typography
                                 varinat="body1"
                                 color="green"

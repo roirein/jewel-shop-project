@@ -2,16 +2,14 @@
 import PageLayout from '../components/PageLayout';
 import CenteredStack from '../../../components/UI/CenteredStack'
 import { useTheme, Stack } from '@mui/material';
-import { useState, useEffect, useContext, useCallback } from 'react';
-import AppContext from '../../../context/AppContext';
+import { useState, useEffect, useContext} from 'react';
 import TableComponent from '../../../components/UI/TableComponent';
 import { useIntl } from 'react-intl';
 import { REQUEST_TABLE_COLUMNS } from '../../../const/TablesColumns';
 import { buttonMessages, customerPageMessages } from '../../../translations/i18n';
-import RequestModalComponent from '../components/RequestModalComponent';
-import { CUSTOMER_ROUTES } from '../../../utils/server-routes';
-import { sendHttpRequest } from '../../../utils/requests';
 import ButtonComponent from '../../../components/UI/ButtonComponent';
+import customersApi from '../../../store/customers/customer-api';
+import TemplateContext from '../../../context/template-context';
 
 const RequestPage = () => {
 
@@ -27,10 +25,9 @@ const RequestPage = () => {
     const [originalData, setOriginalData] = useState([]);
     const [dispalyedData, setDisplayedData] = useState([])
     const [tableData, setTableData] = useState([]);
-    const [showModal, setShowModal] = useState(false)
     const [selectedUser, setSelectedUser] = useState({})
     const [statusFilter, setStatusFilter] = useState(2)
-    const [socket, setSocket] = useState(null)
+    const contextValue = useContext(TemplateContext)
 
     const tableFilters = [
         {
@@ -43,26 +40,9 @@ const RequestPage = () => {
         }
     ]
 
-    const contextValue = useContext(AppContext)
-
-    const fecthRequests = async () => {
-        const response = await sendHttpRequest(CUSTOMER_ROUTES.REQUESTS, 'GET', null, {
-            Authorization: contextValue.token
-        })
-        return response.data.requests
-    }
-
     useEffect(() => {
-        if (contextValue.token){
-            fecthRequests().then(requests => setOriginalData(requests))
-        }
-    }, [contextValue.token])
-
-    useEffect(() => {
-        if (contextValue.socket) {
-            setSocket(contextValue.socket)
-        }
-    }, [contextValue.socket])
+        customersApi.retrieveRequests().then((requests) => setOriginalData(requests))
+    }, [])
 
     useEffect(() => {
         if (statusFilter === 2) {
@@ -88,23 +68,15 @@ const RequestPage = () => {
     }, [dispalyedData])
     
 
-    const handleCloseModal = (toFetchRequests) => {
-        setSelectedUser({})
-        setShowModal(false)
-        if (toFetchRequests) {
-            fecthRequests().then(requests => setOriginalData(requests))
-        }
-    }
-
-    const onResponse = (response) => {
-        socket?.emit('request-response', {
-            customerId: selectedUser.customerId,
-            status: response ? 1 : -1
-        })
-        setStatusFilter(2)
-        setSelectedUser({})
-        fecthRequests().then(requests => setOriginalData(requests))
-    }
+    // const onResponse = (response) => {
+    //     socket?.emit('request-response', {
+    //         customerId: selectedUser.customerId,
+    //         status: response ? 1 : -1
+    //     })
+    //     setStatusFilter(2)
+    //     setSelectedUser({})
+    //     fecthRequests().then(requests => setOriginalData(requests))
+    // }
 
     const onFilterChange = (filterValue) => {
         setStatusFilter(Number(filterValue))
@@ -134,9 +106,7 @@ const RequestPage = () => {
                     data={tableData}
                     showMore
                     onClickShowMore={(rowId) => {
-                        const user = originalData.find((usr) => rowId === usr.customerId)
-                        setSelectedUser(user)
-                        setShowModal(true)
+                        contextValue.onOpenRequestModal(rowId)
                     }}
                     selectedRowId={selectedUser?.customerId}
                     onSelectRow={(rowId) => onSelectRow(rowId)}
@@ -168,12 +138,6 @@ const RequestPage = () => {
                     </Stack>
                 </CenteredStack>
             </CenteredStack>
-            <RequestModalComponent
-                open={showModal}
-                onClose={(toFecthRequests) => handleCloseModal(toFecthRequests)}
-                userId={selectedUser?.customerId}
-                status={selectedUser?.status}
-            />
         </PageLayout>
     )
 }

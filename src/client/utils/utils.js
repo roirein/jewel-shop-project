@@ -99,11 +99,11 @@ const getNotificationMessage = (resource, type, data) => {
 
 export const createNotification = (notificatioData) => {
     return {
-        id: notificatioData.notificationId,
+        id: notificatioData.id,
         resource: notificatioData.resource,
         resourceId: notificatioData.resourceId,
         type: notificatioData.type,
-        read: notificatioData.read,
+        isRead: notificatioData.isRead,
         message: getNotificationMessage(notificatioData.resource, notificatioData.type, notificatioData.data)
     }
 }

@@ -9,38 +9,66 @@ import { useIntl } from 'react-intl';
 import axios from 'axios';
 import { homePageMessages } from '../../translations/i18n';
 import { useRouter } from 'next/router';
-import { getAuthorizationHeader } from '../../utils/utils';
+import { createNotification, getAuthorizationHeader } from '../../utils/utils';
 import { Diamond, PersonAddAlt, ShoppingCart } from '@mui/icons-material';
 import NotificationDropdown from '../UI/Notifications/NotificationDropdown';
 import { sendHttpRequest } from '../../utils/requests';
 import { USER_ROUTES } from '../../utils/server-routes';
+import userApi from '../../store/user/user-api';
+import notifcationsApi from '../../store/notifications/notification-api';
+import { useSelector } from 'react-redux';
+import { getSocket } from '../../socket/socket';
+import TemplateContext from '../../context/template-context';
+import RequestModalComponent from '../../pages/customers/components/RequestModalComponent';
 
 const AppTemplate = (props) => {
 
     const theme = useTheme();
     const intl = useIntl()
     const router = useRouter()
-    const contextValue = useContext(AppContext)
     const [avatarData, setAvatarData] = useState('')
+    const userToken = useSelector((state) => userApi.getUserToken(state));
+    const userPermissionLevel = useSelector((state) => userApi.getUserPermissionLevel(state));
+    const username = useSelector((state) => userApi.getUsername(state))
+    const notificationsAmount = useSelector((state) => notifcationsApi.getUnreadNotificationsAmount(state))
+    const [socket, setSocket] = useState(null)
+    const [notificationMessage, setNotificationMessage] = useState();
+    const [resourceId, setResourceId] = useState();
+    const [showRequestModal, setShowRequestModal] = useState(false)
 
 
     useEffect(() => {
-        if (contextValue.token) {
-            const nameAsArray = contextValue.name.split(' ');
+        if (username) {
+            const nameAsArray = username.split(' ');
             setAvatarData(`${nameAsArray[0][0]}${nameAsArray[1][0]}`)
+            setSocket(getSocket())
         }
-    }, [contextValue])
+    }, [username])
+
+    useEffect(() => {
+        if (socket) {
+            socket.on('notification', (data) => {
+                const notification = createNotification(data)
+                setNotificationMessage(notification.message)
+                notifcationsApi.addNewNotification(notification)
+            })
+
+            return () => {
+                socket.off('notification')
+            }
+        }
+    }, [socket])
 
 
-    const onLogout = async () => {
-        const response = await sendHttpRequest(USER_ROUTES.LOGOUT, 'POST', {userId: contextValue.userId}, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        if (response.status === 200) {
-            contextValue.onLogout();
-            router.push('/')
-        }
-    }
+    // const onLogout = async () => {
+    //     const response = await sendHttpRequest(USER_ROUTES.LOGOUT, 'POST', {userId: contextValue.userId}, {
+    //         Authorization: `Bearer ${contextValue.token}`
+    //     })
+    //     if (response.status === 200) {
+    //         contextValue.onLogout();
+    //         router.push('/')
+    //     }
+    // }
 
     const getDropdownsProps = (permissionLevel) => {
         switch(permissionLevel) {
@@ -49,17 +77,17 @@ const AppTemplate = (props) => {
                     {
                         type: 1,
                         icon: <PersonAddAlt/>,
-                        notifications: contextValue.notifications.customers
+                        notifications: notificationsAmount.customers
                     },
                     {
                         type: 2,
                         icon: <ShoppingCart/>,
-                        notifications: contextValue.notifications.orders
+                        //notifications: contextValue.notifications.orders
                     },
                     {
                         type: 3,
                         icon: <Diamond/>,
-                        notifications: contextValue.notifications.models
+                        //notifications: contextValue.notifications.models
                     }
                 ]
             case 2: 
@@ -67,12 +95,12 @@ const AppTemplate = (props) => {
                     {
                         type: 2,
                         icon: <ShoppingCart/>,
-                        notifications: contextValue.notifications.orders
+                        //notifications: contextValue.notifications.orders
                     },
                     {
                         type: 3,
                         icon: <Diamond/>,
-                        notifications: contextValue.notifications.models
+                        //notifications: contextValue.notifications.models
                     }
                 ]
             case 3:
@@ -81,7 +109,7 @@ const AppTemplate = (props) => {
                     {
                         type: 2,
                         icon: <ShoppingCart/>,
-                        notifications: contextValue.notifications.orders
+                        //notifications: contextValue.notifications.orders
                     }
                 ]
             default: 
@@ -90,16 +118,16 @@ const AppTemplate = (props) => {
     }
 
     const getTabs = () => {
-        if (contextValue.permissionLevel === 1) {
+        if (userPermissionLevel === 1) {
             return MANAGER_TABS
         }
-        if (contextValue.permissionLevel === 2) {
+        if (userPermissionLevel === 2) {
             return DESIGN_MANGER_TABS
         }
-        if (contextValue.permissionLevel === 3) {
+        if (userPermissionLevel === 3) {
             return CUSTOMER_INTERFACE_TABS
         }
-        if (contextValue.permissionLevel === 5) {
+        if (userPermissionLevel === 5) {
             return CUSTOMER_INTERFACE_TABS
         }
         else {
@@ -107,96 +135,106 @@ const AppTemplate = (props) => {
         }
     }
 
+    const onOpenRequestModal = (customerId) => {
+        setResourceId(customerId)
+        setShowRequestModal(true)
+    }
+
     return (
-        <Box
-            width="100%"
-            minHeight="100vh"
-            overflow="auto"
-            border={`${theme.spacing(1)} solid ${theme.palette.primary.main}`}
-            sx={{
-                mt: theme.spacing(4)
-            }}
-        >
-            <AppBar
-                position="static"
-                color="primary"
+        <TemplateContext.Provider value={{onOpenRequestModal}}>
+            <Box
+                width="100%"
+                minHeight="100vh"
+                overflow="auto"
+                border={`${theme.spacing(1)} solid ${theme.palette.primary.main}`}
                 sx={{
-                    height: '50px',
-                    justifyContent: 'center',
-                    p: theme.spacing(4)
+                    mt: theme.spacing(4)
                 }}
             >
-                {contextValue.token && (
-                    <Stack
-                        width="100%"
-                        direction="row"
-                        justifyContent="flex-end"
-                        alignItems="center"
-                        sx={{
-                            direction: `rtl`
-                        }}
-                    >
-                        <Avatar
-                            sx={{
-                                backgroundColor: theme.palette.secondary.main
-                            }}
-                        >
-                            {avatarData}
-                        </Avatar>
+                <AppBar
+                    position="static"
+                    color="primary"
+                    sx={{
+                        height: '50px',
+                        justifyContent: 'center',
+                        p: theme.spacing(4)
+                    }}
+                >
+                    {userToken && (
                         <Stack
+                            width="100%"
                             direction="row"
-                            columnGap={theme.spacing(3)}
+                            justifyContent="flex-end"
+                            alignItems="center"
                             sx={{
-                                mr: theme.spacing(4)
+                                direction: `rtl`
                             }}
                         >
-                            {getDropdownsProps(contextValue.permissionLevel).map((dropdownProps) => (
-                                <NotificationDropdown
-                                    icon={dropdownProps.icon}
-                                    key={dropdownProps.type}
-                                    notifications={dropdownProps.notifications || []}
-                                />
-                            ))}
+                            <Avatar
+                                sx={{
+                                    backgroundColor: theme.palette.secondary.main
+                                }}
+                            >
+                                {avatarData}
+                            </Avatar>
+                            <Stack
+                                direction="row"
+                                columnGap={theme.spacing(3)}
+                                sx={{
+                                    mr: theme.spacing(4)
+                                }}
+                            >
+                                {getDropdownsProps(userPermissionLevel).map((dropdownProps) => (
+                                    <NotificationDropdown
+                                        icon={dropdownProps.icon}
+                                        key={dropdownProps.type}
+                                        notifications={dropdownProps.notifications || []}
+                                    />
+                                ))}
+                            </Stack>
+                            <Link
+                                color={theme.palette.secondary.contrastText}
+                                variant='body1'
+                                onClick={() => onLogout()}
+                                sx={{
+                                    fontWeight: 'bold',
+                                    mr: 'auto',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {intl.formatMessage(homePageMessages.logout)}
+                            </Link>
                         </Stack>
-                        <Link
-                            color={theme.palette.secondary.contrastText}
-                            variant='body1'
-                            onClick={() => onLogout()}
-                            sx={{
-                                fontWeight: 'bold',
-                                mr: 'auto',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            {intl.formatMessage(homePageMessages.logout)}
-                        </Link>
-                    </Stack>
-                )}
-            </AppBar>
-            <CenteredStack
-                rowsGap={theme.spacing(3)}
-            >
-                <img
-                    width="250"
-                    height="150"
-                    src={'/images/logo1.png-1.svg'}
-                />
-                {contextValue.token && (
-                    <TemplateTabsComponent
-                        tabs={getTabs()}
+                    )}
+                </AppBar>
+                <CenteredStack
+                    rowsGap={theme.spacing(3)}
+                >
+                    <img
+                        width="250"
+                        height="150"
+                        src={'/images/logo1.png-1.svg'}
                     />
-                )}
-            </CenteredStack>
-            {props.children}
-            <NotificationComponent
-                open={contextValue.showNotification}
-                onClose={() => {
-                    contextValue.setShowNotification(false)
-                    contextValue.setNotificationMessage('')
-                }}
-                message={contextValue.notificationMessage}
-            />
-        </Box>
+                    {userToken && (
+                        <TemplateTabsComponent
+                            tabs={getTabs()}
+                        />
+                    )}
+                </CenteredStack>
+                    {props.children}
+                <NotificationComponent
+                    open={!!notificationMessage}
+                    onClose={() => {
+                        setNotificationMessage('')
+                    }}
+                    message={notificationMessage}
+                />
+                <RequestModalComponent
+                    open={showRequestModal}
+                    userId={resourceId}
+                />
+            </Box>
+        </TemplateContext.Provider>
     )
 }
 

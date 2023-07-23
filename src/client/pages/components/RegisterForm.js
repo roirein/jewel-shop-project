@@ -13,6 +13,7 @@ import { sendHttpRequest } from "../../utils/requests";
 import { useState } from "react";
 import { USER_ROUTES } from "../../utils/server-routes";
 import { getRegisterErrorMessages } from "../../utils/error";
+import userApi from "../../store/user/user-api";
 
 const RegisterFormComponent = (props) => {
 
@@ -41,12 +42,11 @@ const RegisterFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await sendHttpRequest(USER_ROUTES.REGISTER, 'POST', data, {})
-            if (response.status === 201) {
+            const res = await userApi.createNewUser(data)
+            if (res) {
                 setIsRegisterSuccessful(true)
             }
         } catch (e) {
-            console.log(e)
             setRegisterError(getRegisterErrorMessages(e.response.status))
         }
     }
