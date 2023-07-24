@@ -41,7 +41,7 @@ const LoginFormComponent = (props) => {
             data.rememberMe ? localStorage.setItem('token', userData.token) : sessionStorage.setItem('token', userData.token)
             await router.push(getRouteAfterLogin(userData.permissionLevel))
         } catch(e) {
-            setLoginError(getLoginErrorMessage(e.response.status, e.response.message))
+            setLoginError(getLoginErrorMessage(e.response.status, e.response.data))
         }
     }
 

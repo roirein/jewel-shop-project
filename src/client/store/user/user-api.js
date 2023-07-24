@@ -45,12 +45,58 @@ const createNewUser = async (userData) => {
     }
 }
 
+const getResetPasswordCode = async (email) => {
+    try {
+        const response = await axios.post(`${userRoute}/reset-code`, {
+            email
+        })
+        if (response.status === 201) {
+            return true
+        }
+    } catch (e) {
+        throw (e)
+    }
+}
+
+const verifyResetPasswordCode = async (email, code) => {
+    try {
+        const response = await axios.post(`${userRoute}/verify-code`, {
+            email,
+            code
+        })
+        if (response.status === 200) {
+            return true
+        }
+    } catch (e) {
+        throw (e)
+    }
+}
+
+const resetPassword = async (email, password, confirmPassword) => {
+    try {
+        const response = await axios.patch(`${userRoute}/reset-password `, {
+            email,
+            password,
+            confirmPassword
+        })
+        if (response.status === 200) {
+            return true
+        }
+    } catch (e) {
+        console.log(e)
+        throw (e)
+    }
+}
+
 const userApi = {
     loginUser,
     getUserPermissionLevel,
     getUserToken,
     getUsername,
-    createNewUser
+    createNewUser,
+    getResetPasswordCode,
+    verifyResetPasswordCode,
+    resetPassword
 }
 
 export default userApi

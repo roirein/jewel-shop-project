@@ -17,11 +17,11 @@ router.post('/login', loginUser);
 
 router.post('/logout', authorizeUser, logoutUser)
 
-router.post('/resetPassword', sendResetPasswordCode)
+router.post('/reset-code', sendResetPasswordCode)
 
-router.post('/verifyCode', verifyCode);
+router.post('/verify-code', verifyCode);
 
-router.patch('/updatePassword', updatePassword)
+router.patch('/reset-password', updatePassword)
 
 router.post('/user', authorizeUser, getUserByToken)
 

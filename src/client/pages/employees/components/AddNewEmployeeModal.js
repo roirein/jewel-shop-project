@@ -6,22 +6,17 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { Stack, useTheme } from "@mui/system";
 import { useState, useContext } from "react";
-import AppContext from '../../../context/AppContext'
 import FormSelectComponent from "../../../components/UI/Form/Inputs/FormSelectComponent";
 import FormTextFieldComponent from '../../../components/UI/Form/Inputs/FormTextFieldComponent'
 import { ROLES_ENUM } from "../../../const/Enums";
 import ButtonComponent from "../../../components/UI/ButtonComponent";
-import axios from "axios";
-import { getAuthorizationHeader } from "../../../utils/utils";
 import ErrorLabelComponent from "../../../components/UI/Form/Labels/ErrorLabelComponent";
-import { sendHttpRequest } from "../../../utils/requests";
-import { EMPLOYEES_ROUTES } from "../../../utils/server-routes";
+import employeesApi from "../../../store/employees/employees-api";
 
 const AddNewEmployeeModalComponent = (props) => {
 
     const intl = useIntl();
     const theme = useTheme();
-    const contextValue = useContext(AppContext)
 
     const newEmployeeValidationSchema = yup.object().shape({
         email: yup.string().email(intl.formatMessage(formMessages.emailError)).required(intl.formatMessage(formMessages.emptyFieldError)),
@@ -62,13 +57,9 @@ const AddNewEmployeeModalComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await sendHttpRequest(EMPLOYEES_ROUTES.ADD_EMPLOYEE, 'POST', data, {
-                Authorization: `Bearer ${contextValue.token}`
-            })
-            if (response.status === 201) {
-                clearFields()
-                props.onAddNewEmployee(response.data.employee)
-            }
+            await employeesApi.addNewEmployee(data)
+            clearFields()
+            props.onClose()
         } catch (e) {
             if (e.response.status === 409) {
                 setNewEmployeeError(intl.formatMessage(homePageMessages.userExistError))

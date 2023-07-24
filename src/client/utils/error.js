@@ -30,3 +30,14 @@ export const getRegisterErrorMessages = (errorStatus) => {
             return intl.formatMessage(homePageMessages.userExistError)
         }
 }
+
+export const getCodeVerificationError = (errStatus, errMessage) => {
+    if (errStatus === 400) {
+        if (errMessage === 'invalid-code') {
+            return intl.formatMessage(homePageMessages.invalidCode)
+        }
+        if (errMessage === 'token-expired') {
+            return intl.formatMessage(homePageMessages.codeExpired)
+        }
+    }
+}

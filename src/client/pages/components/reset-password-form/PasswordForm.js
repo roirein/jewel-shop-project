@@ -9,6 +9,7 @@ import ButtonComponent from '../../../components/UI/ButtonComponent';
 import axios from 'axios';
 import { useState } from 'react';
 import ErrorLabelComponent from '../../../components/UI/Form/Labels/ErrorLabelComponent';
+import userApi from "../../../store/user/user-api";
 
 const PasswordFormComponent = (props) => {
 
@@ -29,12 +30,8 @@ const PasswordFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.patch('http://localhost:3002/user/updatePassword', {
-                email: props.email,
-                password: data.password,
-                confirmPassword: data.confirmPassword
-            })
-            if (response.status === 200) {
+            const passwordUpdated = await userApi.resetPassword(props.email, data.password, data.confirmPassword)
+            if (passwordUpdated) {
                 props.onChangePassword()
             }
         } catch (e) {

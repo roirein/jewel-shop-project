@@ -12,33 +12,31 @@ import TableComponent from "../../components/UI/TableComponent"
 import AddNewEmployeeModalComponent from "./components/AddNewEmployeeModal"
 import { sendHttpRequest } from "../../utils/requests";
 import { EMPLOYEES_ROUTES } from "../../utils/server-routes"
+import { useSelector } from "react-redux"
+import employeesApi from "../../store/employees/employees-api"
 
 const EmployeesPage = () => {
 
     const intl = useIntl();
     const theme = useTheme();
-    const [originalData, setOriginalData] = useState()
+    const [originalData, setOriginalData] = useState([])
     const [selectedEmployee, setSelectedEmployee] = useState({})
     const [tableData, setTableData] = useState([]);
     const [showModal, setShowModal] = useState(false)
     const contextValue = useContext(AppContext);
-
-    const fecthEmployees = async () => {
-        const response = await sendHttpRequest(EMPLOYEES_ROUTES.EMPLOYEES, 'GET', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        return response.data.employees
-    }
-
+    const employees = useSelector((state) => employeesApi.getEmployees(state))
 
     useEffect(() => {
-        if (contextValue.token) {
-            fecthEmployees().then((employees) => setOriginalData(employees))
-        }
-    }, [contextValue.token])
+        employeesApi.retriveEmployees()
+    }, [])
+
+    useEffect(() => {
+        setOriginalData(employees)
+    }, [employees])
 
     useEffect(() => {
         const data = [];
+        console.log(originalData)
         originalData?.forEach((dataElement) => {
             data.push(
                 {
@@ -49,12 +47,6 @@ const EmployeesPage = () => {
         setTableData(data)
     }, [originalData])
 
-    const onAddNewEmployee = async () => {
-        fecthEmployees().then((employees) => {
-            setOriginalData(employees)
-            setShowModal(false)
-        })
-    }
 
     const onSelectRow = (rowId) => {
         if (rowId) {
@@ -66,12 +58,8 @@ const EmployeesPage = () => {
     }
 
     const onDeleteEmployee = async () => {
-        const response = await sendHttpRequest(EMPLOYEES_ROUTES.DELETE_EMPLOYEE(selectedEmployee?.id), 'DELETE', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        if (response.status === 200) {
-            const updatedData = await fecthEmployees()
-            setOriginalData(updatedData)
+        const isDeleted = await employeesApi.deleteEmployee(selectedEmployee?.id)
+        if (isDeleted) {
             setSelectedEmployee({})
         }
     }
@@ -129,7 +117,7 @@ const EmployeesPage = () => {
                         <ButtonComponent
                             label={intl.formatMessage(employeesPageMessages.removeEmployee)}
                             onClick={() => onDeleteEmployee()}
-                            disabled={!selectedEmployee}
+                            disabled={Object.keys(selectedEmployee).length === 0}
                         />
                     </Stack>
                 </CenteredStack>
@@ -137,7 +125,7 @@ const EmployeesPage = () => {
             <AddNewEmployeeModalComponent
                 open={showModal}
                 onClose={() => setShowModal(false)}
-                onAddNewEmployee={(employee) => onAddNewEmployee(employee)}
+                //onAddNewEmployee={(employee) => onAddNewEmployee(employee)}
             />
         </Stack>
     )

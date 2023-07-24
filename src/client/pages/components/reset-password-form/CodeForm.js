@@ -9,6 +9,9 @@ import ButtonComponent from '../../../components/UI/ButtonComponent';
 import axios from 'axios';
 import { useState } from 'react';
 import ErrorLabelComponent from '../../../components/UI/Form/Labels/ErrorLabelComponent';
+import userApi from "../../../store/user/user-api";
+import { getCodeVerificationError } from "../../../utils/error";
+import CenteredStack from "../../../components/UI/CenteredStack";
 
 const CodeFormComponent = (props) => {
 
@@ -27,22 +30,12 @@ const CodeFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:3002/user/verifyCode', {
-                email: props.email,
-                code: data.code
-            })
-            if (response.status === 200) {
+            const verified = await userApi.verifyResetPasswordCode(props.email, data.code)
+            if (verified) {
                 props.onCodeVerify()
             }
         } catch (e) {
-            if (e.response.status === 400) {
-                if (e.response.data === 'invalid-code') {
-                    setCodeError(intl.formatMessage(homePageMessages.invalidCode))
-                }
-                if (e.response.data === 'token-expired') {
-                    setCodeError(intl.formatMessage(homePageMessages.codeExpired))
-                }
-            }
+            setCodeError(getCodeVerificationError(e.response.status, e.response.data))
         }
     }
 

@@ -130,13 +130,16 @@ const updatePassword = async (req, res, next) => {
         if (req.body.password !== req.body.confirmPassword) {
             throw new HttpError('password-mismatch', 400)
         }
-        await User.update({
-            password: req.body.password
-        }, {
+
+        const user = await User.findOne({
             where: {
                 email: req.body.email
             }
         })
+
+        user.password = req.body.password,
+        await user.save()
+
         const employee = await Employee.findOne({
             include: {
                 model: User,

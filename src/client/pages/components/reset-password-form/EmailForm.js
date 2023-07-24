@@ -6,9 +6,10 @@ import { buttonMessages, formMessages, homePageMessages } from '../../../transla
 import { Stack, useTheme, Typography } from '@mui/material';
 import FormTextFieldComponent from '../../../components/UI/Form/Inputs/FormTextFieldComponent';
 import ButtonComponent from '../../../components/UI/ButtonComponent';
-import axios from 'axios';
 import { useState } from 'react';
 import ErrorLabelComponent from '../../../components/UI/Form/Labels/ErrorLabelComponent';
+import userApi from "../../../store/user/user-api";
+import CenteredStack from '../../../components/UI/CenteredStack'
 
 const EmailFormComponent = (props) => {
 
@@ -27,14 +28,11 @@ const EmailFormComponent = (props) => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axios.post('http://localhost:3002/user/resetPassword', {
-                email: data.email
-            })
-            if (response.status === 201) {
+            const res = await userApi.getResetPasswordCode(data.email)
+            if (res) {
                 props.onSendEmail(data.email)
             }
         } catch (e) {
-            console.log(e)
             if (e.response.status === 404) {
                 setEmailError(intl.formatMessage(homePageMessages.emailNotExist))
             }
