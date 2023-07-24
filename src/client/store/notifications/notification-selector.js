@@ -2,13 +2,13 @@ import { createSelector } from "@reduxjs/toolkit";
 
 export const notificationsSelect = (state) => state.notifications;
 
-export const selectUnreadNotificationsAmount = createSelector(notificationsSelect, (notifications) => {
-    const customersAmonut = notifications?.customers.filter((not) => !not.isRead)
-    const ordersAmonut = notifications?.orders.filter((not) => !not.isRead)
-    const modelsAmonut = notifications?.models.filter((not) => !not.isRead)
+export const selectNotifications = createSelector(notificationsSelect, (notifications) => {
+    const customers = notifications?.customers
+    const orders = notifications?.orders
+    const models = notifications?.models
     return {
-        customers: customersAmonut,
-        orders: ordersAmonut,
-        models: modelsAmonut
+        customers: customers,
+        orders: orders,
+        models: models
     }
 })

@@ -10,6 +10,7 @@ import { buttonMessages, customerPageMessages } from '../../../translations/i18n
 import ButtonComponent from '../../../components/UI/ButtonComponent';
 import customersApi from '../../../store/customers/customer-api';
 import TemplateContext from '../../../context/template-context';
+import { useSelector } from 'react-redux';
 
 const RequestPage = () => {
 
@@ -28,6 +29,7 @@ const RequestPage = () => {
     const [selectedUser, setSelectedUser] = useState({})
     const [statusFilter, setStatusFilter] = useState(2)
     const contextValue = useContext(TemplateContext)
+    const requestsFromStore = useSelector((state) => customersApi.getRequests(state))
 
     const tableFilters = [
         {
@@ -42,7 +44,7 @@ const RequestPage = () => {
 
     useEffect(() => {
         customersApi.retrieveRequests().then((requests) => setOriginalData(requests))
-    }, [])
+    }, [requestsFromStore])
 
     useEffect(() => {
         if (statusFilter === 2) {
@@ -68,15 +70,13 @@ const RequestPage = () => {
     }, [dispalyedData])
     
 
-    // const onResponse = (response) => {
-    //     socket?.emit('request-response', {
-    //         customerId: selectedUser.customerId,
-    //         status: response ? 1 : -1
-    //     })
-    //     setStatusFilter(2)
-    //     setSelectedUser({})
-    //     fecthRequests().then(requests => setOriginalData(requests))
-    // }
+    const onResponse = async (response) => {
+        await customersApi.respondCustomerRequest(response, selectedUser.customerId)
+        setStatusFilter(2)
+        setSelectedUser({})
+        const requests = await customersApi.retrieveRequests();
+        setOriginalData(requests)
+    }
 
     const onFilterChange = (filterValue) => {
         setStatusFilter(Number(filterValue))

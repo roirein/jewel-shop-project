@@ -24,7 +24,7 @@ const NotificationDropdown = (props) => {
     }
 
     const getBadgeContent = () => {
-        return props.notifications.filter(notification => !notification.read).length
+        return props.notifications.filter(notification => !notification.isRead).length
     }
 
     const onNotificationClick = (resourceId, type, resource) => {
@@ -80,7 +80,7 @@ const NotificationDropdown = (props) => {
                     {props.notifications.map((notification) => (
                         <Notification
                             key={notification.id}
-                            read={notification.read}
+                            read={notification.isRead}
                             resourceId={notification.resourceId}
                             resourceType={notification.resource}
                             message={notification.message}

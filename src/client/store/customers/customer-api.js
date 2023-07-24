@@ -3,6 +3,8 @@ import customersSlice from './customer-slice'
 import store from '../index'
 import { customersSelectore, requestsSelector } from './customer-selector'
 import userApi from '../user/user-api'
+import { getSocket } from '../../socket/socket'
+import notifcationsApi from '../notifications/notification-api'
 
 
 const customerRoute = `${process.env.SERVER_URL}/customer`
@@ -26,7 +28,6 @@ const loadCustomers = async () => {
 
 const retrieveCustomer = async () => {
     const customersState = customersSelectore(store.getState())
-    console.log(customersState)
     if (customersState.length === 0) {
         const customers = await loadCustomers();
         return customers
@@ -50,7 +51,7 @@ const loadRequests = async () => {
 
 const retrieveRequests = async () => {
     const requestsState = requestsSelector(store.getState())
-    if (requestsSelector.length === 0) {
+    if (requestsState.length === 0) {
         const requests = await loadRequests();
         return requests
     } else {
@@ -83,6 +84,46 @@ const getRequestStatus = async (customerId) => {
 
 }
 
+const respondCustomerRequest = async (response, customerId) => {
+    const responseValue = response ? 1 : -1;
+    const socket = getSocket();
+    socket.emit('request-response', {
+        customerId,
+        status: responseValue
+    })
+    const requests = requestsSelector(store.getState())
+    const request = requests.find((req) => req.customerId === customerId);
+    
+    store.dispatch(customersSlice.actions.updateRequests({request: {
+        ...request,
+        status: responseValue
+    }}))
+    notifcationsApi.readNotification(customerId, 'customer')
+    if (response) {
+        store.dispatch(customersSlice.actions.clearCustomers);
+        await loadCustomers()
+    }
+}
+
+const getRequests = (appState) => {
+    return requestsSelector(appState)
+}
+
+export const deleteCustomer = async (customerId) => {
+    const token = userApi.getUserToken(store.getState());
+    const response = await axios.delete(`${customerRoute}/customer/${customerId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    if (response.status === 200) {
+        const customers = customersSelectore(store.getState());
+        const customer = customers.find((cust) => cust.id === customerId)
+        store.dispatch(customersSlice.actions.deleteCustomer({customer}))
+        await loadRequests()
+    }
+}
+
 
 const customersApi = {
     loadCustomers,
@@ -90,7 +131,10 @@ const customersApi = {
     loadRequests,
     retrieveRequests,
     loadCustomer,
-    getRequestStatus
+    getRequestStatus,
+    respondCustomerRequest,
+    deleteCustomer,
+    getRequests
 }
 
 export default customersApi

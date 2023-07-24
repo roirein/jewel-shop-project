@@ -2,12 +2,12 @@ import ModalComponent from "../../../components/UI/ModalComponent"
 import { useIntl } from "react-intl"
 import { buttonMessages, customerPageMessages, notificationMessages } from "../../../translations/i18n";
 import { Typography, useTheme, Stack, Button } from "@mui/material";
-import { useState, useEffect, useContext } from "react";
-import AppContext from '../../../context/AppContext'
+import {useState, useEffect} from "react";
 import ButtonComponent from "../../../components/UI/ButtonComponent";
 import LoadingSpinner from "../../../components/UI/LoadingSpinner";
 import customersApi from "../../../store/customers/customer-api";
 import notifcationsApi from "../../../store/notifications/notification-api";
+import { useSelector } from "react-redux";
 
 
 const RequestModalComponent = (props) => {
@@ -18,11 +18,6 @@ const RequestModalComponent = (props) => {
     const [user, setUser] = useState({})
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState()
-    //const contextValue = useContext(AppContext)
-
-    // const markNotificationAsRead = () => {
-    //     contextValue.readNotification('customer', props.userId, 'new-customer')
-    // }
 
     useEffect(() => {
         if (props.open) {
@@ -38,13 +33,10 @@ const RequestModalComponent = (props) => {
         }
     }, [props.userId])
 
-    // const onResponse = (response) => {
-    //     contextValue.socket.emit('request-response', {
-    //         customerId: props.userId,
-    //         status: response ? 1 : -1
-    //     })
-    //     props.onClose(true)
-    // }
+    const onResponse = (response) => {
+        customersApi.respondCustomerRequest(response, props.userId)
+        props.onClose()
+    }
 
     const getButtonActions = () => {
         return (

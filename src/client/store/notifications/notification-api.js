@@ -3,7 +3,7 @@ import store from '..'
 import { tokenSelector } from '../user/user-selector'
 import { createNotification } from '../../utils/utils'
 import notificationsSlice from './notification-slice'
-import { selectUnreadNotificationsAmount } from './notification-selector'
+import { selectNotifications, selectUnreadNotificationsAmount } from './notification-selector'
 import dayjs from 'dayjs'
 import { getSocket } from '../../socket/socket'
 
@@ -45,11 +45,11 @@ const addNewNotification = (notification) => {
 }
 
 const getUnreadNotificationsAmount = (state) => {
-    return selectUnreadNotificationsAmount(state)
+    return selectNotifications(state)
 }
 
 const readNotification = (resourceId, resource) => {
-    const notifications = selectUnreadNotificationsAmount(store.getState())
+    const notifications = selectNotifications(store.getState())
     let relevantNotifications;
     switch(resource) {
         case 'customer': 

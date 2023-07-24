@@ -2,13 +2,10 @@ import TableComponent from "../../components/UI/TableComponent";
 import PageLayout from "./components/PageLayout"
 import CenteredStack from "../../components/UI/CenteredStack";
 import { CUSTOMER_TABLE_COLUMNS } from "../../const/TablesColumns";
-import { useState, useEffect, useContext } from "react";
-import AppContext from "../../context/AppContext";
-import { useTheme, Stack } from "@mui/material";
+import {useState, useEffect} from "react";
+import {useTheme, Stack} from "@mui/material";
 import { useIntl } from "react-intl";
 import { customerPageMessages } from "../../translations/i18n";
-import { sendHttpRequest } from "../../utils/requests";
-import { CUSTOMER_ROUTES } from "../../utils/server-routes";
 import ButtonComponent from "../../components/UI/ButtonComponent";
 import customersApi from "../../store/customers/customer-api";
 
@@ -19,7 +16,6 @@ const CustomerPage = () => {
     const [selectedCustomer, setSelectedCustomer] = useState({})
     const theme = useTheme();
     const intl = useIntl();
-    const contextValue = useContext(AppContext)
 
     useEffect(() => {
         customersApi.retrieveCustomer().then((customers) => setOriginalData(customers))
@@ -47,14 +43,9 @@ const CustomerPage = () => {
     }
 
     const onDeleteCustomer = async () => {
-        const response = await sendHttpRequest(CUSTOMER_ROUTES.CUSTOMER(selectedCustomer?.id), 'DELETE', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        if (response.status === 200) {
-            const updatedData = await fecthCustomers()
-            setOriginalData(updatedData)
-            setSelectedCustomer({})
-        }
+        await customersApi.deleteCustomer(selectedCustomer?.id)
+        const customers = await customersApi.retrieveCustomer();
+        setOriginalData(customers)
     }
 
     return (
@@ -82,7 +73,7 @@ const CustomerPage = () => {
                         <ButtonComponent
                             label={intl.formatMessage(customerPageMessages.removeCustomer)}
                             onClick={() => onDeleteCustomer()}
-                            disabled={!selectedCustomer}
+                            disabled={Object.keys(selectedCustomer).length === 0}
                         />
                     </Stack>
                 </CenteredStack>

@@ -20,6 +20,7 @@ import { useSelector } from 'react-redux';
 import { getSocket } from '../../socket/socket';
 import TemplateContext from '../../context/template-context';
 import RequestModalComponent from '../../pages/customers/components/RequestModalComponent';
+import customersApi from '../../store/customers/customer-api';
 
 const AppTemplate = (props) => {
 
@@ -51,6 +52,9 @@ const AppTemplate = (props) => {
                 const notification = createNotification(data)
                 setNotificationMessage(notification.message)
                 notifcationsApi.addNewNotification(notification)
+                if (notification.resource === 'customer') {
+                    customersApi.loadRequests();
+                }
             })
 
             return () => {
@@ -232,6 +236,10 @@ const AppTemplate = (props) => {
                 <RequestModalComponent
                     open={showRequestModal}
                     userId={resourceId}
+                    onClose={() => {
+                        setShowRequestModal(false);
+                        setResourceId('')
+                    }}
                 />
             </Box>
         </TemplateContext.Provider>
