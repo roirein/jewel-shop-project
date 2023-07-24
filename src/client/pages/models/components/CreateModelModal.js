@@ -21,12 +21,12 @@ import CenteredStack from '../../../components/UI/CenteredStack';
 import ErrorLabelComponent from '../../../components/UI/Form/Labels/ErrorLabelComponent';
 import { sendHttpRequest } from '../../../utils/requests';
 import { MODELS_ROUTES } from '../../../utils/server-routes';
+import modelsApi from '../../../store/models/models-api';
 
 const CreateModelModal = (props) => {
 
     const intl = useIntl();
     const theme = useTheme();
-    const contextValue = useContext(AppContext)
 
     const newModelValidationSchema = yup.object().shape({
         item: yup.string().required(intl.formatMessage(formMessages.emptyFieldError)),
@@ -51,6 +51,8 @@ const CreateModelModal = (props) => {
         sideStoneSize: modelData ? props.modelData.sideStoneSize : '',
         mainStoneSize: modelData ? props.modelData.mainStoneSize: ''
     }
+
+    const [modelError, setModelError] = useState()
 
     const methods = useForm({
         resolver: yupResolver(newModelValidationSchema)
@@ -80,19 +82,13 @@ const CreateModelModal = (props) => {
             formData.append('metadataId', modelData.id)
         }
         try {
-            const response = await sendHttpRequest(MODELS_ROUTES.ADD_MODEL, 'POST', formData, {
-                'Authorization': `Bearer ${contextValue.token}`,
-                'Content-Type': `multipart/form-data`
-            })
-            if (response.status === 201){
-                contextValue.socket.emit('new-model', {
-                    modelNumber: response.data.model.modelNumber,
-                    title: response.data.model.title
-                })
-                handleClose();
-            }
+            await modelsApi.addNewModel(formData)
+            handleClose();
         } catch(e) {
             console.log(e)
+            if (e.response.status === 409) {
+                setModelError(intl.formatMessage(modelsPageMessages.modelError))
+            }
         }
     }
 
@@ -139,7 +135,7 @@ const CreateModelModal = (props) => {
         methods.setValue('title', '')
         methods.setValue('description', '')
         methods.setValue('model', null)
-        props.onClose(true)
+        props.onClose()
     }
 
     return (
@@ -172,7 +168,7 @@ const CreateModelModal = (props) => {
                                 name="modelNumber"
                                 type="text"
                                 fieldLabel={intl.formatMessage(modelsPageMessages.modelNumber)}
-                                onBlur={() => {}}
+                                onBlur={() => setModelError('')}
                             />
                             <FormSelectComponent
                                 name="item"
@@ -203,7 +199,7 @@ const CreateModelModal = (props) => {
                                 <FormNumberFieldComponent
                                     name="sideStoneSize"
                                     fieldLabel={intl.formatMessage(modelsPageMessages.sideStoneSize)}
-                                    onBlur={() => {}}
+                                    onBlur={() => setModelError('')}
                                 />
                                 <Typography>
                                     {intl.formatMessage(modelsPageMessages.carat)}
@@ -221,7 +217,7 @@ const CreateModelModal = (props) => {
                                 <FormNumberFieldComponent
                                     name="mainStoneSize"
                                     fieldLabel={intl.formatMessage(modelsPageMessages.mainStoneSize)}
-                                    onBlur={() => {}}
+                                    onBlur={() => setModelError('')}
                                 />
                                 <Typography>
                                     {intl.formatMessage(modelsPageMessages.carat)}
@@ -232,18 +228,23 @@ const CreateModelModal = (props) => {
                             name="title"
                             type="text"
                             fieldLabel={intl.formatMessage(modelsPageMessages.title)}
-                            onBlur={() => {}}
+                            onBlur={() => setModelError('')}
                         />
                         <FormTextAreaComponent
                             name="description"
                             fieldLabel={intl.formatMessage(modelsPageMessages.description)}
-                            onBlur={() => {}}
+                            onBlur={() => setModelError('')}
                         />
                         <CenteredStack>
                             <ImageUploader
                                 name="model"
                             />
                         </CenteredStack>
+                        {modelError && (
+                            <ErrorLabelComponent
+                                label={modelError}
+                            />
+                        )}
                     </Stack>
                 </form>
             </FormProvider>

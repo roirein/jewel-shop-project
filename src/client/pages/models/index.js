@@ -14,14 +14,17 @@ import { sendHttpRequest } from "../../utils/requests"
 import { MODELS_ROUTES } from "../../utils/server-routes"
 import { ITEM_ENUMS, MODEL_STATUS_ENUM } from "../../const/Enums"
 import ModelModalComponent from "./components/ModelModal"
+import { useSelector } from "react-redux"
+import modelsApi from "../../store/models/models-api"
+import userApi from "../../store/user/user-api"
+import TemplateContext from "../../context/template-context"
 
 const ModelsPage = () => {
 
     const intl = useIntl();
     const theme = useTheme();
-    const contextValue = useContext(AppContext)
+    const contextValue = useContext(TemplateContext)
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [showModelModal, setShowModelModal] = useState(false);
     const [originalData, setOriginalData] = useState([]);
     const [displayesModels, setDisaplyesModels] = useState([])
     const [tableData, setTableData] = useState([]);
@@ -29,6 +32,8 @@ const ModelsPage = () => {
     const [selectedTab, setSelectedTab] = useState(0)
     const [filter, setFilter] = useState(3)
     const router = useRouter();
+    const models = useSelector((state) => modelsApi.getModels(state));
+    const user = useSelector((state) => userApi.getUser(state))
 
 
     const tableFilters = [
@@ -42,19 +47,19 @@ const ModelsPage = () => {
         }
     ]
 
-    
-    const fetchModels = async () => {
-        const response = await sendHttpRequest(MODELS_ROUTES.GET_MODELS_METADATA, 'GET', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        return response.data.models
-    }
-
-    const handleCloseModal = (toFetchModels) => {
-        setShowCreateModal(false)
-        if (toFetchModels) {
-            fetchModels().then(models => setOriginalData(models))
+    useEffect(() => {
+        if (user.token) {
+            modelsApi.retriveModels()
         }
+    }, [user])
+
+    useEffect(() => {
+        setOriginalData(models)
+    }, [models])
+
+
+    const handleCloseModal = () => {
+        setShowCreateModal(false)
     }
 
     const onSelectRow = (rowId) => {
@@ -65,21 +70,6 @@ const ModelsPage = () => {
             setSelectedModel({})
         }
     }
-
-    const onCloseModelModal = async (toFetchModels) => {
-        setShowModelModal(false)
-        setSelectedModel({})
-        if (toFetchModels) {
-            const models = await fetchModels()
-            setOriginalData(models)
-        }
-    }
-
-    useEffect(() => {
-        if (contextValue.token) {
-            fetchModels().then((models) => setOriginalData(models))
-        }
-    }, [contextValue.token])
 
     const setRowData = (dataElement) => {
         if (selectedTab === 0) {
@@ -139,7 +129,7 @@ const ModelsPage = () => {
                 direction: theme.direction
             }}
         >
-            {contextValue.permissionLevel === 2 && (
+            {user && user.permissionLevel === 2 && (
                 <Tabs
                     value={router.pathname}
                     indicatorColor="transparent"
@@ -164,7 +154,7 @@ const ModelsPage = () => {
                     ))}
                 </Tabs>
             )}
-            {(contextValue.permissionLevel === 2) && (
+            {(user && user.permissionLevel === 2 ) && (
                 <Stack
                     sx={{
                         pr: theme.spacing(4),
@@ -195,46 +185,43 @@ const ModelsPage = () => {
                     mt: theme.spacing(3)
                 }}
             >
-                {contextValue.permissionLevel === 2 && (
-                    <TableComponent
-                        columns={selectedTab === 0 ? MODELS_TABL_COLUMNS : MODELS_TABL_BY_STATUS_COLUMNS}
-                        data={tableData}
-                        showMore
-                        onClickShowMore={(rowId) => {
-                            onSelectRow(rowId)
-                            setShowModelModal(true)
-                        }}
-                        selectedRowId={selectedModel?.id}
-                        onSelectRow={(rowId) => onSelectRow(rowId)}
-                        tableFilters={selectedTab === 0 ? tableFilters : null}
-                        onFilterChange={(filterValue) => setFilter(Number(filterValue))}
-                        
-                    />
-                )}
-                {contextValue.permissionLevel === 1 && (
-                    <TableComponent
-                        columns={MODELS_TABL_COLUMNS}
-                        data={tableData}
-                        showMore
-                        onClickShowMore={(rowId) => {
-                            onSelectRow(rowId)
-                            setShowModelModal(true)
-                        }}
-                        selectedRowId={selectedModel?.id}
-                        onSelectRow={(rowId) => onSelectRow(rowId)}
-                        tableFilters={selectedTab === 0 ? tableFilters : null}
-                        onFilterChange={(filterValue) => setFilter(Number(filterValue))}
-                    />
+                {tableData.length > 0 && (
+                    <>
+                        {user.permissionLevel === 2 && (
+                            <TableComponent
+                                columns={selectedTab === 0 ? MODELS_TABL_COLUMNS : MODELS_TABL_BY_STATUS_COLUMNS}
+                                data={tableData}
+                                showMore
+                                onClickShowMore={(rowId) => {
+                                    contextValue.onOpenModelModal(rowId)
+                                }}
+                                selectedRowId={selectedModel?.id}
+                                onSelectRow={(rowId) => onSelectRow(rowId)}
+                                tableFilters={selectedTab === 0 ? tableFilters : null}
+                                onFilterChange={(filterValue) => setFilter(Number(filterValue))}
+                                
+                            />
+                        )}
+                        {user.permissionLevel === 1 && (
+                            <TableComponent
+                                columns={MODELS_TABL_COLUMNS}
+                                data={tableData}
+                                showMore
+                                onClickShowMore={(rowId) => {
+                                    contextValue.onOpenModelModal(rowId)
+                                }}
+                                selectedRowId={selectedModel?.id}
+                                onSelectRow={(rowId) => onSelectRow(rowId)}
+                                tableFilters={selectedTab === 0 ? tableFilters : null}
+                                onFilterChange={(filterValue) => setFilter(Number(filterValue))}
+                            />
+                        )}        
+                    </>
                 )}
             </CenteredStack>
             <CreateModelModal
                 open={showCreateModal}
-                onClose={(toFetchModels) => handleCloseModal(toFetchModels)}
-            />
-            <ModelModalComponent
-                open={showModelModal}
-                onClose={(toFetchModels) => onCloseModelModal(toFetchModels)}
-                modelNumber={selectedModel?.modelNumber}
+                onClose={() => handleCloseModal()}
             />
         </Stack>
     )

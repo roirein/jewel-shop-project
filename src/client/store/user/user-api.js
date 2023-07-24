@@ -5,6 +5,7 @@ import { nameSelector, permissionLevelSelector, tokenSelector, userSelector } fr
 import customersSlice from '../customers/customer-slice';
 import employeesSlice from '../employees/emplyees-slice';
 import notificationsSlice from '../notifications/notification-slice';
+import notifcationsApi from '../notifications/notification-api';
 
 const userRoute = `${process.env.SERVER_URL}/user`
 const state = store.getState()

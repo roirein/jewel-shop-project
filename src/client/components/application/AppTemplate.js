@@ -6,14 +6,11 @@ import { CUSTOMER_INTERFACE_TABS, DESIGN_MANGER_TABS, MANAGER_TABS } from '../..
 import TemplateTabsComponent from './TemplateTabs';
 import NotificationComponent from '../UI/NotificationComponent';
 import { useIntl } from 'react-intl';
-import axios from 'axios';
 import { homePageMessages } from '../../translations/i18n';
 import { useRouter } from 'next/router';
 import { createNotification, getAuthorizationHeader } from '../../utils/utils';
 import { Diamond, PersonAddAlt, ShoppingCart } from '@mui/icons-material';
 import NotificationDropdown from '../UI/Notifications/NotificationDropdown';
-import { sendHttpRequest } from '../../utils/requests';
-import { USER_ROUTES } from '../../utils/server-routes';
 import userApi from '../../store/user/user-api';
 import notifcationsApi from '../../store/notifications/notification-api';
 import { useSelector } from 'react-redux';
@@ -21,6 +18,8 @@ import { getSocket } from '../../socket/socket';
 import TemplateContext from '../../context/template-context';
 import RequestModalComponent from '../../pages/customers/components/RequestModalComponent';
 import customersApi from '../../store/customers/customer-api';
+import modelsApi from '../../store/models/models-api'
+import ModelModalComponent from '../../pages/models/components/ModelModal';
 
 const AppTemplate = (props) => {
 
@@ -36,13 +35,18 @@ const AppTemplate = (props) => {
     const [notificationMessage, setNotificationMessage] = useState();
     const [resourceId, setResourceId] = useState();
     const [showRequestModal, setShowRequestModal] = useState(false)
+    const [showModelModal, setShowModelModal] = useState(false)
     const user = useSelector((state) => userApi.getUser(state))
 
     useEffect(() => {
         if (router.pathname !== '/') {
-            userApi.loadUser()
+            userApi.loadUser().then(() => {
+                notifcationsApi.setUserNotifications(user.userId)
+                setSocket(getSocket())
+            }).catch(e => router.push('/'))
+
         }
-    }, [])
+    }, [user.token])
 
     useEffect(() => {
         if (username) {
@@ -60,6 +64,9 @@ const AppTemplate = (props) => {
                 notifcationsApi.addNewNotification(notification)
                 if (notification.resource === 'customer') {
                     customersApi.loadRequests();
+                }
+                if (notification.resource === 'model') {
+                    modelsApi.loadModels()
                 }
             })
 
@@ -92,7 +99,7 @@ const AppTemplate = (props) => {
                     {
                         type: 3,
                         icon: <Diamond/>,
-                        //notifications: contextValue.notifications.models
+                        notifications: notificationsAmount.models
                     }
                 ]
             case 2: 
@@ -105,7 +112,7 @@ const AppTemplate = (props) => {
                     {
                         type: 3,
                         icon: <Diamond/>,
-                        //notifications: contextValue.notifications.models
+                        notifications: notificationsAmount.models
                     }
                 ]
             case 3:
@@ -140,13 +147,18 @@ const AppTemplate = (props) => {
         }
     }
 
+    const onOpenModelModal = (modelNumber) => {
+        setResourceId(modelNumber)
+        setShowModelModal(true)
+    }
+
     const onOpenRequestModal = (customerId) => {
         setResourceId(customerId)
         setShowRequestModal(true)
     }
 
     return (
-        <TemplateContext.Provider value={{onOpenRequestModal}}>
+        <TemplateContext.Provider value={{onOpenRequestModal, onOpenModelModal}}>
             <Box
                 width="100%"
                 minHeight="100vh"
@@ -239,6 +251,14 @@ const AppTemplate = (props) => {
                     userId={resourceId}
                     onClose={() => {
                         setShowRequestModal(false);
+                        setResourceId('')
+                    }}
+                />
+                <ModelModalComponent
+                    open={showModelModal}
+                    modelNumber={resourceId}
+                    onClose={() => {
+                        setShowModelModal(false)
                         setResourceId('')
                     }}
                 />

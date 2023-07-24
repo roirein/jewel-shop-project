@@ -87,6 +87,7 @@
     "created": "נוצר",
     "updatePrice": "עדכן מחיר וחומרים",
     "numberOfModel": "מודל מספר {number}",
+    "modelError": "מודל בעל מספר זה קיים, אנא הכנס מספר אחר",
     "createNewOrder": "יצירת הזמנה חדשה",
     "customerDetails": "פרטי לקוח",
     "orderType": "סוג הזמנה",

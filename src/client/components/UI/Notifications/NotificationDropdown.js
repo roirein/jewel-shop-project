@@ -33,8 +33,7 @@ const NotificationDropdown = (props) => {
             contextValue.onOpenRequestModal(resourceId)
         }
         if (resource === 'model') {
-            console.log(2)
-            contextValue.onShowModelModal(resourceId)
+            contextValue.onOpenModelModal(resourceId)
         }
         if (resource === 'order') {
             router.push(`/orders/${resourceId}`)

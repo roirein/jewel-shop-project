@@ -9,6 +9,8 @@ const HttpError = require('../utils/HttpError')
 const { createModelMetadata, createModel, preapareModels, getModelByStatus } = require("../utils/models")
 const path = require('path')
 const { Op } = require("sequelize")
+const OrderTimeline = require("../models/orders/orderTimeline")
+const dayjs = require("dayjs")
 
 const createNewModel = async (req, res, next) => {
     try {
@@ -44,7 +46,7 @@ const createNewModel = async (req, res, next) => {
             sideStoneSize: req.body.sideStoneSize,
             mainStoneSize: req.body.mainStoneSize,
             status: model.dataValues.status,
-            title: model.dataValues.title,
+            title: model.dataValues.title
         }})
     } catch (e) {
         next(e)
@@ -114,6 +116,27 @@ const getModelById = async (req, res, next) => {
     }
 }
 
+const postComment = async (req, res, next) => {
+    try {
+        await JewelModel.update({
+            status: -1
+        }, {
+            where: {
+                modelNumber: req.params.modelNumber
+            }
+        })
+        const comments = await Comments.create({
+            modelNumber: req.params.modelNumber,
+            content: req.body.comments
+        })
+
+        res.status(201).send({comments: comments.content})
+    
+    } catch (e) {
+        next(e)
+    }
+}
+
 const getModelComments = async (req, res, next) => {
     try {
         const commentData = await Comments.findAll({
@@ -161,6 +184,53 @@ const getModelImage = async (req, res, next) => {
         res.status(200).sendFile(image)
     } catch(e) {
         next (e)
+    }
+}
+
+const setPriceData = async (req, res, next) => {
+    try {
+        const priceData = await ModelPrice.create({
+            modelNumber: req.params.modelNumber,
+            materials: req.body.materials,
+            priceWithMaterials: req.body.priceWithMaterials,
+            priceWithoutMaterials: req.body.priceWithoutMaterials
+        })
+    
+        const jewelModel = await JewelModel.findOne({
+            where: {
+                modelNumber: req.params.modelNumber
+            },
+            include: ModelMetadata
+        })
+    
+        if (jewelModel.dataValues['Model Metadatum'].dataValues.orderId) {
+            await Order.update({
+                status: 3
+            }, {
+                where: {
+                    orderId: jewelModel.dataValues['Model Metadatum'].dataValues.orderId
+                }
+            })
+    
+            await OrderTimeline.update({
+                designEnd: dayjs()
+            }, {
+                where: {
+                    orderId: jewelModel.dataValues['Model Metadatum'].dataValues.orderId
+                }
+            })
+        }
+        jewelModel.status = 2;
+        await jewelModel.save();
+        res.status(201).send({
+            priceData: {
+                materials: priceData.materials,
+                priceWithMaterials: priceData.priceWithMaterials,
+                priceWithoutMaterials: priceData.priceWithoutMaterials
+            }
+        })
+    } catch(e) {
+        next(e)
     }
 }
 
@@ -234,5 +304,7 @@ module.exports = {
     updateModel,
     getPriceData,
     getModelsForOrders,
-    getModelByStatus
+    getModelByStatus,
+    setPriceData,
+    postComment
 }

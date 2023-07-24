@@ -22,10 +22,10 @@ const notificationsSlice = createSlice({
                     state.customers = [...state.customers, action.payload.notification]
                     break
                 case 'order':
-                    state.models = [...state.models, action.payload.notification]
+                    state.orders = [...state.orders, action.payload.notification]
                     break
                 case 'model': 
-                    state.orders = [...state.orders, action.payload.notification]
+                    state.models = [...state.models, action.payload.notification]
                     break;
                 default: 
                     state = initialState
@@ -51,6 +51,9 @@ const notificationsSlice = createSlice({
             notifications[index] = action.payload.notification;
             if (resource === 'customer') {
                 state.customers = [...notifications]
+            } 
+            if (resource === 'model') {
+                state.models = [...notifications]
             }
         },
         clear: () => initialState

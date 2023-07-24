@@ -71,7 +71,7 @@ const readNotification = (resourceId, resource) => {
         const currentDate = dayjs(current.createdAt);
         return currentDate.isAfter(mostRecentDate) ? current : recent;
     })
-    console.log(notification)
+
     notification = {
         ...notification,
         isRead: true
@@ -81,7 +81,6 @@ const readNotification = (resourceId, resource) => {
     socket.emit('read-notification', {
         id: notification.id
     })
-
 }
 
 const notifcationsApi = {

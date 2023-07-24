@@ -3,69 +3,42 @@ import { useIntl } from 'react-intl'
 import { buttonMessages, modelsPageMessages, ordersPageMessages  } from '../../../translations/i18n'
 import { Stack, useTheme } from "@mui/system";
 import ButtonComponent from '../../../components/UI/ButtonComponent';
-import axios from 'axios';
-import { getAuthorizationHeader } from '../../../utils/utils';
 import { useContext, useEffect, useState } from 'react';
-import AppContext from '../../../context/AppContext';
 import ModelCardComponent from './ModelCard';
 import CenteredStack from '../../../components/UI/CenteredStack';
 import CommentsForm from './CommentForm';
 import { Typography } from '@mui/material';
 import UpdateForm from './updateForm';
 import UpdatePriceForm from './updatePriceForm';
-import {sendHttpRequest} from '../../../utils/requests'
-import { MODELS_ROUTES } from '../../../utils/server-routes';
+import modelsApi from '../../../store/models/models-api';
+import { useSelector } from 'react-redux';
+import userApi from '../../../store/user/user-api';
+import notifcationsApi from '../../../store/notifications/notification-api';
 
 
 const ModelModalComponent = (props) => {
 
     const intl = useIntl();
     const theme = useTheme();
-    const contextValue = useContext(AppContext);
 
     const [model, setModel] = useState({});
-    const [comments, setComments] = useState();
-    const [priceData, setPriceData] = useState({});
-    const [imageUrl, setImageUrl] = useState('');
     const [showUpdateForm, setShowUpdateForm] = useState(false);
-    const [showUpdatePriceForm, setShowUpdatePriceForm] = useState(false)
     const [status, setStatus] = useState(0)
+    const user = useSelector((state) => userApi.getUser(state))
 
-    const handleClose = (toFecthModels) => {
-        setComments('')
-        props.onClose(toFecthModels)
+    const handleClose = () => {
+        setStatus(0)
+        props.onClose()
     }
 
     useEffect(() => {
-        if(props.modelNumber && props.open) {
-            sendHttpRequest(MODELS_ROUTES.GET_MODEL(props.modelNumber), 'GET', null, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((response) => {
-                setModel(response.data.model)
-                if (response.data.model.status === -1 ) {
-                    sendHttpRequest(MODELS_ROUTES.COMMENTS(props.modelNumber), 'GET', null, {
-                        Authorization: `Bearer ${contextValue.token}`
-                    }).then((res) => setComments(res.data.comment))
-                }
-                if (response.data.model.status === 2) {
-                    sendHttpRequest(MODELS_ROUTES.PRICE(props.modelNumber), 'GET', null, {
-                        Authorization: `Bearer ${contextValue.token}`
-                    }).then((res) => setPriceData(res.data.price))
-                }
+        if (props.open && props.modelNumber) {
+            modelsApi.loadModel(props.modelNumber).then((result) => {
+                setModel(result.model)
+                notifcationsApi.readNotification(props.modelNumber, 'model')
             })
         }
-    }, [props.modelNumber])
-
-    useEffect(() => {
-        if (model.modelNumber) {
-            sendHttpRequest(MODELS_ROUTES.IMAGE(model.image), 'GET', null, {
-                Authorization: `Bearer ${contextValue.token}`
-            }, 'blob').then((res) => {
-                const image = URL.createObjectURL(res.data);
-                setImageUrl(image)
-            })
-        }
-    }, [model])
+    }, [props.open, props.modelNumber])
 
     const getModalActions = () => {
         return (
@@ -87,25 +60,12 @@ const ModelModalComponent = (props) => {
         formData.append('title', data.title)
         formData.append('description', data.description),
         formData.append('model', data.model)
-        const response = await sendHttpRequest(MODELS_ROUTES.UPDATE(props.modelNumber), 'PUT', formData, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        if (response.status === 200) {
-            contextValue.socket.emit('model-update', {
-                modelNumber: props.modelNumber,
-            })
-            handleClose(true)
-        }
+        await modelsApi.updateModel(formData, props.modelNumber);
+        handleClose()
     }
 
     const onUpdatePrice = async (data) => {
-        contextValue.socket.emit('model-approve', {
-            modelNumber: model.modelNumber,
-            status: 2,
-            materials: data.materials,
-            priceWithMaterials: data.priceWithMaterials,
-            priceWithoutMaterials: data.priceWithoutMaterials
-        })
+        await modelsApi.updateModelPrice(data, model.modelNumber)
         handleClose(true)
     }
 
@@ -120,7 +80,7 @@ const ModelModalComponent = (props) => {
             <ModelCardComponent
                 title={model.title}
                 description={model.description}
-                image={imageUrl}
+                image={model.imageUrl}
             />
             <CenteredStack
                 columnGap={theme.spacing(4)}
@@ -132,7 +92,7 @@ const ModelModalComponent = (props) => {
                     flexDirection: 'row-reverse'
                 }}
             >
-                {contextValue.permissionLevel === 1 && (
+                {user.permissionLevel === 1 && (
                     <>
                         {(model.status === 0 || model.status === 1)  &&  (
                             <>
@@ -153,13 +113,9 @@ const ModelModalComponent = (props) => {
                                 {status === -1 && (
                                     <CommentsForm
                                         onCancel={() => setStatus(0)}
-                                        onSubmit={(data) => {
-                                            contextValue.socket.emit('model-reject', {
-                                                status: -1,
-                                                modelNumber: model.modelNumber,
-                                                comments: data.comments
-                                            })
-                                            handleClose(true)
+                                        onSubmit={async (data) => {
+                                            await modelsApi.sendComment(data, props.modelNumber)
+                                            handleClose()
                                         }}
                                     />
                                 )}
@@ -177,7 +133,7 @@ const ModelModalComponent = (props) => {
                 )}
                 {model.status === -1 && (
                     <>
-                        {comments && (
+                        {model.comment && (
                             <Stack
                                 width="100%"
                                 sx={{
@@ -186,9 +142,9 @@ const ModelModalComponent = (props) => {
                                 rowGap={theme.spacing(3)}
                             >
                                 <Typography>
-                                    {`${intl.formatMessage(ordersPageMessages.comments)}: ${comments}`}
+                                    {`${intl.formatMessage(ordersPageMessages.comments)}: ${model.comment}`}
                                 </Typography>
-                                {contextValue.permissionLevel === 2 && (
+                                {user.permissionLevel === 2 && (
                                     <>
                                         {!showUpdateForm && (
                                             <ButtonComponent
@@ -208,7 +164,7 @@ const ModelModalComponent = (props) => {
                         )}
                     </>
                 )}
-                {model.status === 2 && (
+                {status === 2 && (
                     <Stack
                         width="100%"
                         rowGap={theme.spacing(3)}
@@ -217,13 +173,13 @@ const ModelModalComponent = (props) => {
                         }}
                     >
                         <Typography>
-                            {`${intl.formatMessage(modelsPageMessages.materials)}: ${priceData.materials}`}
+                            {`${intl.formatMessage(modelsPageMessages.materials)}: ${model.materials}`}
                         </Typography>
                         <Typography>
-                            {`${intl.formatMessage(modelsPageMessages.priceWithMaterials)}: ${priceData.priceWithMaterials}`}
+                            {`${intl.formatMessage(modelsPageMessages.priceWithMaterials)}: ${model.priceWithMaterials}`}
                         </Typography>
                         <Typography>
-                            {`${intl.formatMessage(modelsPageMessages.priceWithoutMaterials)}: ${priceData.priceWithoutMaterials}`}
+                            {`${intl.formatMessage(modelsPageMessages.priceWithoutMaterials)}: ${model.priceWithoutMaterials}`}
                         </Typography>
                     </Stack>
                 )}

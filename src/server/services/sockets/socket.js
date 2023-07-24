@@ -126,9 +126,7 @@ const sendNewCustomerNotification = async (customerName, customerId, managerId) 
     const notification = await createNotification(managerId, 'customer', 'new_customer', customerId, {
         name: customerName
     })
-    console.log(notification)
     if (socketId) {
-        console.log('sending')
         ioInstance.to(socketId).emit('notification', notification)
     }
 }
@@ -139,117 +137,44 @@ const onCreateNewModel = async (modelNumber, modelTitle) => {
             permissionLevel: 1
         }
     })
-    const socketId = users[manager.dataValues.userId]
-    const notificationData = {
-        resource: 'model',
-        type: 'new-model',
-        resourceId: modelNumber,
-        recipient: manager.dataValues.userId,
-        data: {
-            modelNumber,
-            modelTitle
-        }
-    }
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(manager.dataValues.userId)
+    const notification = await createNotification(manager.dataValues.userId, 'model', 'new-model', modelNumber, {
+        modelNumber,
+        modelTitle
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('new-model', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
-
 }
 
 
 const onModelApprove = async (modelData) => {
-    await ModelPrice.create({
-        modelNumber: modelData.modelNumber,
-        materials: modelData.materials,
-        priceWithMaterials: modelData.priceWithMaterials,
-        priceWithoutMaterials: modelData.priceWithoutMaterials
-    })
-
-    const jewelModel = await JewelModel.findOne({
-        where: {
-            modelNumber: modelData.modelNumber
-        },
-        include: ModelMetadata
-    })
-
-    console.log(jewelModel.dataValues)
-
-    if (jewelModel.dataValues['Model Metadatum'].dataValues.orderId) {
-        await Order.update({
-            status: 3
-        }, {
-            where: {
-                orderId: jewelModel.dataValues['Model Metadatum'].dataValues.orderId
-            }
-        })
-
-        await OrderTimeline.update({
-            designEnd: dayjs()
-        }, {
-            where: {
-                orderId: jewelModel.dataValues['Model Metadatum'].dataValues.orderId
-            }
-        })
-    }
-
-    jewelModel.status = 2
-    await jewelModel.save()
-    
-    const designManager = await User.findOne({
+    const manager = await User.findOne({
         where: {
             permissionLevel: 2
         }
     })
-    const socketId = users[designManager.dataValues.userId]
-    const notificationData = {
-        resource: 'model',
-        type: 'model-approve',
-        resourceId: modelData.modelNumber,
-        recipient: designManager.dataValues.userId,
-        data: {
-            modelNumber: modelData.modelNumber
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(manager.dataValues.userId)
+    const notification = await createNotification(manager.dataValues.userId, 'model', 'model-approve', modelData.modelNumber, {
+        modelNumber: modelData.modelNumber
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('new-model', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
 const onModelReject = async (data) => {
-    await JewelModel.update({
-        status: data.status
-    }, {
-        where: {
-            modelNumber: data.modelNumber
-        }
-    })
-    await Comments.create({
-        modelNumber: data.modelNumber,
-        content: data.comments
-    })
-
-    const designManager = await User.findOne({
+    const manager = await User.findOne({
         where: {
             permissionLevel: 2
         }
     })
-    const socketId = users[designManager.dataValues.userId]
-    const notificationData = {
-        resource: 'model',
-        type: 'model-reject',
-        resourceId: data.modelNumber,
-        recipient: designManager.dataValues.userId,
-        data: {
-            modelNumber: data.modelNumber
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(manager.dataValues.userId)
+    const notification = await createNotification(manager.dataValues.userId, 'model', 'model-reject', data.modelNumber, {
+        modelNumber: data.modelNumber
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('model-reject', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -259,20 +184,12 @@ const onModelUpdate = async (data) => {
             permissionLevel: 1
         }
     })
-    const socketId = users[manager.dataValues.userId]
-    const notificationData = {
-        resource: 'model',
-        type: 'model-update',
-        resourceId: data.modelNumber,
-        recipient: manager.dataValues.userId,
-        data: {
-            modelNumber: data.modelNumber
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(manager.dataValues.userId)
+    const notification = await createNotification(manager.dataValues.userId, 'model', 'model-update', data.modelNumber, {
+        modelNumber: data.modelNumber
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('model-update', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -638,26 +555,6 @@ const completeOrder = async (data) => {
     })
 }
 
-const sendNewModelNotification = async (modelId) => {
-    const manager = await User.findOne({
-        where: {
-            permissionLevel: 1
-        }
-    })
-    const socketId = users[manager.dataValues.userId]
-    await Notifications.create({
-        resource: 'Model',
-        type: 'new_model',
-        resourceId:  modelId,
-        recipient: manager.dataValues.userId
-    })
-    if (socketId) {
-        ioInstance.to(socketId).emit('newModel', {
-            modelId
-        })
-    }
-}
-
 const updateRequestStatus = async (response, customerId) => {
     const customer = await User.findOne({
         where: {
@@ -718,5 +615,4 @@ const sendPriceOffer = async (data) => {
 module.exports = {
     initSocket,
     sendNewCustomerNotification,
-    sendNewModelNotification
 }

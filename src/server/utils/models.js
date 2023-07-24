@@ -11,8 +11,6 @@ const createModelMetadata = async (setting, sideStoneSize, mainStoneSize, item, 
         design
     })
 
-    console.log(metadata)
-
     return metadata
 }
 

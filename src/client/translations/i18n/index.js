@@ -541,6 +541,10 @@ export const modelsPageMessages = defineMessages({
     modelStatus: {
         id: 'modelStatus',
         defaultMessage: 'model status'
+    },
+    modelError: {
+        id: 'modelError',
+        defaultMessage: 'model with the enetred number exist, please enter anothe number'
     }
 })
 
