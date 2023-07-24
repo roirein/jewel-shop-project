@@ -23,7 +23,7 @@ router.post('/verify-code', verifyCode);
 
 router.patch('/reset-password', updatePassword)
 
-router.post('/user', authorizeUser, getUserByToken)
+router.post('/user', getUserByToken)
 
 router.get('/notifications/:userId', authorizeUser, getNotifications)
 

@@ -8,6 +8,8 @@ import { useIntl } from "react-intl";
 import { customerPageMessages } from "../../translations/i18n";
 import ButtonComponent from "../../components/UI/ButtonComponent";
 import customersApi from "../../store/customers/customer-api";
+import { useSelector } from "react-redux";
+import userApi from "../../store/user/user-api";
 
 const CustomerPage = () => {
 
@@ -16,10 +18,13 @@ const CustomerPage = () => {
     const [selectedCustomer, setSelectedCustomer] = useState({})
     const theme = useTheme();
     const intl = useIntl();
+    const user = useSelector((state) => userApi.getUser(state))
 
     useEffect(() => {
-        customersApi.retrieveCustomer().then((customers) => setOriginalData(customers))
-    }, [])
+        if (user.token) {
+            customersApi.retrieveCustomer().then((customers) => setOriginalData(customers))
+        }
+    }, [user])
     
     useEffect(() => {
         const data = [];
@@ -56,12 +61,14 @@ const CustomerPage = () => {
                     mt: theme.spacing(3)
                 }}
             >
-                <TableComponent
-                    columns={CUSTOMER_TABLE_COLUMNS}
-                    data={tableData}
-                    selectedRowId={selectedCustomer?.id}
-                    onSelectRow={(rowId) => onSelectRow(rowId)}
-                />
+                {tableData.length > 0 && (
+                    <TableComponent
+                        columns={CUSTOMER_TABLE_COLUMNS}
+                        data={tableData}
+                        selectedRowId={selectedCustomer?.id}
+                        onSelectRow={(rowId) => onSelectRow(rowId)}
+                    />
+                )}
                 <CenteredStack
                     width="100%"
                     direction="row"

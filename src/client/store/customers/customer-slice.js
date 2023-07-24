@@ -29,7 +29,8 @@ const customersSlice = createSlice({
             const index = customers.findIndex((cust) => action.payload.customer.id === cust.id)
             customers.splice(index, 1)
             state.customers = [...customers]
-        }
+        },
+        clear: () => initialState
     }
 })
 

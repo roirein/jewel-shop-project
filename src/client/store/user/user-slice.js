@@ -22,7 +22,8 @@ const userSlice = createSlice({
             state.permissionLevel = action.payload.permissionLevel,
             state.token = action.payload.token
             initSocket(action.payload.id)
-        }
+        },
+        clear: () => initialState
     }
 })
 

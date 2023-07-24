@@ -52,7 +52,8 @@ const notificationsSlice = createSlice({
             if (resource === 'customer') {
                 state.customers = [...notifications]
             }
-        }
+        },
+        clear: () => initialState
     }
 })
 

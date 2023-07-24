@@ -1,7 +1,10 @@
 import axios from 'axios'
 import userSlice from './user-slice'
 import store from '../index'
-import { nameSelector, permissionLevelSelector, tokenSelector } from './user-selector';
+import { nameSelector, permissionLevelSelector, tokenSelector, userSelector } from './user-selector';
+import customersSlice from '../customers/customer-slice';
+import employeesSlice from '../employees/emplyees-slice';
+import notificationsSlice from '../notifications/notification-slice';
 
 const userRoute = `${process.env.SERVER_URL}/user`
 const state = store.getState()
@@ -32,6 +35,10 @@ const getUserPermissionLevel = (appState) => {
 
 const getUsername = (appState) => {
     return nameSelector(appState)
+}
+
+const getUser = (appState) => {
+    return userSelector(appState)
 }
 
 const createNewUser = async (userData) => {
@@ -88,6 +95,37 @@ const resetPassword = async (email, password, confirmPassword) => {
     }
 }
 
+const loadUser = async () => {
+    let token = sessionStorage.getItem('token');
+    if (!token) {
+        token = localStorage.getItem('token')
+    }
+
+    if (token) {
+        const response = await axios.post(`${userRoute}/user`, {
+            token
+        })
+
+        store.dispatch(userSlice.actions.loginSuccess({token, ...response.data.user}))
+    }
+}
+
+const logoutUser = async () => {
+    const user = userSelector(store.getState())
+    await axios.post(`${userRoute}/logout`, {
+        userId: user.userId
+    }, {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    })
+
+    const slices = [userSlice, customersSlice, employeesSlice, notificationsSlice]
+    slices.forEach(slice => {
+        store.dispatch(slice.actions.clear())
+    })   
+}
+
 const userApi = {
     loginUser,
     getUserPermissionLevel,
@@ -96,7 +134,10 @@ const userApi = {
     createNewUser,
     getResetPasswordCode,
     verifyResetPasswordCode,
-    resetPassword
+    resetPassword,
+    loadUser,
+    getUser,
+    logoutUser
 }
 
 export default userApi

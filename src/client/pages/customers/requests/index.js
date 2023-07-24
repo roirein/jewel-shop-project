@@ -2,7 +2,7 @@
 import PageLayout from '../components/PageLayout';
 import CenteredStack from '../../../components/UI/CenteredStack'
 import { useTheme, Stack } from '@mui/material';
-import { useState, useEffect, useContext} from 'react';
+import { useState, useEffect, useContext, use} from 'react';
 import TableComponent from '../../../components/UI/TableComponent';
 import { useIntl } from 'react-intl';
 import { REQUEST_TABLE_COLUMNS } from '../../../const/TablesColumns';
@@ -11,6 +11,7 @@ import ButtonComponent from '../../../components/UI/ButtonComponent';
 import customersApi from '../../../store/customers/customer-api';
 import TemplateContext from '../../../context/template-context';
 import { useSelector } from 'react-redux';
+import userApi from '../../../store/user/user-api';
 
 const RequestPage = () => {
 
@@ -30,6 +31,7 @@ const RequestPage = () => {
     const [statusFilter, setStatusFilter] = useState(2)
     const contextValue = useContext(TemplateContext)
     const requestsFromStore = useSelector((state) => customersApi.getRequests(state))
+    const user = useSelector((state) => userApi.getUser(state))
 
     const tableFilters = [
         {
@@ -43,7 +45,13 @@ const RequestPage = () => {
     ]
 
     useEffect(() => {
-        customersApi.retrieveRequests().then((requests) => setOriginalData(requests))
+        if (user.token) {
+            customersApi.retrieveRequests()
+        }
+    }, [user])
+
+    useEffect(() => {
+        setOriginalData(requestsFromStore)
     }, [requestsFromStore])
 
     useEffect(() => {
@@ -101,18 +109,20 @@ const RequestPage = () => {
                     mt: theme.spacing(3)
                 }}
             >
-                <TableComponent
-                    columns={REQUEST_TABLE_COLUMNS}
-                    data={tableData}
-                    showMore
-                    onClickShowMore={(rowId) => {
-                        contextValue.onOpenRequestModal(rowId)
-                    }}
-                    selectedRowId={selectedUser?.customerId}
-                    onSelectRow={(rowId) => onSelectRow(rowId)}
-                    tableFilters={tableFilters}
-                    onFilterChange={(filterValue) => onFilterChange(filterValue)}
-                />
+                {tableData.length > 0 && (
+                    <TableComponent
+                        columns={REQUEST_TABLE_COLUMNS}
+                        data={tableData}
+                        showMore
+                        onClickShowMore={(rowId) => {
+                            contextValue.onOpenRequestModal(rowId)
+                        }}
+                        selectedRowId={selectedUser?.customerId}
+                        onSelectRow={(rowId) => onSelectRow(rowId)}
+                        tableFilters={tableFilters}
+                        onFilterChange={(filterValue) => onFilterChange(filterValue)}
+                    />
+                )}
                 <CenteredStack
                     width="100%"
                     direction="row"

@@ -26,33 +26,32 @@ const ContextProvider = (props) => {
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
     const [notifications, setNotifications] = useState({})
-    const [isLoading, setIsLoading] = useState(false);
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [showModelModal, setShowModelModal] = useState(false);
     const [modalResouceId, setModalResourceId] = useState(null);
 
-    useEffect(() => {
-        const authToken = getToken();
-        if (authToken) {
-            setIsLoading(true) 
-            sendHttpRequest(USER_ROUTES.USER, 'POST', {token: authToken}, {
-                Authorization: `Bearer ${authToken}`
-            }).then((res) => {
-                setUserData({token: authToken, ...res.data.user})
-                const sock = io('http://localhost:3002');
-                sock.emit('login', {
-                    userId: res.data.userId
-                })
-                setSocket(socket)
-                if (router.pathname === '/') {
-                    const route = getRouteAfterLogin(res.data.user.permissionLevel)
-                    router.push(route)
-                }
-            })
-        } else {
-            router.push('/')
-        }
-    }, [])
+    // useEffect(() => {
+    //     const authToken = getToken();
+    //     if (authToken) {
+    //         setIsLoading(true) 
+    //         sendHttpRequest(USER_ROUTES.USER, 'POST', {token: authToken}, {
+    //             Authorization: `Bearer ${authToken}`
+    //         }).then((res) => {
+    //             setUserData({token: authToken, ...res.data.user})
+    //             const sock = io('http://localhost:3002');
+    //             sock.emit('login', {
+    //                 userId: res.data.userId
+    //             })
+    //             setSocket(socket)
+    //             if (router.pathname === '/') {
+    //                 const route = getRouteAfterLogin(res.data.user.permissionLevel)
+    //                 router.push(route)
+    //             }
+    //         })
+    //     } else {
+    //         router.push('/')
+    //     }
+    // }, [])
 
     useEffect(() => {
         if (token && userId)
@@ -345,10 +344,6 @@ const ContextProvider = (props) => {
         readNotification,
         onShowRequestModal,
         onShowModelModal
-    }
-
-    if (isLoading) {
-        return <LoadingSpinner/>
     }
 
 

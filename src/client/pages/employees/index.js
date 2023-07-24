@@ -4,16 +4,14 @@ import { Add } from "@mui/icons-material"
 import { useIntl } from "react-intl"
 import { employeesPageMessages } from "../../translations/i18n"
 import { EMPLOYEES_TABLE_COLUMNS } from "../../const/TablesColumns"
-import { useState, useEffect, useContext } from "react"
-import AppContext from "../../context/AppContext"
+import { useState, useEffect} from "react"
 import { ROLES_ENUM } from "../../const/Enums"
 import CenteredStack from "../../components/UI/CenteredStack"
 import TableComponent from "../../components/UI/TableComponent"
 import AddNewEmployeeModalComponent from "./components/AddNewEmployeeModal"
-import { sendHttpRequest } from "../../utils/requests";
-import { EMPLOYEES_ROUTES } from "../../utils/server-routes"
 import { useSelector } from "react-redux"
 import employeesApi from "../../store/employees/employees-api"
+import userApi from "../../store/user/user-api"
 
 const EmployeesPage = () => {
 
@@ -23,12 +21,14 @@ const EmployeesPage = () => {
     const [selectedEmployee, setSelectedEmployee] = useState({})
     const [tableData, setTableData] = useState([]);
     const [showModal, setShowModal] = useState(false)
-    const contextValue = useContext(AppContext);
     const employees = useSelector((state) => employeesApi.getEmployees(state))
+    const user = useSelector((state) => userApi.getUser(state))
 
     useEffect(() => {
-        employeesApi.retriveEmployees()
-    }, [])
+        if (user.token) {
+            employeesApi.retriveEmployees()
+        }
+    }, [user])
 
     useEffect(() => {
         setOriginalData(employees)
@@ -100,12 +100,14 @@ const EmployeesPage = () => {
                     mt: theme.spacing(3)
                 }}
             >
-                <TableComponent
-                    columns={EMPLOYEES_TABLE_COLUMNS}
-                    data={tableData}
-                    selectedRowId={selectedEmployee?.id}
-                    onSelectRow={(rowId) => onSelectRow(rowId)}
-                />
+                {tableData.length > 0 && (
+                    <TableComponent
+                        columns={EMPLOYEES_TABLE_COLUMNS}
+                        data={tableData}
+                        selectedRowId={selectedEmployee?.id}
+                        onSelectRow={(rowId) => onSelectRow(rowId)}
+                    />
+                )}
                 <CenteredStack
                     width="100%"
                     direction="row"
@@ -125,7 +127,6 @@ const EmployeesPage = () => {
             <AddNewEmployeeModalComponent
                 open={showModal}
                 onClose={() => setShowModal(false)}
-                //onAddNewEmployee={(employee) => onAddNewEmployee(employee)}
             />
         </Stack>
     )

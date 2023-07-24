@@ -12,11 +12,9 @@ const MyApp = ({Component, pageProps}) => {
         <ThemeProvider theme={theme}>
             <IntlProvider messages={messages}>
                 <Provider store={store}>
-                    <ContextProvider>
-                        <AppTemplate>
-                            <Component {...pageProps}/>
-                        </AppTemplate>
-                    </ContextProvider>
+                    <AppTemplate>
+                        <Component {...pageProps}/>
+                    </AppTemplate>
                 </Provider>
             </IntlProvider>
         </ThemeProvider>

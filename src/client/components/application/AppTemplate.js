@@ -36,7 +36,13 @@ const AppTemplate = (props) => {
     const [notificationMessage, setNotificationMessage] = useState();
     const [resourceId, setResourceId] = useState();
     const [showRequestModal, setShowRequestModal] = useState(false)
+    const user = useSelector((state) => userApi.getUser(state))
 
+    useEffect(() => {
+        if (router.pathname !== '/') {
+            userApi.loadUser()
+        }
+    }, [])
 
     useEffect(() => {
         if (username) {
@@ -64,15 +70,10 @@ const AppTemplate = (props) => {
     }, [socket])
 
 
-    // const onLogout = async () => {
-    //     const response = await sendHttpRequest(USER_ROUTES.LOGOUT, 'POST', {userId: contextValue.userId}, {
-    //         Authorization: `Bearer ${contextValue.token}`
-    //     })
-    //     if (response.status === 200) {
-    //         contextValue.onLogout();
-    //         router.push('/')
-    //     }
-    // }
+    const onLogout = async () => {
+        await userApi.logoutUser()
+        router.push('/')
+    }
 
     const getDropdownsProps = (permissionLevel) => {
         switch(permissionLevel) {
@@ -164,7 +165,7 @@ const AppTemplate = (props) => {
                         p: theme.spacing(4)
                     }}
                 >
-                    {userToken && (
+                    {user && userToken && (
                         <Stack
                             width="100%"
                             direction="row"
@@ -225,7 +226,7 @@ const AppTemplate = (props) => {
                         />
                     )}
                 </CenteredStack>
-                    {props.children}
+                {user && props.children}
                 <NotificationComponent
                     open={!!notificationMessage}
                     onClose={() => {

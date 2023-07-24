@@ -19,7 +19,8 @@ const employeesSlice = createSlice({
             const index = employees.findIndex((emp) => action.payload.employee.id === emp.id)
             employees.splice(index, 1)
             state.employees = [...employees]
-        }
+        },
+        clear: () => initialState
     }
 })
 
