@@ -86,7 +86,7 @@ const OrderPage = () => {
             username: user.username,
             taskId: tasks[0].taskId
         })
-        ordersApi.loadOrder(router.query.orderId).then((order) => setOrder(order))
+        ordersApi.getTaskByEmployee(user.userId, order?.orderId).then((tsk) => setTasks([tsk]))
     }
 
     const sendPriceOffer = (price) => {
