@@ -18,6 +18,8 @@ import { formMessages, ordersPageMessages, reportsPageMessages, tabsMessages } f
 import { KeyboardArrowDown } from "@mui/icons-material";
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import ordersApi from "../../store/orders/orders-api";
+import customersApi from '../../store/customers/customer-api'
 
 const ReportsPage = (props) => {
 
@@ -42,15 +44,11 @@ const ReportsPage = (props) => {
     }
 
     useEffect(() => {
-        sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('completed'), 'GET', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        }).then(response => setOrders(response.data.orders))
+        ordersApi.loadOrdersByStatus('completed').then((ords) => setOrders(ords))
     }, [])
 
     useEffect(() => {
-        sendHttpRequest(CUSTOMER_ROUTES.CUSTOMERS, "GET", null, {
-            Authorization: `Bearer ${contextValue.token}`
-        }).then((response) => {
+        customersApi.retrieveCustomer().then((custs) => setCustomers(custs)).then((response) => {
             const customersData = response.data.customers.map((customer) => {
                 const customerOrders = orders.filter((ord) => {
                     return ord.customerName === customer.name

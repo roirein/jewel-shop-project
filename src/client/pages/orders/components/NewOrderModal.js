@@ -1,15 +1,10 @@
 import ModalComponent from "../../../components/UI/ModalComponent"
 import { useIntl } from "react-intl"
-import { buttonMessages, employeesPageMessages, formMessages, homePageMessages, ordersPageMessages } from "../../../translations/i18n"
-import { FormProvider, useForm } from "react-hook-form"
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from "yup";
+import { buttonMessages, ordersPageMessages } from "../../../translations/i18n"
 import { Stack, useTheme, Stepper, Step, StepLabel } from "@mui/material";
 import { useState, useContext, useRef } from "react";
 import AppContext from '../../../context/AppContext'
 import ButtonComponent from "../../../components/UI/ButtonComponent";
-import axios from "axios";
-import { getAuthorizationHeader } from "../../../utils/utils";
 import CustomerDetails from "./order-steps/CustomerDetails";
 import OrdersMenuComponent from "./order-steps/OrderTypesMenu";
 import PersonalDesignOrderDetails from "./order-steps/order-detail/PersonalDesginForm";
@@ -17,8 +12,7 @@ import OrderSummary from "./order-steps/order-summary/OrderSummaryCOmponent";
 import { useRouter } from "next/router";
 import FixOrderForm from "./order-steps/order-detail/FixOrderForm";
 import ExistingModelForm from "./order-steps/existing-model-odrer/ExistingModelForm";
-import {sendHttpRequest} from '../../../utils/requests'
-import { ORDERS_ROUTES } from "../../../utils/server-routes";
+import ordersApi from "../../../store/orders/orders-api";
 
 
 const CreateOrderModal = (props) => {
@@ -120,20 +114,9 @@ const CreateOrderModal = (props) => {
         Object.entries(orderDetails).forEach((entry) => {
             formData.append(entry[0], entry[1]);
         })
-        const response = await sendHttpRequest(ORDERS_ROUTES.ADD_ORDER, 'POST', formData, {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${contextValue.token}`
-        })
-        if (response.status === 201) {
-            handleClose()
-            if (contextValue.permissionLevel === 5) {
-                contextValue.socket.emit('new-order', {
-                    customerName: orderDetails.customerName,
-                    orderId: response.data.orderId
-                })
-            }
-            router.push(`/orders/${response.data.orderId}`)
-        }
+        const order = await ordersApi.addNewOrder(formData)
+        handleClose()
+        router.push(`/orders/${order.orderId}`)
     }
     
 

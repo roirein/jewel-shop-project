@@ -13,6 +13,8 @@ import { useRouter } from 'next/router'
 import { POSITIONS } from '../../../../const/Enums'
 import { sendHttpRequest } from '../../../../utils/requests'
 import { EMPLOYEES_ROUTES, ORDERS_ROUTES } from '../../../../utils/server-routes'
+import employeesApi from '../../../../store/employees/employees-api'
+import ordersApi from '../../../../store/orders/orders-api'
 
 const CreateTasksModal = (props) => {
 
@@ -27,18 +29,7 @@ const CreateTasksModal = (props) => {
     const router = useRouter()
 
     useEffect(() => {
-        sendHttpRequest(EMPLOYEES_ROUTES.EMPLOYEES_ROLE, 'GET', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        }).then((response) => {
-            const employeesData = response.data.employees.map((employee) => {
-                return {
-                    value: employee.employeeId,
-                    label: employee.name,
-                    role: employee.role
-                }
-            })
-            setEmployees(employeesData)
-        })
+        employeesApi.getEmployeesByRole().then((emps) => setEmployees(emps))
     }, [])
 
     const steps = [
@@ -131,12 +122,8 @@ const CreateTasksModal = (props) => {
                 position: task.position
             }
         })
-        const response = await sendHttpRequest(ORDERS_ROUTES.TASKS(router.query.orderId), 'POST', {tasks: tasksData}, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        if (response.status === 201) {
-            handleClose(true);
-        }
+        await ordersApi.createTasks(router.query.orderId, tasksData)
+        handleClose(true)
     }
 
     const getModalActions = () => {

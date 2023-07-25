@@ -12,52 +12,22 @@ import CenteredStack from "../../../../../components/UI/CenteredStack"
 import ButtonComponent from "../../../../../components/UI/ButtonComponent"
 import { useIntl } from "react-intl"
 import { modelsPageMessages } from "../../../../../translations/i18n"
+import modelsApi from "../../../../../store/models/models-api"
 
 const ModelsList = (props) => {
 
     const theme = useTheme()
     const [models, setModels] = useState([]);
-    const [modelsImages, setModelImages] = useState({})
     const [selectedModel, setSelectedModel] = useState(null) 
     const [displayedModels, setDisplayedModels] = useState([])
     const [price, setPrice] = useState({});
-    const contextValue = useContext(AppContext)
     const {setValue} = useFormContext();
     const intl = useIntl();
 
     useEffect(() => {
-        sendHttpRequest(MODELS_ROUTES.GET_MODELS, 'GET', null, {
-            Authorization: `Bearer ${contextValue.token}`
-        }).then((response) => setModels(response.data.models))
+        modelsApi.loadModelsForOrder().then((modelsResponse) => setModels(modelsResponse))
     }, [])
 
-    useEffect(() => {
-        if (models) {
-            const fecthImage = async (model) => {
-                const image = await sendHttpRequest(MODELS_ROUTES.IMAGE(model.image), 'GET', null, {
-                    Authorization: `Bearer ${contextValue.token}`
-                }, 'blob')
-    
-                return {
-                    modelNumber: model.modelNumber,
-                    image: image.data
-                }
-            }
-    
-            const promises = models.map((model) => {
-                return fecthImage(model)
-            })
-    
-            Promise.all(promises).then((result) => {
-                const imagesDict = {}
-                result.forEach((modelImage) => {
-                    const imageUrl = URL.createObjectURL(modelImage.image)
-                    imagesDict[modelImage.modelNumber] = imageUrl
-                })
-                setModelImages(imagesDict)
-            })
-        }
-    }, [models])
 
     const onChooseModel = (model) => {
         setSelectedModel(model)
@@ -98,7 +68,7 @@ const ModelsList = (props) => {
                         <ModelCardComponent
                             title={model.title}
                             description={model.description}
-                            image={modelsImages[model.modelNumber]}
+                            image={model.imageUrl}
                         />
                     </Stack>
                 ))}

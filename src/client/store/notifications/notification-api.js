@@ -66,22 +66,24 @@ const readNotification = (resourceId, resource) => {
     }
 
     const resourceNotifications = relevantNotifications.filter((not) => not.resourceId === resourceId);
-    let notification = resourceNotifications.reduce((recent, current) => {
-        const mostRecentDate = dayjs(recent.createdAt);
-        const currentDate = dayjs(current.createdAt);
-        return currentDate.isAfter(mostRecentDate) ? current : recent;
-    })
-
-    notification = {
-        ...notification,
-        isRead: true
+    if (resourceNotifications.length > 0) {
+        let notification = resourceNotifications.reduce((recent, current) => {
+            const mostRecentDate = dayjs(recent.createdAt);
+            const currentDate = dayjs(current.createdAt);
+            return currentDate.isAfter(mostRecentDate) ? current : recent;
+        })
+    
+        notification = {
+            ...notification,
+            isRead: true
+        }
+        store.dispatch(notificationsSlice.actions.readNotification({notification}));
+        const socket = getSocket();
+        socket.emit('read-notification', {
+            id: notification.id
+        })
     }
-    store.dispatch(notificationsSlice.actions.readNotification({notification}));
-    const socket = getSocket();
-    socket.emit('read-notification', {
-        id: notification.id
-    })
-}
+    }
 
 const notifcationsApi = {
     setUserNotifications,

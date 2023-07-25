@@ -6,6 +6,8 @@ import customersSlice from '../customers/customer-slice';
 import employeesSlice from '../employees/emplyees-slice';
 import notificationsSlice from '../notifications/notification-slice';
 import notifcationsApi from '../notifications/notification-api';
+import modelsSlice from '../models/models-slice';
+import ordersSlice from '../orders/orders-slice';
 
 const userRoute = `${process.env.SERVER_URL}/user`
 const state = store.getState()
@@ -121,7 +123,7 @@ const logoutUser = async () => {
         }
     })
 
-    const slices = [userSlice, customersSlice, employeesSlice, notificationsSlice]
+    const slices = [userSlice, customersSlice, employeesSlice, notificationsSlice, modelsSlice, ordersSlice]
     slices.forEach(slice => {
         store.dispatch(slice.actions.clear())
     })   

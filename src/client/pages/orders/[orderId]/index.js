@@ -1,74 +1,44 @@
-import axios from "axios"
-import { getAuthorizationHeader, getUserToken } from "../../../utils/utils"
 import { useIntl } from "react-intl"
-import OrderSummaryComponent from "../components/OrderSummary"
 import { useState, useEffect, useContext } from "react"
 import AppContext from "../../../context/AppContext"
 import { buttonMessages, modelsPageMessages, ordersPageMessages } from "../../../translations/i18n"
 import { ITEM_ENUMS, METAL_ENUM, ORDER_STATUS, POSITIONS, SIZE_ENUM } from "../../../const/Enums"
 import { Stack, Typography, useTheme } from "@mui/material"
 import ButtonComponent from "../../../components/UI/ButtonComponent"
-import OrderModelData from "../components/OrderModelData"
 import CreateTasksModal from "../components/tasks/CreateTasksModal"
 import TaskSummaryComponent from "../components/tasks/TasksSummary"
 import CustomerDetails from "../components/order-summary/CustomerDetails"
 import OrderDeatils from "../components/order-summary/OrderDetails"
 import { useRouter } from "next/router"
 import CenteredStack from "../../../components/UI/CenteredStack"
-import ModelComponent from "../components/order-steps/existing-model-odrer/ModelComponent"
 import PriceOfferModal from "./OfferPriceModal"
-import { MODELS_ROUTES, ORDERS_ROUTES } from "../../../utils/server-routes"
-import { sendHttpRequest } from "../../../utils/requests"
 import ModelCardComponent from "../../models/components/ModelCard"
+import ordersApi from "../../../store/orders/orders-api"
+import notifcationsApi from "../../../store/notifications/notification-api"
+import { useSelector } from "react-redux"
+import userApi from "../../../store/user/user-api"
 
 const OrderPage = () => {
 
     const intl = useIntl();
     const theme = useTheme();
     const router = useRouter();
-    const contextValue = useContext(AppContext);
 
     const [order, setOrder] = useState();
-    const [imageUrl, setImageUrl] = useState();
-    const [modelImageUrl, setModelImageUrl] = useState();
+    const user = useSelector((state) => userApi.getUser(state))
     const [orderSummary, setOrderSummary] = useState();
     const [showTaskModal, setShowTaskModal] = useState();
     const [showPriceOfferModal, setShowPriceOfferModal] = useState(false)
     const [tasks, setTasks] = useState([]);
 
-    const fetchOrder = async () => {
-        const orderId = router.query.orderId
-        const response = await sendHttpRequest(ORDERS_ROUTES.GET_ORDER(orderId), "GET", {}, {
-            Authorization: `Bearer ${contextValue.token}`
-        })
-        return response.data.order
-    }
-
     useEffect(() => {
-        fetchOrder().then((order) => setOrder(order));        
-    }, [])
-
-    useEffect(() => {
-        if (order?.type === 1) {
-            sendHttpRequest(ORDERS_ROUTES.IMAGE(order.design), 'GET', {}, {
-                Authorization: `Bearer ${contextValue.token}`
-            }, 'blob').then((res) => {
-                const image = URL.createObjectURL(res.data)
-                setImageUrl(image)
-            })
-        }
-    }, [order])
-
-    useEffect(() => {
-        if ((order?.status > 2 && order?.type === 1) || (order?.type === 2)) {
-            sendHttpRequest(MODELS_ROUTES.IMAGE(order.image), 'GET', {}, {
-                Authorization: `Bearer ${contextValue.token}`
-            }, 'blob').then((res) => {
-                const image = URL.createObjectURL(res.data)
-                setModelImageUrl(image)
-            }) 
-        }
-    }, [order])
+        if (user.token && router.query.orderId) {
+            ordersApi.loadOrder(router.query.orderId).then((order) => {
+                setOrder(order)
+                notifcationsApi.readNotification(router.query.orderId, 'order')
+            })  
+        } 
+    }, [user.token, router.query.orderId])
 
     useEffect(() => {
         const detailsProps = {}
@@ -87,142 +57,44 @@ const OrderPage = () => {
     }, [order])
 
     useEffect(() => {
-        if (order?.status === 8 && contextValue.permissionLevel === 3) {
-            sendHttpRequest(ORDERS_ROUTES.TASKS(order?.orderId), 'GET', null, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((response) => {
-                const tasksData = response.data.tasks.map((task, index) => {
-                    return {
-                        index: index + 1,
-                        employee: task.employeeName,
-                        description: task.description,
-                        position: POSITIONS[task.position],
-                        isCompleted: task.isCompleted
-                    }
-                })
-                setTasks(tasksData)
-            })
+        if (order?.status === 8 && user.permissionLevel === 3) {
+            ordersApi.getTasks(order?.orderId).then((taskData) => setTasks(taskData))
         }
     }, [order])
 
 
     useEffect(() => {
-        if (order?.status === 8 && contextValue.permissionLevel === 4) {
-            sendHttpRequest(ORDERS_ROUTES.TASK_BY_EMPLOYEE(order?.orderId, contextValue.userId), 'GET', null, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((response) => {
-                const taskData = response.data.task
-                const result =  {
-                        index: 1,
-                        taskId: taskData.taskId,
-                        employee: taskData.employeeName,
-                        description: taskData.description,
-                        position: POSITIONS[taskData.position],
-                        isCompleted: taskData.isCompleted,
-                        isBlocked: taskData.isBlocked
-                    }
-                setTasks([result])
-            })
+        if (order?.status === 8 && user.permissionLevel === 4) {
+            ordersApi.getTaskByEmployee(user.userId, order?.orderId).then((tsk) => setTasks([tsk]))
         }
     }, [order])
 
-    const handleCloseTasksModal = (toFetchOrder) => {
+    const updateOrderStatus = (eventName, data) => {
+        ordersApi.updateOrderStatus(eventName, data).then(() => {
+            ordersApi.loadOrder(router.query.orderId).then((order) => setOrder(order))
+        })
+    }
+
+    const handleCloseTasksModal = () => {
         setShowTaskModal(false);
-        if (toFetchOrder) {
-            fetchOrder().then((order) => setOrder(order))
-        }
-    }
-
-    const sendOrderToDesign = () => {
-        contextValue.socket.emit('new-design', {
-            orderId: order?.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const sendOrderToCustomerApproval = () => {
-        contextValue.socket.emit('customer-design-complete', {
-            orderId: order?.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const approveOrderByCustomer = (price) => {
-        contextValue.socket.emit('customer-order-approval', {
-            price,
-            orderId: order.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const sendOrderToCasting = () => {
-        contextValue.socket.emit('casting-start', {
-            orderId: order.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const completeCasting = () => {
-        contextValue.socket.emit('casting-end', {
-            orderId: order.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const sendOrderToProduction = () => {
-        contextValue.socket.emit('production-start', {
-            orderId: order.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
+        ordersApi.loadOrder(router.query.orderId).then((order) => setOrder(order))
     }
 
     const completeTask = () => {
-        contextValue.socket.emit('task-complete', {
+        updateOrderStatus('task-complete', {
             orderId: order.orderId,
-            username: contextValue.name,
+            username: user.username,
             taskId: tasks[0].taskId
         })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const completeProduction = () => {
-        contextValue.socket.emit('production-end', {
-            orderId: order.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const updateCustomer = () => {
-        contextValue.socket.emit('order-ready', {
-            orderId: order.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
-    }
-
-    const completeOrder = () => {
-        contextValue.socket.emit('order-complete', {
-            orderId: order.orderId
-        })
-
-        fetchOrder().then((order) => setOrder(order))
+        ordersApi.loadOrder(router.query.orderId).then((order) => setOrder(order))
     }
 
     const sendPriceOffer = (price) => {
-        contextValue.socket.emit('price-offer', {
+        updateOrderStatus('price-offer', {
             price,
             orderId: order.orderId
         })
         setShowPriceOfferModal(false)
-        fetchOrder().then((order) => setOrder(order))
     }
 
     return (
@@ -255,7 +127,7 @@ const OrderPage = () => {
                             <img
                                 width="150px"
                                 height="150px"
-                                src={imageUrl}
+                                src={order.imageUrl}
                             />
                         </Stack>
                     )}
@@ -273,7 +145,7 @@ const OrderPage = () => {
                 {order?.type === 2 && (
                     <Stack>
                         <ModelCardComponent
-                            image={modelImageUrl}
+                            image={order.modelImageUrl}
                             title={order.title}
                             description={order.description}
                         />
@@ -284,14 +156,14 @@ const OrderPage = () => {
                         rowGap={theme.spacing(3)}
                     >
                         <ModelCardComponent
-                            image={modelImageUrl}
+                            image={order.modelImageUrl}
                             title={order.title}
                             description={order.description}
                         />
                         <Typography>
                                 {`${intl.formatMessage(modelsPageMessages.materials)}: ${order.materials}`}
                         </Typography>
-                        {contextValue.permissionLevel !== 5 && (
+                        {user.permissionLevel !== 5 && (
                             <Stack
                                 rowGap={theme.spacing(3)}
                             >
@@ -352,7 +224,7 @@ const OrderPage = () => {
                     </Stack>
                 )}
             </Stack>
-            {contextValue.permissionLevel === 1 && (
+            {user.permissionLevel === 1 && (
                 <>
                     {order?.status === 0 && (
                         <Stack
@@ -366,7 +238,7 @@ const OrderPage = () => {
                             {order?.type === 1 && (
                                 <ButtonComponent
                                     label={intl.formatMessage(ordersPageMessages.sendToDesignManager)}
-                                    onClick={() => sendOrderToDesign()}
+                                    onClick={() => updateOrderStatus('new-design', {orderId: order?.orderId})}
                                 />
                             )}
                             {order?.type === 2 && (
@@ -374,13 +246,13 @@ const OrderPage = () => {
                                     {order?.casting && (
                                         <ButtonComponent
                                             label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
-                                            onClick={() => sendOrderToCasting()}
+                                            onClick={() => updateOrderStatus('casting-start', {orderId: order?.orderId})}
                                         />
                                     )}
                                     {!order?.casting && (
                                         <ButtonComponent
                                             label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
-                                            onClick={() => sendOrderToProduction()}
+                                            onClick={() => updateOrderStatus('production-start', {orderId: order?.orderId})}
                                         />
                                     )}
                                 </>
@@ -404,7 +276,7 @@ const OrderPage = () => {
                         >
                             <ButtonComponent
                                 label={intl.formatMessage(ordersPageMessages.sendToCustomerApproval)}
-                                onClick={() => sendOrderToCustomerApproval()}
+                                onClick={() => updateOrderStatus('customer-design-complete', {orderId: order?.orderId})}
                             />
                         </Stack>
                     )}
@@ -417,13 +289,13 @@ const OrderPage = () => {
                                     {order?.casting && (
                                         <ButtonComponent
                                             label={intl.formatMessage(ordersPageMessages.sendOrderToCasting)}
-                                            onClick={() => sendOrderToCasting()}
+                                            onClick={() => updateOrderStatus('casting-start', {orderId: order?.orderId})}
                                         />
                                     )}
                                     {!order?.casting && (
                                         <ButtonComponent
                                             label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
-                                            onClick={() => sendOrderToProduction()}
+                                            onClick={() =>  updateOrderStatus('production-start', {orderId: order?.orderId})}
                                         />
                                     )}
                                 </>
@@ -434,7 +306,7 @@ const OrderPage = () => {
                                 >
                                     <ButtonComponent
                                         label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
-                                        onClick={() => sendOrderToProduction()}
+                                        onClick={() => updateOrderStatus('production-start', {orderId: order?.orderId})}
                                     />
                                 </Stack>
                             )}
@@ -447,7 +319,7 @@ const OrderPage = () => {
                             {order?.casting && (
                                 <ButtonComponent
                                     label={intl.formatMessage(ordersPageMessages.completeCasting)}
-                                    onClick={() => completeCasting()}
+                                    onClick={() => updateOrderStatus('casting-end', {orderId: order?.orderId})}
                                 />
                             )}
                         </Stack>
@@ -458,7 +330,7 @@ const OrderPage = () => {
                         >
                             <ButtonComponent
                                 label={intl.formatMessage(ordersPageMessages.sendOrderToProduction)}
-                                onClick={() => sendOrderToProduction()}
+                                onClick={() => updateOrderStatus('production-start', {orderId: order?.orderId})}
                             />
                         </Stack>
                     )}
@@ -468,7 +340,7 @@ const OrderPage = () => {
                         >
                             <ButtonComponent
                                 label={intl.formatMessage(ordersPageMessages.updateCustomer)}
-                                onClick={() => updateCustomer()}
+                                onClick={() => updateOrderStatus('order-ready', {orderId: order?.orderId})}
                             />
                         </Stack>
                     )}
@@ -478,14 +350,14 @@ const OrderPage = () => {
                         >
                             <ButtonComponent
                                 label={intl.formatMessage(ordersPageMessages.completeOrder)}
-                                onClick={() => completeOrder()}
+                                onClick={() => updateOrderStatus('order-complete', {orderId: order?.orderId})}
                             />
                         </Stack>
                     )}
                     
                 </>
             )}
-            {contextValue.permissionLevel === 3 && (
+            {user.permissionLevel === 3 && (
                 <>
                     {tasks.length === 0 && order?.status === 8 && (
                         <Stack
@@ -514,7 +386,7 @@ const OrderPage = () => {
                             >
                                 <ButtonComponent
                                     label={intl.formatMessage(ordersPageMessages.completeProduction)}
-                                    onClick={() => completeProduction()}
+                                    onClick={() => updateOrderStatus('production-end', {orderId: order.orderId})}
                                     disabled={!(tasks.every((task) => task.isCompleted))}
                                 />
                             </Stack>
@@ -522,7 +394,7 @@ const OrderPage = () => {
                     )}
                 </>
             )}
-            {contextValue.permissionLevel === 4 && (
+            {user.permissionLevel === 4 && (
                 <>
                     {tasks.length > 0 && (
                         <Stack
@@ -535,6 +407,8 @@ const OrderPage = () => {
                             />
                             <CenteredStack
                                 width="20%"
+                                direction="row"
+                                columnGap={theme.spacing(3)}
                                 sx={{
                                     margin: '0 auto'
                                 }}
@@ -544,12 +418,16 @@ const OrderPage = () => {
                                     onClick={() => completeTask()}
                                     disabled={tasks[0].isBlocked || tasks[0].isCompleted}
                                 />
+                                <ButtonComponent
+                                    label={intl.formatMessage(buttonMessages.goBack)}
+                                    onClick={() => router.push('/employee')}
+                                />
                             </CenteredStack>
                         </Stack>
                     )}
                 </>
             )}
-            {contextValue.permissionLevel === 5 && (
+            {user.permissionLevel === 5 && (
                 <>
                     {order?.status === 4 && (
                         <Stack
@@ -558,17 +436,25 @@ const OrderPage = () => {
                             sx={{
                                 mt: theme.spacing(4)
                             }}
-                            width="20%"
+                            width="30%"
                         >
                             {order?.type === 1 && (
                                 <>
                                     <ButtonComponent
                                         label={`${intl.formatMessage(modelsPageMessages.priceWithMaterials)}: ${order.priceWithMaterials}`}
-                                        onClick={() => approveOrderByCustomer(order.priceWithMaterials)}
+                                        onClick={() => updateOrderStatus('customer-order-approval', {
+                                            orderId: order.orderId,
+                                            price: order.priceWithMaterials,
+                                            customerName: user.username
+                                        })}
                                     />
                                     <ButtonComponent
                                         label={`${intl.formatMessage(modelsPageMessages.priceWithoutMaterials)}: ${order.priceWithoutMaterials}`}
-                                        onClick={() => approveOrderByCustomer(order.priceWithoutMaterials)}
+                                        onClick={() => updateOrderStatus('customer-order-approval', {
+                                            orderId: order.orderId,
+                                            price: order.priceWithoutMaterials,
+                                            customerName: user.username
+                                        })}
                                     />
                                 </>
                             )}
@@ -597,7 +483,11 @@ const OrderPage = () => {
                                     </Stack>
                                     <ButtonComponent
                                         label={intl.formatMessage(buttonMessages.approve)}
-                                        onClick={() => approveOrderByCustomer(order?.priceOffer)}
+                                        onClick={() => updateOrderStatus('customer-order-approval', {
+                                            orderId: order.orderId,
+                                            price: order.priceOffer,
+                                            customerName: user.username
+                                        })}
                                     />
                                 </>
                             )}
@@ -609,13 +499,13 @@ const OrderPage = () => {
                     )}
                 </>
             )}
-            {contextValue.permissionLevel === 3 && tasks.length === 0 && (
+            {user.permissionLevel === 3 && tasks.length === 0 && (
                 <CreateTasksModal
                     open={showTaskModal}
-                    onClose={(fetchOrder) => handleCloseTasksModal(fetchOrder)}
+                    onClose={() => handleCloseTasksModal()}
                 />
             )}
-            {contextValue.permissionLevel === 1 && order?.type === 3 && order?.status === 0 && (
+            {user.permissionLevel === 1 && order?.type === 3 && order?.status === 0 && (
                 <PriceOfferModal
                     open={showPriceOfferModal}
                     onClose={() => setShowPriceOfferModal(false)}

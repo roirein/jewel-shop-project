@@ -1,18 +1,12 @@
 import { Typography, Stack, useTheme } from "@mui/material"
 import { useIntl } from "react-intl"
-import { useFormContext } from "react-hook-form"
 import { ordersPageMessages } from "../../../../../translations/i18n";
-import { ITEM_ENUMS, METAL_ENUM, ORDER_TYPES, SIZE_ENUM } from "../../../../../const/Enums";
+import { ITEM_ENUMS, ORDER_TYPES} from "../../../../../const/Enums";
 import { useState, useEffect, useContext } from "react";
 import CustomerDetails from "../../order-summary/CustomerDetails";
 import OrderDeatils from "../../order-summary/OrderDetails";
-import axios from "axios";
-import AppContext from "../../../../../context/AppContext";
-import { getAuthorizationHeader } from "../../../../../utils/utils";
-import ModelComponent from "../existing-model-odrer/ModelComponent";
-import { sendHttpRequest } from "../../../../../utils/requests";
-import { MODELS_ROUTES } from "../../../../../utils/server-routes";
 import ModelCardComponent from "../../../../models/components/ModelCard";
+import modelsApi from "../../../../../store/models/models-api";
 
 const OrderSummary = (props) => {
 
@@ -22,8 +16,6 @@ const OrderSummary = (props) => {
     const [imageUrl, setImageUrl] = useState();
     const [summaryProps, setSummaryProps] = useState({});
     const [modelData, setModelData] = useState({})
-    const [modelImage, setModelImage] = useState();
-    const contextValue = useContext(AppContext)
 
     useEffect(() => {
         if (props.orderData['design']) {
@@ -53,23 +45,9 @@ const OrderSummary = (props) => {
 
     useEffect(() => {
         if (props.orderData['modelNumber']) {
-            sendHttpRequest(MODELS_ROUTES.GET_MODEL(props.orderData['modelNumber']), 'GET', null, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((res) => setModelData(res.data.model))
+            modelsApi.loadModel(props.orderData['modelNumber']).then((model) => setModelData(model.model))
         } 
     }, [])
-
-    useEffect(() => {
-        if (modelData?.image) {
-            console.log(modelData)
-            sendHttpRequest(MODELS_ROUTES.IMAGE(modelData?.image), 'GET', null, {
-                Authorization: `Bearer ${contextValue.token}`
-            }, 'blob').then((res) => {
-                const image = URL.createObjectURL(res.data)
-                setModelImage(image)
-            })
-        }
-    }, [modelData])
 
     return (
         <Stack
@@ -139,7 +117,7 @@ const OrderSummary = (props) => {
                         <ModelCardComponent
                             title={modelData.title}
                             description={modelData.description}
-                            image={modelImage}
+                            image={modelData.imageUrl}
                         />
                     </Stack>
                 )}

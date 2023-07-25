@@ -55,6 +55,9 @@ const notificationsSlice = createSlice({
             if (resource === 'model') {
                 state.models = [...notifications]
             }
+            if (resource === 'order') {
+                state.orders = [...notifications]
+            }
         },
         clear: () => initialState
     }

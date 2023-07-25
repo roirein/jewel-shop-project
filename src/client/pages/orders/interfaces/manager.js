@@ -12,16 +12,17 @@ import { ordersPageMessages } from "../../../translations/i18n"
 import CenteredStack from "../../../components/UI/CenteredStack"
 import { sendHttpRequest } from "../../../utils/requests"
 import { ORDERS_ROUTES } from "../../../utils/server-routes"
-import AppContext from "../../../context/AppContext"
+import TemplateContext from '../../../context/template-context'
 import dayjs from "dayjs"
 import ModelModalComponent from "../../models/components/ModelModal"
+import ordersApi from "../../../store/orders/orders-api"
 
 const ManagerInterface = (props) => {
 
     const theme = useTheme();
     const router = useRouter();
     const intl = useIntl();
-    const contextValue = useContext(AppContext)
+    const contextValue = useContext(TemplateContext)
 
     const [selectedTab, setSelectedTab] = useState(0)
     const [showCreateModal, setShowCreateModal] = useState(false)
@@ -36,21 +37,6 @@ const ManagerInterface = (props) => {
             setDisplayedOrders(props.orders)
         }
     }, [props.orders])
-
-    const handleOpenModelModal = (modelNumber) => {
-        setShowModelModal(true);
-        setSelectedModel(modelNumber)
-    }
-
-    const handleCloseModal = (toFetchModels) => {
-        setShowModelModal(false)
-        setSelectedModel(null)
-        if (toFetchModels) {
-            sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('design'), "GET", {}, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((res) => setDisplayedOrders(res.data.orders))
-        }
-    }
 
     const createTableData = () => {
         const data = []
@@ -83,7 +69,7 @@ const ManagerInterface = (props) => {
                                             dataElement.customerName,
                                             dayjs(dataElement.deadline).format('DD/MM/YYYY'),
                                             dataElement?. modelNumber ? <Link
-                                                onClick={() => handleOpenModelModal(dataElement.modelNumber)}
+                                                onClick={() => contextValue.onOpenModelModal(modelNumber)}
                                             >
                                                 {dataElement.modelNumber}
                                             </Link> : null,
@@ -164,9 +150,7 @@ const ManagerInterface = (props) => {
         }
         if (selectedTab === 3) {
             setTableColumns(ORDERS_IN_DESIGN_MANAGER_TABLE_COLUMNS)
-            sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('design'), "GET", {}, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((res) => setDisplayedOrders(res.data.orders))
+            ordersApi.loadOrdersByStatus('design').then((ords) => setDisplayedOrders(ords))
         }
         if (selectedTab === 4) {
             const orders = displayedOrders.filter(order => order.status === 4 || order.status === 5)
@@ -175,21 +159,16 @@ const ManagerInterface = (props) => {
         }
         if (selectedTab === 5) {
             setTableColumns(ORDERS_IN_CASTING_TABLE_COLUMNS)
-            sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('casting'), "GET", {}, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((res) => setDisplayedOrders(res.data.orders))
+            ordersApi.loadOrdersByStatus('casting').then((ords) => setDisplayedOrders(ords))
         }
         if (selectedTab === 6) {
             setTableColumns(ORDERS_IN_PRODUCTION_TABLE_COLUMNS)
-            sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('production'), "GET", {}, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((res) => setDisplayedOrders(res.data.orders))
+            ordersApi.loadOrdersByStatus('production').then((ords) => setDisplayedOrders(ords))
+
         }
         if (selectedTab === 7) {
             setTableColumns(MANAGER_COMPLETED_ORDERS_COLUMNS)
-            sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('completed'), "GET", {}, {
-                Authorization: `Bearer ${contextValue.token}`
-            }).then((res) => setDisplayedOrders(res.data.orders))
+            ordersApi.loadOrdersByStatus('completed').then((ords) => setDisplayedOrders(ords))
         }
     }, [selectedTab])
 
@@ -262,13 +241,6 @@ const ManagerInterface = (props) => {
                 open={showCreateModal}
                 onClose={() => setShowCreateModal(false)}
             />
-            {selectedTab === 3 && (
-                <ModelModalComponent
-                    open={showModelModal}
-                    modelNumber={selectedModel}
-                    onClose={(toFecthModels) => handleCloseModal(toFecthModels)}
-                />
-            )}
         </Stack>
     )
 }

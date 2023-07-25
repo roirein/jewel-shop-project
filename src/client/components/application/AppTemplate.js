@@ -20,6 +20,7 @@ import RequestModalComponent from '../../pages/customers/components/RequestModal
 import customersApi from '../../store/customers/customer-api';
 import modelsApi from '../../store/models/models-api'
 import ModelModalComponent from '../../pages/models/components/ModelModal';
+import ordersApi from '../../store/orders/orders-api';
 
 const AppTemplate = (props) => {
 
@@ -66,7 +67,10 @@ const AppTemplate = (props) => {
                     customersApi.loadRequests();
                 }
                 if (notification.resource === 'model') {
-                    modelsApi.loadModels()
+                    modelsApi.loadModels();
+                }
+                if (notification.resource === 'order') {
+                    ordersApi.loadOrders();
                 }
             })
 
@@ -94,7 +98,7 @@ const AppTemplate = (props) => {
                     {
                         type: 2,
                         icon: <ShoppingCart/>,
-                        //notifications: contextValue.notifications.orders
+                        notifications: notificationsAmount.orders
                     },
                     {
                         type: 3,
@@ -107,7 +111,7 @@ const AppTemplate = (props) => {
                     {
                         type: 2,
                         icon: <ShoppingCart/>,
-                        //notifications: contextValue.notifications.orders
+                        notifications: notificationsAmount.orders
                     },
                     {
                         type: 3,
@@ -121,7 +125,7 @@ const AppTemplate = (props) => {
                     {
                         type: 2,
                         icon: <ShoppingCart/>,
-                        //notifications: contextValue.notifications.orders
+                        notifications: notificationsAmount.orders
                     }
                 ]
             default: 

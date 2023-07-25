@@ -58,6 +58,7 @@ const addNewModel = async (data) => {
 
 const loadModel = async (modelNumber) => {
     const token = userApi.getUserToken(store.getState())
+    console.log(token, 12)
     const modelResponse = await axios.get(`${modelsRoute}/model/${modelNumber}`, {
         headers: {
             Authorization: `Bearer ${token}`
@@ -165,7 +166,36 @@ const updateModel = async (data, modelNumber) => {
             modelNumber
         })
     }
+}
 
+const loadModelImage = async (imagePath) => {
+    const token = userApi.getUserToken(store.getState());
+    const imageResponse = await axios.get(`${modelsRoute}/image/${imagePath}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        responseType: 'blob'
+    });
+
+    return URL.createObjectURL(imageResponse.data)
+}
+
+const loadModelsForOrder = async () => {
+    const token = userApi.getUserToken(store.getState());
+    const response = await axios.get(`${modelsRoute}/models`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+
+    const models = response.data.models
+    const imagePromises = models.map((model) => loadModelImage(model.image));
+    const images = await Promise.all(imagePromises);
+    models.forEach((model, index) => {
+        model.imageUrl = images[index];
+    }); 
+
+    return models
 }
 
 const modelsApi = {
@@ -176,7 +206,8 @@ const modelsApi = {
     loadModel,
     updateModelPrice,
     sendComment,
-    updateModel
+    updateModel,
+    loadModelsForOrder,
 }
 
 export default modelsApi

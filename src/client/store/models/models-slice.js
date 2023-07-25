@@ -19,7 +19,8 @@ const modelsSlice = createSlice({
             const modelIndex = models.findIndex((mod) => mod.modelNumber === action.payload.model.modelNumber)
             models[modelIndex] = action.payload.model
             state.models = [...models]
-        }
+        },
+        clear: () => initialState
     }
 })
 

@@ -164,7 +164,7 @@ const ModelModalComponent = (props) => {
                         )}
                     </>
                 )}
-                {status === 2 && (
+                {model.status === 2 && (
                     <Stack
                         width="100%"
                         rowGap={theme.spacing(3)}

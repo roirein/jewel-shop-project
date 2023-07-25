@@ -79,7 +79,7 @@ const getAllOrders = async (permissionLevel, userId) => {
     });
 
     if (permissionLevel === 5) {
-        ordersData.filter((order) => {
+        ordersData = ordersData.filter((order) => {
             return order.customerId === userId
         })
     }
@@ -102,6 +102,7 @@ const getOrderByPermissionLevel = async (permissionLevel, userId) => {
     let orders;
     switch (permissionLevel) {
         case 1: 
+        case 5:
             orders = await getAllOrders(permissionLevel, userId);
             break
         case 2:
@@ -109,9 +110,6 @@ const getOrderByPermissionLevel = async (permissionLevel, userId) => {
             break;
         case 3: 
             orders = await getOrdersInProduction();
-            break;
-        case 5: 
-            orders = await getAllOrders(permissionLevel, userId)
             break;
         default: 
             orders = []

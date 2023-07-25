@@ -3,17 +3,18 @@ import { Stack, Typography, useTheme } from "@mui/material"
 import { useIntl } from "react-intl"
 import { customerPageMessages, formMessages, ordersPageMessages } from "../../../../translations/i18n"
 import FormDatePickerComponent from "../../../../components/UI/Form/Inputs/FormDatePickerComponent"
-import { forwardRef, useImperativeHandle, useContext } from "react"
+import {forwardRef, useImperativeHandle} from "react"
 import {useForm, FormProvider} from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from "@hookform/resolvers/yup"
-import AppContext from "../../../../context/AppContext"
+import { useSelector } from "react-redux"
+import userApi from "../../../../store/user/user-api"
 
 const CustomerDetails = forwardRef((props, ref) => {
 
     const intl = useIntl();
     const theme = useTheme();
-    const contextValue = useContext(AppContext)
+    const user = useSelector((state) => userApi.getUser(state))
 
     const customerValidationSchema = yup.object().shape({
         email: yup.string().email(intl.formatMessage(formMessages.emailError)).required(intl.formatMessage(formMessages.emptyFieldError)),
@@ -23,14 +24,14 @@ const CustomerDetails = forwardRef((props, ref) => {
     }).required();
 
     const defaultValues = {
-        customerName: contextValue.name,
-        email: contextValue.email,
-        phoneNumber: contextValue.phoneNumber
+        customerName: user.username,
+        email: user.email,
+        phoneNumber: user.phoneNumber
     }
 
     const methods = useForm({
         resolver: yupResolver(customerValidationSchema),
-        defaultValues: contextValue.permissionLevel === 5 ? defaultValues : {}
+        defaultValues: user.permissionLevel === 5 ? defaultValues : {}
     })
 
     useImperativeHandle(ref, () => ({

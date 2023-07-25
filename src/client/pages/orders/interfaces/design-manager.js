@@ -1,13 +1,13 @@
 import { Stack, Tab, Tabs, useTheme, Link} from "@mui/material"
 import { CUSTOMER_INTERFACE_TABS, CUSTOMER_ORDERS_TABS, DESIGN_MANAGER_ORDERS_TABS } from "../../../const/TabDefinitions"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Add } from "@mui/icons-material"
 import TableComponent from "../../../components/UI/TableComponent"
 import { CUSTOMER_TABLE_COLUMNS, ORDERS_IN_DESIGN_TABLE_COLUMNS, ORDER_CUSTOMER_TABEL_COLUMNS } from "../../../const/TablesColumns"
 import { MODEL_STATUS_ENUM, ORDER_STATUS, ORDER_TYPES } from "../../../const/Enums"
 import { useRouter } from "next/router"
 import { useIntl } from "react-intl"
-import CreateOrderModal from "../components/NewOrderModal"
+import TemplateContext from "../../../context/template-context"
 import { modelsPageMessages, ordersPageMessages } from "../../../translations/i18n"
 import CenteredStack from "../../../components/UI/CenteredStack"
 import CreateModelModal from "../../models/components/CreateModelModal"
@@ -19,15 +19,14 @@ const DesignManagerInterface = (props) => {
     const theme = useTheme();
     const router = useRouter();
     const intl = useIntl();
+    const contextValue = useContext(TemplateContext)
 
     const [selectedTab, setSelectedTab] = useState(0)
     const [tableColumns, setTableColumns] = useState(ORDERS_IN_DESIGN_TABLE_COLUMNS)
     const [tableData, setTableData] = useState([])
     const [displayedOrders, setDisplayedOrders] = useState(props.orders)
     const [showCreateModal, setShowCreateModal] = useState(false)
-    const [showModelModal, setShowMModelModal] = useState(false)
     const [modelData, setModelData] = useState({})
-    const [selectedModelNumber, setSelectedModelNumber] = useState(null)
 
     useEffect(() => {
         if (props.orders) {
@@ -48,19 +47,6 @@ const DesignManagerInterface = (props) => {
         setShowCreateModal(true);
     }
 
-    const handleOpenModelModal = (modelNumber) => {
-        setSelectedModelNumber(modelNumber)
-        setShowMModelModal(true)
-    }
-
-    const handelCloseModelModal = (toFetchModels) => {
-        setSelectedModelNumber(null)
-        setShowMModelModal(false)
-        if (toFetchModels) {
-            router.push('/models')
-        }
-    }
-
     const handleCloseCreateModal = (toFetchModels) => {
         setModelData({});
         setShowCreateModal(false);
@@ -74,7 +60,7 @@ const DesignManagerInterface = (props) => {
             return (
                 <Link
                     href="#"
-                    onClick={() => handleOpenModelModal(modelNumber)}
+                    onClick={() => contextValue.onOpenModelModal(modelNumber)}
                 >
                     {modelNumber}
                 </Link>
@@ -161,11 +147,6 @@ const DesignManagerInterface = (props) => {
                 open={showCreateModal}
                 modelData={modelData}
                 onClose={(toFetchModels) => handleCloseCreateModal()}
-            />
-            <ModelModalComponent
-                open={showModelModal}
-                modelNumber={selectedModelNumber}
-                onClose={(toFecthModels) => handelCloseModelModal(toFecthModels)}
             />
         </Stack>
     )

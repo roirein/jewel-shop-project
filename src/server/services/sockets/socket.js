@@ -200,20 +200,12 @@ const onCreateNewOrder = async (data) => {
             permissionLevel: 1
         }
     })
-    const socketId = users[manager.dataValues.userId]
-    const notificationData = {
-        resource: 'order',
-        type: 'new-order',
-        resourceId: data.orderId,
-        recipient: manager.dataValues.userId,
-        data: {
-            customerName: data.customerName,
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(manager.dataValues.userId)
+    const notification = await createNotification(manager.dataValues.userId, 'order', 'new-order', data.orderId, {
+        customerName: data.customerName
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('new-order', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -239,20 +231,12 @@ const onNewDesignRequest = async (data) => {
             permissionLevel: 2
         }
     })
-    const socketId = users[designManager.dataValues.userId]
-    const notificationData = {
-        resource: 'order',
-        type: 'new-design',
-        resourceId: data.orderId,
-        recipient: designManager.dataValues.userId,
-        data: {
-            orderId: data.orderId,
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(designManager.dataValues.userId)
+    const notification = await createNotification(designManager.dataValues.userId, 'order', 'new-design', data.orderId, {
+        orderId: data.orderId
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('new-design', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -266,20 +250,12 @@ const onDesignComplete = async (data) => {
     order.status = 4
     await order.save();
 
-    const socketId = users[order.dataValues.customerId]
-    const notificationData = {
-        resource: 'order',
-        type: 'customer-design-complete',
-        resourceId: data.orderId,
-        recipient: order.dataValues.customerId,
-        data: {
-            orderId: data.orderId,
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(order.dataValues.customerId)
+    const notification = await createNotification(order.dataValues.customerId, 'order', 'customer-design-complete', data.orderId, {
+        orderId: data.orderId
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('customer-design-complete', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -298,21 +274,13 @@ const setOrderPrice = async (data) => {
             permissionLevel: 1
         }
     })
-    const socketId = users[manager.dataValues.userId]
-    const notificationData = {
-        resource: 'order',
-        type: 'customer-order-approval',
-        resourceId: data.orderId,
-        recipient: manager.dataValues.userId,
-        data: {
-            orderId: data.orderId,
-            customerName: data.customerName,
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(manager.dataValues.userId)
+    const notification = await createNotification(manager.dataValues.userId, 'order', 'customer-order-approval', data.orderId, {
+        orderId: data.orderId,
+        customerName: data.customerName
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('customer-order-approval', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -392,20 +360,12 @@ const startProduction = async (data) => {
             permissionLevel: 3
         }
     })
-    const socketId = users[productionManager.dataValues.userId]
-    const notificationData = {
-        resource: 'order',
-        type: 'production-start',
-        resourceId: data.orderId,
-        recipient: productionManager.dataValues.userId,
-        data: {
-            orderId: data.orderId,
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(productionManager.dataValues.userId)
+    const notification = await createNotification(productionManager.dataValues.userId, 'order', 'production-start', data.orderId, {
+        orderId: data.orderId,
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('production-start', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -443,22 +403,13 @@ const completeTask = async (data) => {
             permissionLevel: 3
         }
     })
-
-    const socketId = users[productionManager.dataValues.userId]
-    const notificationData = {
-        resource: 'order',
-        type: 'task-complete',
-        resourceId: data.orderId,
-        recipient: productionManager.dataValues.userId,
-        data: {
-            orderId: data.orderId,
-            employeeName: data.username
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(productionManager.dataValues.userId)
+    const notification = await createNotification(productionManager.dataValues.userId, 'order', 'task-complete', data.orderId, {
+        orderId: data.orderId,
+        employeeName: data.username
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('task-complete', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 
 }
@@ -485,20 +436,13 @@ const endProduction = async (data) => {
             permissionLevel: 1
         }
     })
-    const socketId = users[manager.dataValues.userId]
-    const notificationData = {
-        resource: 'order',
-        type: 'production-end',
-        resourceId: data.orderId,
-        recipient: manager.dataValues.userId,
-        data: {
-            orderId: data.orderId,
-        }
-    }
-
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(manager.dataValues.userId)
+    const notification = await createNotification(manager.dataValues.userId, 'order', 'production-end', data.orderId, {
+        orderId: data.orderId,
+        employeeName: data.username
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('production-end', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -512,17 +456,6 @@ const updateCustomer = async (data) => {
     order.status = 10
     await order.save();
 
-    const socketId = users[order.dataValues.customerId]
-    const notificationData = {
-        resource: 'order',
-        type: 'order-ready',
-        resourceId: data.orderId,
-        recipient: order.dataValues.customerId,
-        data: {
-            orderId: data.orderId,
-        }
-    }
-
     const customerDetails = await OrderCustomer.findOne({
         where: {
             customerId: order.dataValues.customerId
@@ -531,9 +464,12 @@ const updateCustomer = async (data) => {
 
     sendOrderReadyMail(customerDetails.dataValues.customerName, customerDetails.dataValues.email, data.orderId)
 
-    const notification = await Notifications.create(notificationData)
+    const socketId = findUserSocket(order.dataValues.customerId)
+    const notification = await createNotification(order.dataValues.customerId, 'order', 'order-ready', data.orderId, {
+        orderId: data.orderId,
+    })
     if (socketId) {
-        ioInstance.to(socketId).emit('order-ready', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 }
 
@@ -594,20 +530,13 @@ const sendPriceOffer = async (data) => {
     order.status = 4
     await order.save();
 
-    const socketId = users[order.dataValues.customerId]
-    const notificationData = {
-        resource: 'order',
-        type: 'price-offer',
-        resourceId: data.orderId,
-        recipient: order.dataValues.customerId,
-        data: {
-            orderId: data.orderId,
-        }
-    }
+    const socketId = findUserSocket(order.dataValues.customerId)
+    const notification = await createNotification(order.dataValues.customerId, 'order', 'price-offer', data.orderId, {
+        orderId: data.orderId
+    })
 
-    const notification = await Notifications.create(notificationData)
     if (socketId) {
-        ioInstance.to(socketId).emit('price-offer', notification)
+        ioInstance.to(socketId).emit('notification', notification)
     }
 
 }

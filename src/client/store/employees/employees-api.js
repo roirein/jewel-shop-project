@@ -64,12 +64,32 @@ const deleteEmployee = async (employeeId) => {
     }
 } 
 
+const getEmployeesByRole = async () => {
+    const token = userApi.getUserToken(store.getState());
+    const response = await axios.get(`${employeesRoute}/employees-role`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+
+    const employees = response.data.employees.map((employee) => {
+        return {
+            value: employee.employeeId,
+            label: employee.name,
+            role: employee.role
+        }
+    })
+
+    return employees
+}
+
 const employeesApi = {
     loadEmployees,
     retriveEmployees,
     getEmployees,
     addNewEmployee,
-    deleteEmployee
+    deleteEmployee,
+    getEmployeesByRole
 }
 
 export default employeesApi

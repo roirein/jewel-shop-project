@@ -7,19 +7,13 @@ import { CUSTOMER_TABLE_COLUMNS, ORDERS_IN_DESIGN_TABLE_COLUMNS, ORDERS_IN_PRODU
 import { MODEL_STATUS_ENUM, ORDER_STATUS, ORDER_TYPES, PRODUCTION_STATUS } from "../../../const/Enums"
 import { useRouter } from "next/router"
 import { useIntl } from "react-intl"
-import { modelsPageMessages, ordersPageMessages } from "../../../translations/i18n"
 import CenteredStack from "../../../components/UI/CenteredStack"
-import dayjs from "dayjs"
-import AppContext from "../../../context/AppContext"
-import { sendHttpRequest } from "../../../utils/requests"
-import { ORDERS_ROUTES } from "../../../utils/server-routes"
+import ordersApi from "../../../store/orders/orders-api"
 
 const ProductionManagerInterface = () => {
 
     const theme = useTheme();
     const router = useRouter();
-    const intl = useIntl();
-    const contextValue = useContext(AppContext)
 
     const [selectedTab, setSelectedTab] = useState(0)
     const [tableData, setTableData] = useState([])
@@ -27,12 +21,7 @@ const ProductionManagerInterface = () => {
     const [displayedOrders, setDisplayedOrders] = useState([])
 
     useEffect(() => {
-        sendHttpRequest(ORDERS_ROUTES.ORDETS_BY_STATUS('production'), "GET", {}, {
-            Authorization: `Bearer ${contextValue.token}`
-        }).then((response) => {
-                setOrders(response.data.orders)
-                setDisplayedOrders(response.data.orders)
-        })
+        ordersApi.loadOrdersByStatus('production').then((ords) => setOrders(ords))
     }, [])
 
     useEffect(() => {
@@ -58,8 +47,9 @@ const ProductionManagerInterface = () => {
         if (selectedTab === 2) {
             newOrders = orders.filter((ord) => ord.productionStatus === 6)
         }
+        console.log(newOrders)
         setDisplayedOrders(newOrders)
-    }, [selectedTab])
+    }, [selectedTab, orders])
 
     return (
         <Stack
